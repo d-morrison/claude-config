@@ -45,17 +45,17 @@ history to understand what decisions were made previously and why.
    glab mr view <N> 2>&1 | cat
    ```
 
-4. **Check for contradictions** — if a prior MR explicitly chose approach A
+4. **Check for contradictions** — if a prior MR/PR explicitly chose approach A
    and you're about to implement approach B, understand *why* A was chosen.
    Common patterns:
-   - MR !X switched to strategy A for performance → don't blindly revert to B
-   - MR !Y removed code as dead → verify it's still dead before re-adding
-   - MR !Z added a guard/check → understand what it prevents before removing
+   - MR/PR #X switched to strategy A for performance → don't blindly revert to B
+   - MR/PR #Y removed code as dead → verify it's still dead before re-adding
+   - MR/PR #Z added a guard/check → understand what it prevents before removing
 
-5. **Document the relationship** in your commit message or MR description:
-   - "This resolves the incompatibility between !X and !Y"
-   - "Supersedes the approach from !Z because [reason]"
-   - "Preserves the intent of !X (no wasted resources) while also..."
+5. **Document the relationship** in your commit message or MR/PR description:
+   - "This resolves the incompatibility between #X and #Y"
+   - "Supersedes the approach from #Z because [reason]"
+   - "Preserves the intent of #X (no wasted resources) while also..."
 
 ## What to look for
 
