@@ -16,8 +16,11 @@ finding → push → post summary → re-request review → repeat until clean.
 
 ## Procedure
 
-1. **Identify the PR/MR.** Use the current branch's open MR, or the one the
-   user specified.
+1. **Identify and claim the PR/MR.** Use the current branch's open MR, or
+   the one the user specified. Post a brief claim comment so a parallel
+   `@claude` CI run or another person doesn't start a colliding session:
+   `gh pr comment <N> --body "Driving this PR to clean — back off until done."`
+   Skip if your most recent comment already says so.
 
 2. **Read the latest review.** Pull the most recent reviewer comment (bot or
    human). Don't trust earlier cached verdicts.

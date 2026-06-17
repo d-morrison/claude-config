@@ -2,6 +2,11 @@
 name: record-learnings
 description: "Persist discoveries, debugging insights, and working patterns to memory and shared instruction files as you work. Ensures knowledge survives across sessions and is accessible to other AI agents via the shared claude-config repo. Use continuously — after solving a tricky bug, discovering a codebase convention, or learning a tool quirk."
 user-invocable: true
+allowed-tools:
+  - Bash
+  - Read
+  - Edit
+  - Write
 ---
 
 # record-learnings
@@ -51,7 +56,7 @@ For standing instructions that should always be in context:
 |----------|---------|-------|
 | Bug diagnosis | "bash EOF error = CRLF line endings" | `/memories/debugging.md` |
 | Tool quirk | "glab has no GITLAB_TOKEN env var" | `/memories/tools.md` |
-| Codebase fact | "HACtions uses branch pipelines, not MR-event" | `/memories/repo/` |
+| Codebase fact | "CI only runs on branch pushes, not PR events" | `/memories/repo/` |
 | Workflow | "Always run r-pkg-spellcheck before push" | Skill file |
 | Preference | "Always request d-morrison as reviewer" | `/memories/preferences.md` |
 | Failed approach | "Don't use merge_request_event with $CI_OPEN_MERGE_REQUESTS" | `/memories/repo/` |

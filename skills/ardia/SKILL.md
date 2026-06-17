@@ -31,8 +31,8 @@ each to a clean review verdict in series.
 
    | MR/PR | Rounds | Final status |
    |-------|--------|--------------|
-   | [!25](url) | 3 | ✅ Clean |
-   | [!26](url) | 1 | ✅ Clean |
+   | [#25](url) | 3 | ✅ Clean |
+   | [#26](url) | 1 | ✅ Clean |
 
 ## Rules
 

@@ -2,6 +2,11 @@
 name: split-concerns
 description: "When an MR/PR addresses multiple independent concerns, proactively offer to split it into separate MRs/PRs — one per concern. Simpler diffs mean easier review, independent merge timelines, and less risk of one concern blocking another. Use when reviewing your own staged changes or when a reviewer flags scope creep."
 user-invocable: true
+allowed-tools:
+  - Bash
+  - Read
+  - Edit
+  - Write
 ---
 
 # split-concerns
@@ -50,7 +55,7 @@ Examples:
    - Start each from `main` (not from each other)
    - Cherry-pick or recreate the relevant commits on each branch
    - Open separate MRs with focused descriptions
-   - Cross-reference them ("Related: !25, !26")
+   - Cross-reference them ("Related: #25, #26")
 
 ## Benefits to communicate
 
