@@ -1,0 +1,77 @@
+---
+name: check-history
+description: "Review the MR/PR history (merged and closed) before starting work on an issue, to ensure proposed changes don't undo past progress or re-introduce previously fixed problems. Use automatically before beginning implementation on any issue or MR — especially when modifying shared infrastructure, CI templates, or code that has been refactored before."
+user-invocable: false
+---
+
+# check-history
+
+Before implementing changes for an issue or MR, review the repository's merge
+history to understand what decisions were made previously and why.
+
+## When this fires (automatically)
+
+- Starting work on any issue that involves modifying existing code
+- Before proposing changes to CI/CD templates, shared infrastructure, or
+  configuration files
+- When the change touches code that has been refactored in prior MRs
+
+## Procedure
+
+1. **List recent merged MRs** touching the same area:
+
+   **GitHub:**
+   ```bash
+   gh pr list --state merged --limit 20 --json number,title,headRefName | cat
+   ```
+
+   **GitLab:**
+   ```bash
+   glab mr list --merged --per-page=20 2>&1 | cat
+   ```
+
+2. **Identify relevant MRs** — look for titles/branches that relate to the
+   files or subsystem you're about to modify.
+
+3. **Read their descriptions** for rationale:
+
+   **GitHub:**
+   ```bash
+   gh pr view <N> --json body --jq '.body' | cat
+   ```
+
+   **GitLab:**
+   ```bash
+   glab mr view <N> 2>&1 | cat
+   ```
+
+4. **Check for contradictions** — if a prior MR explicitly chose approach A
+   and you're about to implement approach B, understand *why* A was chosen.
+   Common patterns:
+   - MR !X switched to strategy A for performance → don't blindly revert to B
+   - MR !Y removed code as dead → verify it's still dead before re-adding
+   - MR !Z added a guard/check → understand what it prevents before removing
+
+5. **Document the relationship** in your commit message or MR description:
+   - "This resolves the incompatibility between !X and !Y"
+   - "Supersedes the approach from !Z because [reason]"
+   - "Preserves the intent of !X (no wasted resources) while also..."
+
+## What to look for
+
+- **Intentional trade-offs** documented in MR descriptions
+- **Reverted MRs** — if something was tried and reverted, don't repeat it
+  without understanding why it failed
+- **Sequential MRs** that built on each other — your change might break an
+  assumption from a later MR
+- **Closed (not merged) MRs** — rejected approaches that shouldn't be retried
+
+## Output
+
+Report a brief summary to the user:
+- Which MRs are relevant to the current work
+- Any potential conflicts or trade-offs identified
+- Confirmation that the proposed approach is compatible with prior decisions
+
+If a conflict is found, surface it before writing code — don't implement first
+and discover the regression later.
