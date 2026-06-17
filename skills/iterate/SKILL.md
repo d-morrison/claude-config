@@ -111,8 +111,8 @@ accept the current state. Don't loop forever.
 
 - If you claimed the PR, post a closing/unclaim comment so it's free for the
   next person.
-- Report the final verdict and the round count. Don't merge unless the user
-  asked — opening the merge is their call.
+- Report the final verdict and the round count, with a clickable link to the
+  MR/PR. Don't merge unless the user asked — opening the merge is their call.
 
 ## Driving many PRs at once
 

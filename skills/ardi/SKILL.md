@@ -48,4 +48,6 @@ surface that to the user and ask whether to continue or accept.
 
 ## On clean
 
+Always provide a clickable link to the MR/PR in the final message.
+
 Report the final verdict and round count. Don't merge unless asked.

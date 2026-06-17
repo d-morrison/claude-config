@@ -83,10 +83,30 @@ When creating a new skill that other agents should use:
 3. The skill becomes available locally immediately (via symlink)
 4. Other agents get it after the PR merges and they pull
 
+## General guidance = update both skills AND preferences
+
+When the user provides general guidance or a new preference (not just a one-off
+instruction), always update **both**:
+1. The relevant skill file(s) — so the behavior is encoded in the workflow
+2. `/memories/preferences.md` — so it persists and is visible across all contexts
+
+Skills without a matching preference risk being forgotten when the skill isn't
+invoked. Preferences without matching skill updates risk being ignored during
+skill-driven workflows.
+
+## Always push skill changes
+
+After adding or updating any skill file, always commit and push to origin:
+- If a PR/branch for skill changes is already open, push there.
+- Otherwise, create a new branch + PR on the claude-config repo.
+- Never leave skill edits as local-only uncommitted changes.
+
 ## Anti-patterns
 
 - ❌ Learning something and not writing it down
 - ❌ Writing a long paragraph when a one-line bullet suffices
 - ❌ Recording in session memory what should be permanent
+- ❌ Updating only a skill OR only preferences when general guidance is given
+- ❌ Editing skills locally without committing and pushing to origin
 - ❌ Duplicating information already in a skill file
 - ❌ Forgetting to check if a note already exists before adding

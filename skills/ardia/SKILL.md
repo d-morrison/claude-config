@@ -41,4 +41,4 @@ each to a clean review verdict in series.
 
 ## On completion
 
-Report the table. Don't merge unless asked.
+Report the table with clickable links to each MR/PR. Don't merge unless asked.
