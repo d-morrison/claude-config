@@ -13,7 +13,34 @@ COPILOT_MEMORY_DIR="${COPILOT_MEMORY_DIR:-$HOME/Library/Application Support/Code
 
 mkdir -p "$CLAUDE_DIR"
 
+# --- Top-level files (CLAUDE.md, etc.) ---
 shopt -s nullglob
+for src in "$SCRIPT_DIR"/*.md; do
+  [ -f "$src" ] || continue
+  fname="$(basename "$src")"
+  [[ "$fname" == "README.md" ]] && continue   # don't symlink repo README
+  dest="$CLAUDE_DIR/$fname"
+
+  if [ -L "$dest" ]; then
+    current="$(readlink "$dest")"
+    if [ "$current" = "$src" ]; then
+      printf 'ok    %s (already linked)\n' "$fname"
+    else
+      printf 'skip  %s (symlink points elsewhere: %s)\n' "$fname" "$current"
+    fi
+    continue
+  fi
+
+  if [ -e "$dest" ]; then
+    printf 'skip  %s (real file exists at %s — move or merge manually, then rerun)\n' "$fname" "$dest"
+    continue
+  fi
+
+  ln -s "$src" "$dest"
+  printf 'link  %s -> %s\n' "$fname" "$src"
+done
+
+# --- Directories (skills, commands, memories, etc.) ---
 for src in "$SCRIPT_DIR"/*/; do
   src="${src%/}"
   name="$(basename "$src")"

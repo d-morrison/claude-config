@@ -19,6 +19,8 @@ reflect, and persist.
 ## When this fires
 
 - User says "ums", "update memories and skills", "record what we learned"
+- **At the start of `/clear`** — before context is lost, capture any
+  accumulated learnings from the session
 - After a workflow reveals a gap (e.g., a skill was followed but missed a
   step, or a preference wasn't encoded)
 - After a multi-step session where several learnings accumulated

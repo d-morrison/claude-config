@@ -60,3 +60,5 @@
   When a workflow emerges that could be codified, proactively suggest creating a skill for it.
 - "slide <tag>" means force-move a floating Git tag to current main HEAD (delete + recreate + push).
   Common for repos with floating major-version tags that consumers reference.
+
+- "dew it" means "do it".
