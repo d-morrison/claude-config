@@ -74,17 +74,22 @@ for p in active[1:]:
    printed, so a failure is visible rather than silent:
 
 ```bash
-glab api "projects/$PROJECT_ID/pipelines?ref=$BRANCH&sort=desc&per_page=10" 2>&1 | \
+CANCEL_CMDS=$(glab api "projects/$PROJECT_ID/pipelines?ref=$BRANCH&sort=desc&per_page=10" 2>&1 | \
   python3 -c "
 import json, sys
 active = [p for p in json.load(sys.stdin) if p['status'] in ('running', 'pending', 'created')]
 for p in active[1:]:
     print(f'glab api -X POST projects/$PROJECT_ID/pipelines/{p[\"id\"]}/cancel')
-" | while read -r cmd; do
+")
+if [ -z "$CANCEL_CMDS" ]; then
+  echo "Nothing to cancel — at most one active pipeline."
+else
+  echo "$CANCEL_CMDS" | while read -r cmd; do
     echo "+ $cmd"
     eval "$cmd" 2>&1 | python3 -c "import json,sys; print('  ->', json.load(sys.stdin).get('status','?'))" \
       || echo "  -> FAILED (cancel did not return valid JSON)"
   done
+fi
 ```
 
 `$PROJECT_ID` inside the Python f-string is expanded by the **shell** before
@@ -103,23 +108,29 @@ variable.
 ```bash
 for BRANCH in branch1 branch2; do
   echo "=== $BRANCH ==="
-  glab api "projects/$PROJECT_ID/pipelines?ref=$BRANCH&sort=desc&per_page=5" 2>&1 | \
+  CANCEL_CMDS=$(glab api "projects/$PROJECT_ID/pipelines?ref=$BRANCH&sort=desc&per_page=10" 2>&1 | \
     python3 -c "
 import json, sys
 active = [p for p in json.load(sys.stdin) if p['status'] in ('running', 'pending', 'created')]
 for p in active[1:]:
     print(f'glab api -X POST projects/$PROJECT_ID/pipelines/{p[\"id\"]}/cancel')
-" | while read -r cmd; do
+")
+  if [ -z "$CANCEL_CMDS" ]; then
+    echo "Nothing to cancel — at most one active pipeline."
+  else
+    echo "$CANCEL_CMDS" | while read -r cmd; do
       echo "+ $cmd"
       eval "$cmd" 2>&1 | python3 -c "import json,sys; print('  ->', json.load(sys.stdin).get('status','?'))" \
-        || echo "  -> FAILED"
+        || echo "  -> FAILED (cancel did not return valid JSON)"
     done
+  fi
 done
 ```
 
-To dry-run instead, replace the `while read … done` loop with `cat` — that
-prints the raw `glab api … cancel` commands without running them. For the
-friendly `Would cancel: #N` listing, run step 2's preview per branch.
+To dry-run instead, `echo "$CANCEL_CMDS"` (or skip the `if`/`else` and just
+print the variable) — that shows the raw `glab api … cancel` commands without
+running them. For the friendly `Would cancel: #N` listing, run step 2's preview
+per branch.
 
 ## Notes
 
