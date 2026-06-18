@@ -3,8 +3,9 @@ name: memorize
 description: "Add a fact or preference to persistent memory. Use when the user says 'memorize', 'remember that', 'add to memories', 'note that', or gives a directive that should persist across sessions."
 user-invocable: true
 allowed-tools:
-  - memory
   - Read
+  - Write
+  - Edit
 ---
 
 # Memorize

@@ -50,7 +50,9 @@ Track each completed issue in a running table:
 
 | # | Issue | MR/PR | Rounds | Status |
 |---|-------|-------|--------|--------|
-| 1 | [#12](url) | [!30](url) | 2 | ✅ Clean |
+| 1 | [#12](url) | [#30](url) | 2 | ✅ Clean |
+
+(Examples use GitHub `#N` notation; on GitLab the MR IID is `!N`.)
 
 #### c. Decide the next base branch (stacking)
 
@@ -62,7 +64,7 @@ After ARDI completes clean on the current MR/PR:
   base the next branch on the **current MR's branch** — this creates a
   stacked MR. Note the dependency in the new MR's description:
 
-  > ⚠️ Stacked on [!30](url) — merge that first.
+  > ⚠️ Stacked on [#30](url) — merge that first.
 
   Track the stack so the final report shows the merge order.
 
@@ -91,11 +93,12 @@ When stacking MRs (basing a new branch on an unmerged MR branch):
    git checkout -b feat/<next-slug> <previous-mr-branch>
    ```
 
-2. **Note the dependency** in the new MR description:
+2. **Note the dependency** in the new MR description (use `#<N>` on GitHub,
+   `!<N>` on GitLab):
    ```
-   ⚠️ Stacked on !<N> — merge that first.
+   ⚠️ Stacked on #<N> (GitHub) / !<N> (GitLab) — merge that first.
 
-   Depends on: !<N>
+   Depends on: #<N>
    ```
 
 3. **If the base MR gets changes** (from ARDI on a later review round),
@@ -113,14 +116,14 @@ When the loop ends, print a summary:
 
 | # | Issue | MR/PR | Rounds | Status |
 |---|-------|-------|--------|--------|
-| 1 | [#12](url) | [!30](url) | 2 | ✅ Clean |
-| 2 | [#8](url)  | [!31](url) | 1 | ✅ Clean |
-| 3 | [#15](url) | [!32](url) | 3 | ✅ Clean |
+| 1 | [#12](url) | [#30](url) | 2 | ✅ Clean |
+| 2 | [#8](url)  | [#31](url) | 1 | ✅ Clean |
+| 3 | [#15](url) | [#32](url) | 3 | ✅ Clean |
 
 ### Merge order
-1. [!30](url) — fix: auth timeout
-2. [!31](url) — feat: retry logic (stacked on !30)
-3. [!32](url) — docs: v3 migration guide
+1. [#30](url) — fix: auth timeout
+2. [#31](url) — feat: retry logic (stacked on #30)
+3. [#32](url) — docs: v3 migration guide
 ```
 
 ## Relationship to other skills
