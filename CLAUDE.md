@@ -47,6 +47,10 @@ latest claude comment (`gh pr view N --json comments --jq
 and parse it for any "Findings", "Issues", "Remaining" sections before
 declaring a PR ready.
 
+(A specific case of the standing **never assume; always verify** rule in
+`memories/preferences.md` — confirm the verdict with a fresh query, don't
+recall it.)
+
 ## Claim a GitHub PR/issue before working on it
 
 Before starting a work session on a GitHub PR or issue — i.e. before fetching
@@ -131,7 +135,9 @@ git merge origin/main
 ```
 
 Always do this before triggering a fresh `@claude review`, so the reviewer
-evaluates the PR against current `main` rather than a stale snapshot.
+evaluates the PR against current `main` rather than a stale snapshot. (Another
+instance of **never assume; always verify** — `git fetch` to check main's
+actual position instead of assuming the branch is current.)
 
 Don't rebase or squash-rewrite a published PR branch unless explicitly
 asked — a merge commit is the right move because it matches GitHub's "Update

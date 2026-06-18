@@ -55,18 +55,17 @@ reflect, and persist.
    ANY changes (skills, memories, etc.) as local-only uncommitted edits.
    ```bash
    cd "$(dirname "$(readlink ~/.claude/skills)")"
-   # If a PR for this work is already open, commit + push to its branch.
-   # Otherwise branch off main — pushing skill/memory changes straight to main
-   # is denied by auto-mode and bypasses review:
+   # Already on an open PR's branch? Commit + push to it:
+   git add -A && git commit -m "ums: <brief summary>" && git push
+   # Otherwise branch off main first — a direct-to-main push is denied by
+   # auto-mode and bypasses review:
    git fetch origin main && git checkout -b ums-<topic> origin/main
    git add -A && git commit -m "ums: <brief summary>"
    git push -u origin HEAD && gh pr create --fill   # then request d-morrison as reviewer
    ```
    **CAUTION:** if a compound `add && commit && push` is **denied**, *nothing*
    was committed — verify with `git status` / `git log` before any `git reset
-   --hard`, or you'll silently discard the still-uncommitted edits (happened
-   this session: a denied direct-to-main push left edits uncommitted, then a
-   reset wiped them).
+   --hard`, or you'll silently discard the still-uncommitted edits.
 
 5. **Report what was updated.** Provide a brief summary table:
 
