@@ -133,11 +133,14 @@ push a half-resolved merge.
 
 ## Watch PRs you open by default
 
-After creating or opening a PR, **subscribe to its activity** (CI status +
-review comments) right away with `subscribe_pr_activity` — don't ask first.
-Watching is the default, not an opt-in. Keep the subscription alive until the
-PR is **merged or closed**, or until I explicitly tell you to stop (then
-`unsubscribe_pr_activity`). Because webhooks don't deliver CI *success*, new
-pushes, or merge-conflict transitions, schedule a periodic self check-in
-(e.g. `send_later`, ~1h out) to re-poll state and re-arm silently if nothing
-changed.
+In Claude Code **web / remote sessions** — where the GitHub MCP server exposes
+the `subscribe_pr_activity` / `unsubscribe_pr_activity` tools — after creating
+a PR, **subscribe to its activity** (CI status + review comments)
+right away; don't ask first. Watching is the default, not an opt-in. Keep the
+subscription alive until the PR is **merged or closed**, or until I explicitly
+tell you to stop (then unsubscribe). If those tools aren't in your tool list
+(e.g. a plain local CLI session), this rule just doesn't apply — never try to
+call a tool that isn't present. Because webhooks don't deliver CI *success*,
+new pushes, or merge-conflict transitions, schedule a periodic self check-in
+(via the `send_later` tool when it's available, ~1h out) to re-poll state and
+re-arm silently if nothing changed.
