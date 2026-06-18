@@ -33,7 +33,7 @@ gh pr list --state open --json number,title,headRefName,author \
   --jq '.[] | "#\(.number) [\(.author.login)] \(.title)"'
 gh issue list --state open --json number,title --jq '.[] | "#\(.number) \(.title)"'
 git status --short                         # uncommitted work?
-git log --oneline origin/main -5           # what actually landed on main
+git log --oneline -5 origin/main           # what actually landed on main
 ```
 
 - For every PR/issue you touched, confirm its real state with
@@ -62,7 +62,7 @@ List, don't bury:
 
 ### 4. Run a UMS review
 
-Run the full `ums` procedure (`~/.claude/skills/ums/SKILL.md`): scan the session
+Run the full `ums` procedure (invoke the `ums` skill by name): scan the session
 for mistakes-corrected, new user preferences, tool quirks, and skill gaps;
 update the relevant memory files and skill definitions; commit via a **branch +
 PR** (not direct to `main`). If nothing durable emerged, say so explicitly

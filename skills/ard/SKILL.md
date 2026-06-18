@@ -169,7 +169,7 @@ Inside the `iterate` loop:
 1. Read the latest review (iterate step 4)
 2. Apply ARD to each finding (this skill: steps 1–2)
 3. Commit + push fixes (this skill: step 3)
-4. Post the ARD summary (this skill: step 4)
+4. Post the ARD summary and per-thread replies (this skill: steps 4–4b)
 5. Re-request review (iterate step 3) — **even if this round was Rebut/Defer only**, so the reviewer re-evaluates.
 
 The loop continues until the reviewer returns zero findings (and CI is green).
