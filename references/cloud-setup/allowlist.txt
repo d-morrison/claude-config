@@ -18,11 +18,12 @@ cloud.r-project.org           # renv bootstrap/fallback (often already allowed)
 *.r-project.org               # CRAN mirrors (superset of cloud.r-project.org)
 packagemanager.posit.co       # Posit Package Manager (renv.lock's repo)
 *.posit.co                    # Posit PPM CDN / redirects (superset of packagemanager.posit.co)
-bioconductor.org              # Bioconductor-tagged packages in renv.lock
-# Runtime hosts — needed by the session-start renv::restore(), not the
-# build-time cloud-setup.sh itself (so they're not in that script's header):
+# Runtime hosts — reached by the session-start renv::restore(), not the build
+# itself. (cloud-setup.sh's header lists bioconductor.org but not the other two;
+# all three are runtime needs.)
 rspm-sync.rstudio.com         # PPM binary package sync
 api.r-hub.io                  # R-hub system-requirements lookups
+bioconductor.org              # Bioconductor-tagged packages restored by renv::restore()
 
 # --- GitHub (Quarto .deb, TinyTeX, GitHub-sourced R packages) ---
 github.com                    # Quarto .deb + GitHub-sourced R pkgs
