@@ -74,14 +74,15 @@ for p in active[1:]:
    printed, so a failure is visible rather than silent:
 
 ```bash
-CANCEL_CMDS=$(glab api "projects/$PROJECT_ID/pipelines?ref=$BRANCH&sort=desc&per_page=10" | \
+if ! CANCEL_CMDS=$(glab api "projects/$PROJECT_ID/pipelines?ref=$BRANCH&sort=desc&per_page=10" | \
   python3 -c "
 import json, sys
 active = [p for p in json.load(sys.stdin) if p['status'] in ('running', 'pending', 'created')]
 for p in active[1:]:
     print(f'glab api -X POST projects/$PROJECT_ID/pipelines/{p[\"id\"]}/cancel')
-")
-if [ -z "$CANCEL_CMDS" ]; then
+"); then
+  echo "Pipeline query failed — check PROJECT_ID and glab auth (see stderr above)."
+elif [ -z "$CANCEL_CMDS" ]; then
   echo "Nothing to cancel — at most one active pipeline."
 else
   echo "$CANCEL_CMDS" | while read -r cmd; do
@@ -115,15 +116,17 @@ rather than being parsed as pipeline JSON.)
 ```bash
 for BRANCH in branch1 branch2; do
   echo "=== $BRANCH ==="
-  CANCEL_CMDS=$(glab api "projects/$PROJECT_ID/pipelines?ref=$BRANCH&sort=desc&per_page=10" | \
+  if ! CANCEL_CMDS=$(glab api "projects/$PROJECT_ID/pipelines?ref=$BRANCH&sort=desc&per_page=10" | \
     python3 -c "
 import json, sys
 active = [p for p in json.load(sys.stdin) if p['status'] in ('running', 'pending', 'created')]
 for p in active[1:]:
     print(f'glab api -X POST projects/$PROJECT_ID/pipelines/{p[\"id\"]}/cancel')
-")
-  if [ -z "$CANCEL_CMDS" ]; then
-    echo "Nothing to cancel — at most one active pipeline."
+"); then
+    echo "  Pipeline query failed — check PROJECT_ID and glab auth (see stderr above)."
+    continue
+  elif [ -z "$CANCEL_CMDS" ]; then
+    echo "  Nothing to cancel — at most one active pipeline."
   else
     echo "$CANCEL_CMDS" | while read -r cmd; do
       echo "+ $cmd"
