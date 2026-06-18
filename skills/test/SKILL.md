@@ -130,6 +130,10 @@ to the user.
 |----------|-----------|-------------------|
 | test.hac | 1611 | HACtions CI templates (lint, check-package, claude-review, etc.) |
 
+> The row above is d-morrison's own test bed; project ID `1611` is specific to
+> that GitLab instance. Replace this table with your own downstream revdep
+> repos and their project IDs.
+
 ## Anti-patterns
 
 - Don't skip testing because "it's just a template change" — template
