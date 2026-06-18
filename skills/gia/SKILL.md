@@ -1,6 +1,6 @@
 ---
 name: gia
-description: "Grab Issues + iterate-All: clear the repo's entire work queue in two phases — first run ARDIA (drive every open PR/MR to a clean review verdict), then run GII (grab each open issue, implement it, open an MR/PR, ARDI to clean, recurse). Use when asked to 'gia', 'adria+gii', 'clear the whole queue', 'clean all PRs then do all the issues', 'burn down everything', or 'tidy the repo end to end'."
+description: "Grab Issues + iterate-All: clear the repo's entire work queue in two phases — first run ARDIA (drive every open PR/MR to a clean review verdict), then run GII (grab each open issue, implement it, open an MR/PR, ARDI to clean, recurse). Use when asked to 'gia', 'ardia+gii', 'adria+gii', 'gii+ardia', 'clear the whole queue', 'clean all PRs then do all the issues', 'burn down everything', or 'tidy the repo end to end'."
 user-invocable: true
 allowed-tools:
   - Bash
@@ -26,7 +26,7 @@ close issues that the open PRs address).
 
 ## When this fires
 
-- "gia", "adria+gii", "gii+adria"
+- "gia", "ardia+gii", "adria+gii", "gii+ardia", "gii+adria"
 - "clear the whole queue", "clean all PRs then do all the issues"
 - "burn down everything", "tidy the repo end to end", "empty the backlog"
 
@@ -43,6 +43,9 @@ Run the full [`ardia`](../ardia/SKILL.md) procedure: list every open PR/MR and
 drive each to a clean verdict in series (claim → ARD every finding → push →
 post summary → re-request review → repeat until clean). Per-PR rules from
 `ardi` apply (sync main first, re-request even on Rebut/Defer-only rounds).
+
+If there are **zero open PRs/MRs**, Phase 1 is a no-op — note "no open PRs" in
+the report's Phase 1 section and go straight to Phase 2.
 
 Carry forward an interim table:
 
@@ -87,9 +90,16 @@ Print one combined summary covering both phases:
 2. [#30](url) — fix: … (stacked on #16 if applicable)
 ```
 
+List the merge order across **both** phases — Phase 1 PRs can be stacked on each
+other just as Phase 2 issue-PRs can, so a dependency may run PR → PR, PR →
+issue-PR, or issue-PR → issue-PR. Order so every base merges before whatever
+stacks on it.
+
 ## Stopping conditions
 
-- Stop after Phase 1 and check in if the user only wanted the PR queue cleared.
+- If the trigger was ambiguous about whether to also burn down issues (e.g. a
+  bare "clean up the PRs"), stop after Phase 1 and check in before starting
+  Phase 2.
 - Honor GII's 5-issue checkpoint in Phase 2 (ask before continuing).
 - Stop if a PR or issue is blocked and surface it rather than spinning.
 - If Phase 1's reviewer keeps emitting new nits each round on the same PR
