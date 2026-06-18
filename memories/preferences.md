@@ -44,9 +44,13 @@
 - When the user provides general guidance or a new preference, always update BOTH the
   relevant skills AND `/memories/preferences.md`. Skills encode the behavior; preferences
   ensure it persists and is visible across all contexts.
-- After adding or updating skills, always push the result to origin (on the current
-  branch if a PR is already open, or create a new branch + PR if the change is out of
-  scope for the current one). Never leave skill changes as local-only uncommitted edits.
+- After adding or updating skills OR memory files in the ai-config repo, always commit
+  and push everything to origin (on the current branch if a PR is already open, or
+  create a new branch + PR if the change is out of scope). Never leave ANY changes in
+  ai-config as local-only uncommitted edits — including memory files.
+- When creating a new acronym/short-name skill (e.g., `gi`, `sup`, `ums`), always also
+  create a spelled-out alias skill (e.g., `grab-issue`, `send-upstream`,
+  `update-memories-and-skills`) that points to the canonical file.
 - During ARDI loops: if a round has only Rebut/Defer dispositions (no code pushed),
   still explicitly re-request review — the push won't auto-trigger the reviewer bot.
 - Always look for opportunities to create new reusable skills from multi-step processes.

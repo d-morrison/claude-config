@@ -47,14 +47,14 @@ reflect, and persist.
    - If updating a skill: the change should be specific enough that following
      the skill next time would avoid the mistake
 
-4. **Commit and push skill changes.** Skills live in the ai-config repo
-   (`~/.claude/skills/` → discover actual path with `readlink`). After
-   editing:
+4. **Commit and push ALL ai-config changes.** Skills AND memory files both
+   live in the ai-config repo (`~/.claude/skills/` → discover actual path
+   with `readlink`). After editing anything in that repo:
    ```bash
    cd $(readlink -f ~/.claude/skills/..)
    git add -A && git commit -m "ums: <brief summary>" && git push
    ```
-   Never leave skill edits as local-only uncommitted changes.
+   Never leave ANY changes (skills, memories, etc.) as local-only uncommitted edits.
 
 5. **Report what was updated.** Provide a brief summary table:
 
