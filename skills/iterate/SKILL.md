@@ -58,8 +58,19 @@ For each round:
 
 4. **Wait for the review to land, then read the LATEST one.** Don't trust an
    earlier cached verdict — a newer review may have landed since (bot, human,
-   or re-trigger). Poll the workflow run / the review comment until it's
-   complete, then read the most recent reviewer comment in full:
+   or re-trigger). **You MUST actively poll** until a new review appears that
+   references the commit you just pushed. Don't declare "clean" based on a
+   review that evaluated an earlier commit.
+
+   **Polling procedure:**
+   - After pushing, wait ~30–60 seconds for the CI pipeline to trigger the
+     reviewer.
+   - Then poll the MR/PR notes until you see a review referencing your latest
+     commit SHA. Compare the review's "latest: <sha>" against your push.
+   - If no new review appears after ~2 minutes, check pipeline status — it
+     may have failed before the review job ran.
+
+   **GitHub:**
    ```bash
    gh pr view <N> --json comments \
      --jq '[.comments[] | select(.author.login | startswith("claude"))] | last | .body'
@@ -69,7 +80,26 @@ For each round:
    some setups post reviews as `github-actions[bot]`. `startswith("claude")`
    matches the @claude bot across both `gh pr view` and `gh api` — broaden it
    if your reviewer posts under a different login, or you'll silently read
-   `null` and false-pass. `gh pr checks` going green is about CI state, **not**
+   `null` and false-pass.
+
+   **GitLab:**
+   ```bash
+   # Poll for a review note referencing the latest commit
+   LATEST_SHA=$(git rev-parse --short HEAD)
+   glab api "projects/<PID>/merge_requests/<IID>/notes?sort=desc&per_page=3" \
+     | python3 -c "
+   import json, sys
+   notes = json.load(sys.stdin)
+   for n in notes:
+       if 'Auto-review' in n['body'] and '$LATEST_SHA' in n['body']:
+           print(n['body']); sys.exit(0)
+   print('NO_NEW_REVIEW'); sys.exit(1)
+   "
+   ```
+   If exit code is 1, wait and retry. Don't proceed until you have a review
+   that evaluated your latest push.
+
+   `gh pr checks` / `glab ci list` going green is about **CI state**, **not**
    the review verdict — always parse the latest review body for findings.
    (If `gh` JSON parsing gets fragile, structured MCP GitHub CI tools like
    `mcp__github_ci__get_ci_status` are an alternative where available.)
