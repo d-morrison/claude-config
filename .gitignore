@@ -2,3 +2,7 @@
 *.swp
 *.swo
 *~
+
+# Skill-upload build artifacts
+skills.zip
+skill-zips/
