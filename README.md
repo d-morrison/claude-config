@@ -72,6 +72,42 @@ session (or prefix with `claude ` to run them in a terminal):
 No `version` is pinned, so every commit to this repo counts as a new version —
 sessions with marketplace auto-update pick up the latest automatically.
 
+## Use these skills with this repo's own `@claude` bot
+
+The two mechanisms above cover the **CLI** (`~/.claude/skills` via `bootstrap.sh`)
+and **other repos' cloud sessions** (the plugin marketplace). The third surface
+is the `@claude` **CI bot** running on *this* repo's PRs/issues
+(`.github/workflows/claude-bot.yml`).
+
+That bot runs `claude-code-action`, which does **not** auto-discover skills from
+`~/.claude` (the runner's home is fresh) or from a plugin unless it's installed.
+It *does* load **project** skills from `.claude/skills/` in the checked-out
+repo.
+
+The `.claude/skills → ../skills` symlink is **committed** to this repo. It
+works via a subtle two-step mechanism:
+
+1. `claude-code-action` has a security feature called `restoreConfigFromBase`
+   that, for every PR, restores `.claude/` from the **base branch** (`main`)
+   using `git checkout origin/main -- .claude`. This prevents malicious PR
+   branches from injecting hooks or settings.
+2. Because `.claude/skills` is committed to `main`, `restoreConfigFromBase`
+   always restores the symlink — even if the PR branch doesn't have it.
+3. `git checkout origin/main -- .claude` correctly materializes the symlink on
+   disk (unlike `gh pr checkout`, which dropped it due to `core.symlinks`
+   handling — a separate failure mode that was the original blocker).
+
+Once the symlink is in place every top-level skill becomes available to the bot
+by **bare name**. Comment **`@claude ardi`** (or any other skill trigger) on a
+PR or issue and the bot can invoke the `ardi` skill, exactly like the local CLI
+does. No duplication (`skills/` stays the one source of truth) and new skills
+are picked up automatically.
+
+> **Note:** On PRs that predate the merge of this feature to `main`, the
+> symlink is absent (`restoreConfigFromBase` restores from the `main` at the
+> time Claude runs). Skills become available to the bot for all sessions after
+> this PR merges.
+
 ## What's tracked
 
 - `skills/` — reusable workflow skills (`~/.claude/skills/`)
