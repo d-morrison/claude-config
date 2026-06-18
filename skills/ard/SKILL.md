@@ -9,7 +9,7 @@ allowed-tools:
   - Write
 ---
 
-# ARD — Address, Rebut, or Defer
+# ARD — Address, Rebut, Defer, or Acknowledge
 
 Every review comment gets exactly one disposition: **A**, **R**, **D**, or **K**. Ignoring is not an option.
 
