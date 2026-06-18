@@ -26,6 +26,13 @@ runs `bootstrap.sh` once the repo is on disk, symlinking `skills/` and
 `commands/` into `~/.claude/`. The hook is a no-op outside remote sessions
 (`CLAUDE_CODE_REMOTE`) and idempotent, so local machines are unaffected.
 
+The same hook also installs **Julia** (via `juliaup`) on the first session
+start, since the base web image ships none. The install is guarded (a no-op
+once Julia is present) and non-fatal — it only succeeds if the environment's
+network policy allowlists the Julia download hosts. See
+[`docs/julia-setup.md`](docs/julia-setup.md) for the allowlist and a
+build-time alternative.
+
 ## Use these skills in another repo's web sessions (plugin marketplace)
 
 The `SessionStart` hook above only fires when **ai-config itself** is the open
