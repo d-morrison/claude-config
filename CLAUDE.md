@@ -47,6 +47,10 @@ latest claude comment (`gh pr view N --json comments --jq
 and parse it for any "Findings", "Issues", "Remaining" sections before
 declaring a PR ready.
 
+(A specific case of the standing **never assume; always verify** rule in
+`memories/preferences.md` — confirm the verdict with a fresh query, don't
+recall it.)
+
 ## Claim a GitHub PR/issue before working on it
 
 Before starting a work session on a GitHub PR or issue — i.e. before fetching
@@ -77,6 +81,16 @@ This applies to:
 
 It does **not** apply to read-only inspection: `show me PR #X`, `what's the
 status of #Y`, `explain the diff on #Z`. Those don't risk a parallel session.
+
+## Always run ARDI on PRs you touch
+
+Whenever I'm working a PR/MR, run the full **ARDI** loop by default, without
+being asked: **A**ddress every flagged item, **R**ebut findings that are wrong,
+**D**efer out-of-scope items to tracked issues, then **I**terate with a fresh
+review — repeating until the latest review has zero flagged items under any
+heading. Don't stop at "review-clean, just needs approval" and hand triage
+back; keep the cycle going until it's genuinely clean. (Mechanics for each
+step are in the sections below.)
 
 ## Address every in-scope review comment, even non-blockers
 
@@ -121,7 +135,9 @@ git merge origin/main
 ```
 
 Always do this before triggering a fresh `@claude review`, so the reviewer
-evaluates the PR against current `main` rather than a stale snapshot.
+evaluates the PR against current `main` rather than a stale snapshot. (Another
+instance of **never assume; always verify** — `git fetch` to check main's
+actual position instead of assuming the branch is current.)
 
 Don't rebase or squash-rewrite a published PR branch unless explicitly
 asked — a merge commit is the right move because it matches GitHub's "Update
@@ -130,17 +146,3 @@ branch" button and preserves the PR history.
 If the merge has conflicts, resolve them, run the project's standard
 pre-commit checks (render / lint / spell / tests), commit, then push. Don't
 push a half-resolved merge.
-
-## Watch PRs you open by default
-
-In Claude Code **web / remote sessions** — where the GitHub MCP server exposes
-the `subscribe_pr_activity` / `unsubscribe_pr_activity` tools — after creating
-a PR, **subscribe to its activity** (CI status + review comments)
-right away; don't ask first. Watching is the default, not an opt-in. Keep the
-subscription alive until the PR is **merged or closed**, or until I explicitly
-tell you to stop (then unsubscribe). If those tools aren't in your tool list
-(e.g. a plain local CLI session), this rule just doesn't apply — never try to
-call a tool that isn't present. Because webhooks don't deliver CI *success*,
-new pushes, or merge-conflict transitions, schedule a periodic self check-in
-(via the `send_later` tool from the claude-code-remote MCP server when it's
-available, ~1h out) to re-poll state and re-arm silently if nothing changed.
