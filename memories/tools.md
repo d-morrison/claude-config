@@ -30,3 +30,20 @@
   - `glab api --method POST "/projects/<TARGET_ID>/job_token_scope/allowlist" -f "target_project_id=<SOURCE_ID>"`
   - `include:` (for CI templates) works independently of the API allowlist
   - Check existing: `glab api "/projects/<ID>/job_token_scope/allowlist"`
+
+## Julia in Claude Code cloud / web sessions
+- To install Julia, prefer downloading the official binary tarball from
+  `julialang-s3.julialang.org` via `curl` (system CA store) over `juliaup`:
+  juliaup's rustls HTTP client rejects TLS-intercepting proxies common in cloud
+  environments, so it can fail even when the host is allowlisted. Prebuilt Linux
+  Julia binaries live ONLY on `julialang-s3.julialang.org` — the
+  `JuliaLang/julia` GitHub releases attach source tarballs only. `Pkg`
+  operations need `pkg.julialang.org` allowlisted too.
+- Worked, reviewed example: `references/cloud-setup/cloud-setup.sh` in ai-config
+  (curl+tarball, `$SUDO`-aware, best-effort/non-fatal).
+- Layering: the build-time **Setup script** is the right place for slow,
+  repo-independent toolchain installs (R, Julia, Quarto); the **SessionStart
+  hook** is for repo-dependent per-session work (`renv::restore`,
+  `Pkg.instantiate`). BUT the build-time Setup script can't be committed to a
+  repo (it's pasted into the web UI), so a SessionStart hook is the only
+  in-repo lever to auto-install a toolchain for *that repo's own* sessions.
