@@ -118,7 +118,7 @@ gh pr create --title "<title>" --body "Closes #<N>
 # GitLab
 glab mr create --title "<title>" --description "Closes #<N>
 
-<description>" --assignee demorrison
+<description>" --assignee <your-gitlab-username>
 ```
 
 Include `Closes #N` in the description to auto-close the issue on merge.

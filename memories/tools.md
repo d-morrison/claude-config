@@ -5,7 +5,7 @@
 - Always disable it: pipe `| cat` or set `GH_PAGER=cat` (e.g. `gh pr view 116 | cat`).
 
 ## glab (GitLab CLI)
-- Installed at `/opt/homebrew/bin/glab`
+- Installed via Homebrew (macOS) or system package manager — verify with `which glab`.
 - Authenticated on your GitLab instance — run `glab auth status` to verify host and username
 - Use for MR comments, pipeline checks, CI job logs, etc.
 - No `GITLAB_TOKEN` env var — glab uses its own config at `~/Library/Application Support/glab-cli/config.yml`

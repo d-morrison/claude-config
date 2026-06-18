@@ -52,8 +52,8 @@ includes:
 
 - **Workflow syntax errors** — fix them in this repo.
 - **Upstream template bugs** — if the failure is in a reusable workflow from
-  HACtions or a GitHub Action, file an issue (or open a PR) upstream using
-  the `sup` skill, then either pin a working version or apply a local
+  a shared CI library or a GitHub Action, file an issue (or open a PR) upstream
+  using the `sup` skill, then either pin a working version or apply a local
   workaround until the upstream fix lands.
 - **Flaky / infra failures** — retry once; if it persists, investigate root
   cause.
