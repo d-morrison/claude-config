@@ -142,5 +142,5 @@ tell you to stop (then unsubscribe). If those tools aren't in your tool list
 (e.g. a plain local CLI session), this rule just doesn't apply — never try to
 call a tool that isn't present. Because webhooks don't deliver CI *success*,
 new pushes, or merge-conflict transitions, schedule a periodic self check-in
-(via the `send_later` tool when it's available, ~1h out) to re-poll state and
-re-arm silently if nothing changed.
+(via the `send_later` tool from the claude-code-remote MCP server when it's
+available, ~1h out) to re-poll state and re-arm silently if nothing changed.
