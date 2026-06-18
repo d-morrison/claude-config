@@ -68,8 +68,13 @@ if ! command -v juliaup >/dev/null 2>&1; then
   curl -fsSL https://install.julialang.org | sh -s -- --yes
 fi
 
-# juliaup installs its shims into ~/.juliaup/bin; persist on PATH for shells.
-# -F keeps the literal dot from acting as a regex wildcard.
+# Make juliaup/julia available to THIS shell — the installer only edits rc
+# files, which the current (non-interactive) process doesn't re-source, so
+# without this the `julia --version` check below would fail under `set -e`.
+export PATH="$HOME/.juliaup/bin:$PATH"
+
+# Persist it on PATH for future shells too. -F keeps the literal dot from
+# acting as a regex wildcard.
 if ! grep -qsF '.juliaup/bin' "$HOME/.bashrc" 2>/dev/null; then
   echo "export PATH=\"\$HOME/.juliaup/bin:\$PATH\"" >> "$HOME/.bashrc"
 fi
