@@ -11,6 +11,9 @@
   (via `gh issue create` or `glab issue create`) capturing the deferred item. Don't just
   mention it in a comment — create the issue so it's tracked.
 - Always open MRs/PRs after pushing — never ask first ("always yes").
+- Always ARDI an open PR/MR to a clean review verdict — don't ask "want me to ARDI it?"
+  first, just drive it to clean. (Still don't merge unless asked; "always ardi" means
+  always drive to clean, not always merge.)
 - Always include `Closes #N` in MR/PR descriptions to auto-close the linked issue on merge.
 - On GitLab, assign MRs to `demorrison`.
 - Run local validation before pushing R-pkg work: lintr::lint_package(), devtools::document(),
