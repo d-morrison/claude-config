@@ -43,9 +43,15 @@ For each round:
    Don't rebase/squash a published branch — a merge commit matches GitHub's
    "Update branch" button.
 
-3. **Request the review.**
-   - `@claude` bot reviewer: post `@claude review` on the PR (or the repo's
-     equivalent trigger).
+3. **Request the review — but don't double-trigger.**
+   - `@claude` bot reviewer: if you **just pushed code**, the push already
+     triggers the review workflow (e.g. `claude-code-review` on `pull_request`
+     sync) — do **NOT** also post `@claude review`. On workflows with
+     `concurrency: cancel-in-progress` the two runs cancel each other and the
+     latest commit ends up with no posted verdict. Only post `@claude review`
+     when **no fixes were pushed** this round. If a review gets
+     canceled with no comment, dispatch a clean one:
+     `gh workflow run claude-review.yml -f pr_number=<N>`.
    - Human reviewer: request one directly —
      ```bash
      gh api -X POST repos/<owner>/<repo>/pulls/<N>/requested_reviewers \

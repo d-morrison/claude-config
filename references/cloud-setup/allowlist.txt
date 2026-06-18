@@ -1,0 +1,47 @@
+# Recommended egress allowlist for Claude Code on the web
+# ---------------------------------------------------------------------------
+# Paste these hosts into the environment's custom network allowlist (claude.ai
+# web UI) when the environment can't use the 'Full' network policy. It's a
+# superset of the per-host allowlist documented in cloud-setup.sh's header: it
+# covers the R / Quarto / TinyTeX / Julia toolchain that script installs at
+# build time, plus the runtime hosts the per-session renv::restore() and Julia
+# Pkg.instantiate() reach.
+#
+# One host per line. If your allowlist parser rejects '#' comments or blank
+# lines, strip them — the bare hostnames are all that's required.
+
+# --- R / CRAN ---
+# Where a specific host and a wildcard overlap, both are kept: the wildcard is
+# the real requirement, the specific entry is a fallback for allowlist parsers
+# that don't honor wildcards.
+cloud.r-project.org           # renv bootstrap/fallback (often already allowed)
+*.r-project.org               # CRAN mirrors (superset of cloud.r-project.org)
+packagemanager.posit.co       # Posit Package Manager (renv.lock's repo)
+*.posit.co                    # Posit PPM CDN / redirects (superset of packagemanager.posit.co)
+# Runtime hosts — reached by the session-start renv::restore(), not the build
+# itself. (cloud-setup.sh's header lists bioconductor.org but not the other two;
+# all three are runtime needs.)
+rspm-sync.rstudio.com         # PPM binary package sync
+api.r-hub.io                  # R-hub system-requirements lookups
+bioconductor.org              # Bioconductor-tagged packages restored by renv::restore()
+
+# --- GitHub (Quarto .deb, TinyTeX, GitHub-sourced R packages) ---
+github.com                    # Quarto .deb + GitHub-sourced R pkgs
+api.github.com                # release lookups (set GH_TOKEN to avoid rate limits)
+codeload.github.com           # source tarball downloads
+release-assets.githubusercontent.com   # GitHub release asset downloads
+objects.githubusercontent.com           # GitHub release / object storage
+
+# --- Quarto / LaTeX ---
+# quarto.org is NOT required — the Quarto .deb is fetched from github.com (see
+# cloud-setup.sh header). Kept as a comment-only line so it isn't allowlisted
+# needlessly.
+ctan.math.illinois.edu        # one pinned CTAN mirror for tlmgr (TinyTeX) installs
+
+# --- Julia ---
+julialang-s3.julialang.org    # prebuilt Linux Julia binaries (the ONLY host for these)
+pkg.julialang.org             # Julia package server (Pkg.instantiate / precompile)
+# The two below are only needed if you install Julia via juliaup instead of the
+# curl+tarball method in cloud-setup.sh (juliaup can fail behind a TLS proxy):
+install.julialang.org         # juliaup installer script
+julialang.org                 # juliaup version-scheme / downloads fallback

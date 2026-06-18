@@ -49,14 +49,30 @@ reflect, and persist.
    - If updating a skill: the change should be specific enough that following
      the skill next time would avoid the mistake
 
-4. **Commit and push ALL ai-config changes.** Skills AND memory files both
-   live in the ai-config repo (`~/.claude/skills/` → discover actual path
-   with `readlink`). After editing anything in that repo:
+4. **Commit and push ALL ai-config changes — via a branch + PR, not direct to
+   `main`.** Skills AND memory files both live in the ai-config repo
+   (`~/.claude/skills/` → discover actual path with `readlink`). Never leave
+   ANY changes (skills, memories, etc.) as local-only uncommitted edits. Run
+   **one** of the two paths below — not both:
+
+   *Already on the open PR's branch* (e.g. mid-ARDI): commit + push to it.
    ```bash
    cd "$(dirname "$(readlink ~/.claude/skills)")"
-   git add -A && git commit -m "ums: <brief summary>" && git push origin HEAD
+   git add -A && git commit -m "ums: <brief summary>"
+   git push origin HEAD
    ```
-   Never leave ANY changes (skills, memories, etc.) as local-only uncommitted edits.
+
+   *No PR yet:* branch off main first — a direct-to-main push is denied by
+   auto-mode and bypasses review.
+   ```bash
+   cd "$(dirname "$(readlink ~/.claude/skills)")"
+   git fetch origin main && git checkout -b ums-<topic> origin/main
+   git add -A && git commit -m "ums: <brief summary>"
+   git push -u origin HEAD && gh pr create --fill   # then request d-morrison as reviewer
+   ```
+   **CAUTION:** if a compound `add && commit && push` is **denied**, *nothing*
+   was committed — verify with `git status` / `git log` before any `git reset
+   --hard`, or you'll silently discard the still-uncommitted edits.
 
 5. **Report what was updated.** Provide a brief summary table:
 

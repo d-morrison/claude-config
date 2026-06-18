@@ -64,7 +64,9 @@ for src in "$SCRIPT_DIR"/*/; do
   src="${src%/}"
   name="$(basename "$src")"
   case "$name" in
-    .git|node_modules) continue ;;
+    # references/ is documentation/example material, not consumable config, so
+    # it is deliberately NOT symlinked into ~/.claude.
+    .git|node_modules|references) continue ;;
   esac
 
   dest="$CLAUDE_DIR/$name"

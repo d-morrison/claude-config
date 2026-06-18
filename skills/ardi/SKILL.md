@@ -1,6 +1,6 @@
 ---
 name: ardi
-description: "ARD + Iterate: apply the ARD framework within an iterate loop on a single PR/MR. Read the latest review, Address/Rebut/Defer every finding, push fixes, post the ARD summary, then re-request review — repeating until the verdict is clean. Use when asked to 'ardi', 'iterate this MR', 'drive this PR to clean', or after receiving a review you want to resolve completely."
+description: "ARD + Iterate: apply the ARD framework within an iterate loop on a single PR/MR. Read the latest review, Address/Rebut/Defer every finding, push fixes, post the ARD summary, then re-request review — repeating until the verdict is clean. Use when asked to 'ardi', 'dc', 'drive to clean', 'iterate this MR', 'drive this PR to clean', or after receiving a review you want to resolve completely."
 user-invocable: true
 allowed-tools:
   - Bash
@@ -35,12 +35,26 @@ finding → push → post summary → re-request review → repeat until clean.
 5. **Post the ARD summary** as a comment on the MR/PR (table format per the
    ARD skill).
 
-6. **Re-request review.** If no code was pushed (all items were Rebutted or
-   Deferred), the push won't auto-trigger a new review — you must still
-   explicitly re-request review (e.g., post a comment triggering the bot,
-   or use the forge API to request a new review). The ARD summary comment
-   itself can serve as the trigger if the reviewer bot watches for it.
-   Wait for the new verdict.
+6. **Re-request review — but don't double-trigger.** How depends on whether
+   this round pushed code:
+   - **Code was pushed:** the push **already** triggers the review (e.g.
+     `claude-code-review` on `pull_request` sync). Do **NOT** also post
+     "@claude review again". On workflows with `concurrency:
+     cancel-in-progress` (the d-morrison/gha setup), the push-triggered and
+     mention-triggered runs **cancel each other**, leaving the latest commit
+     with a canceled, never-posted verdict. Just wait for the push-triggered
+     review.
+   - **No code pushed** (all Rebut/Defer): no push occurred, so nothing
+     auto-triggers — you **must** explicitly re-request (post `@claude review`,
+     or the forge's equivalent). This is the only case where you post the
+     mention.
+   - **A review ends up canceled with no comment:** trigger one cleanly via
+     `gh workflow run claude-review.yml -f pr_number=<N>` (input is
+     `pr_number`) and don't push/comment again until it posts. Note: a review
+     run on a **bot-pushed** commit may show as `action_required` (gated) and
+     never run — the explicit `workflow_dispatch` bypasses that.
+
+   Then wait for the new verdict.
 
 7. **Repeat from step 2** until the verdict has zero findings.
 

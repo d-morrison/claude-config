@@ -103,13 +103,60 @@ Addressed findings from review of <commit-or-range>:
 
 Expand each Rebut below the table. Deferred rows must carry a real issue link.
 
+### 4b. Reply to every inline review thread — and resolve where appropriate
+
+The one summary comment is **not** enough on its own. A reviewer who left
+inline comments wants a response **on each thread**, not just a table posted
+elsewhere. For every inline comment, post a short reply on its own thread with
+the disposition (and the commit SHA for an Address), then **resolve** the thread
+once the item is genuinely settled.
+
+**GitHub** — reply on the comment's thread, then resolve via GraphQL:
+
+```bash
+# Reply on the same thread as inline comment <comment_id>:
+gh api repos/{owner}/{repo}/pulls/<N>/comments \
+  -f body="✅ Addressed in <sha>." -F in_reply_to=<comment_id>
+
+# List threads to get the node id, then resolve the settled one:
+gh api graphql -f query='query { repository(owner:"<owner>",name:"<repo>") {
+  pullRequest(number:<N>) { reviewThreads(first:100) { nodes {
+    id isResolved comments(first:1){ nodes { databaseId body } } } } } } }'
+gh api graphql -f query='mutation {
+  resolveReviewThread(input:{threadId:"<thread_node_id>"}) { thread { isResolved } } }'
+```
+
+**GitLab** — reply to the discussion, then resolve it:
+
+```bash
+glab api -X POST "projects/:id/merge_requests/<N>/discussions/<discussion_id>/notes" \
+  -f body="Addressed in <sha>."
+glab api -X PUT "projects/:id/merge_requests/<N>/discussions/<discussion_id>?resolved=true"
+```
+
+**Resolve only when the item is actually settled:**
+
+- **Address** — resolve after the fix is **pushed** (reply names the SHA). Never
+  resolve an Address whose fix isn't on the branch yet.
+- **Defer** — reply with the tracked issue link, then resolve (work lives
+  elsewhere now).
+- **Acknowledge** — reply briefly, then resolve.
+- **Rebut** — reply with the falsifiable evidence. Resolve if the reviewer is a
+  bot or you're confident; **leave a human's thread open** if they may want to
+  respond to the rebuttal.
+
+Don't resolve a thread you haven't replied to. Every inline comment ends with
+both a reply and (where appropriate) a resolution — silence on a thread reads as
+ignored, exactly the failure ARD exists to prevent.
+
 ### 5. Report back with a link
 
 Tell the user what you did and give a **clickable URL** to the PR/MR (and to the posted summary comment if available), so they can review in one click.
 
 ## Rules
 
-- **Every reviewer comment appears in the table.** Any item with no row reads as ignored — including positive observations, which get a 👍 Acknowledge row.
+- **Every reviewer comment appears in the table AND gets a reply on its own inline thread** (step 4b). The summary table is the overview; the per-thread reply is what the reviewer sees in context. A thread with no reply reads as ignored.
+- **Resolve threads once settled** (Addressed-and-pushed / Deferred-with-issue / Acknowledged), but never resolve a thread you haven't replied to or whose fix isn't pushed — and leave a human reviewer's thread open if they may want to respond.
 - **Severity never exempts.** "Nit" / "optional" / "consider" still require A, R, or D — never K.
 - **Rebuttals must be falsifiable** — point to specific code, behavior, or documentation.
 - **Deferrals must be tracked.** A defer without a filed issue is just ignoring with extra words.
@@ -122,7 +169,7 @@ Inside the `iterate` loop:
 1. Read the latest review (iterate step 4)
 2. Apply ARD to each finding (this skill: steps 1–2)
 3. Commit + push fixes (this skill: step 3)
-4. Post the ARD summary (this skill: step 4)
+4. Post the ARD summary and per-thread replies (this skill: steps 4–4b)
 5. Re-request review (iterate step 3) — **even if this round was Rebut/Defer only**, so the reviewer re-evaluates.
 
 The loop continues until the reviewer returns zero findings (and CI is green).
