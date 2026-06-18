@@ -1,5 +1,10 @@
 # User preferences (cross-workspace)
 
+- NEVER assume; ALWAYS verify. Before stating a status/fact/outcome (PR or issue
+  state, merge status, CI/review verdict, branch position, file contents) or acting
+  on one, confirm it with a tool call — don't rely on what was true earlier in the
+  session or what "should" be the case. State drifts between turns. "It should be X" /
+  "I left it as X" / "presumably X" are red flags; replace with a fresh check.
 - ALWAYS record what I learn in memory/AI-instruction notes as I work (standing request).
 - When creating a GitHub PR, request reviewer `d-morrison` (see request-pr-review skill).
 - When deferring work out of scope during a review iteration, always file a follow-up issue
