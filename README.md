@@ -16,6 +16,16 @@ bash ~/ai-config/bootstrap.sh
 
 Rerun `bootstrap.sh` any time a new top-level dir is added to the repo.
 
+## Claude Code on the web
+
+In cloud (web) sessions you can't run `bootstrap.sh` by hand, and the
+environment "Setup script" runs at build time *before* this repo is checked
+out — so it can't reference `bootstrap.sh` either. Instead, the committed
+`SessionStart` hook (`.claude/settings.json` → `.claude/hooks/session-start.sh`)
+runs `bootstrap.sh` once the repo is on disk, symlinking `skills/` and
+`commands/` into `~/.claude/`. The hook is a no-op outside remote sessions
+(`CLAUDE_CODE_REMOTE`) and idempotent, so local machines are unaffected.
+
 ## What's tracked
 
 - `skills/` — reusable workflow skills (`~/.claude/skills/`)
@@ -31,6 +41,9 @@ These are either machine-specific, sensitive, or pure session state:
 
 - `settings.json` / `settings.local.json` — permission allowlists and
   `additionalDirectories` bake in absolute paths and per-machine choices.
+  (This is the *user-level* `~/.claude/settings.json`. The repo-root
+  `.claude/settings.json` is a different thing — project-level hooks config
+  for the web `SessionStart` hook above — and is intentionally tracked.)
 - `sessions/`, `history.jsonl`, `tasks/`, `plans/`, `projects/` — session
   and per-CWD memory state, keyed by absolute home path.
 - `cache/`, `shell-snapshots/`, `file-history/`, `ide/`, `telemetry/`,
