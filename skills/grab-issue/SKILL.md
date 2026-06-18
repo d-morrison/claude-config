@@ -8,4 +8,4 @@ user-invocable: true
 
 This is a spelled-out alias. Read and follow the canonical skill:
 
-→ **`/Users/ezramorrison/.claude/skills/gi/SKILL.md`**
+→ **`~/.claude/skills/gi/SKILL.md`**

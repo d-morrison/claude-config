@@ -51,7 +51,7 @@ reflect, and persist.
    live in the ai-config repo (`~/.claude/skills/` → discover actual path
    with `readlink`). After editing anything in that repo:
    ```bash
-   cd $(readlink -f ~/.claude/skills/..)
+   cd "$(dirname "$(readlink ~/.claude/skills)")"
    git add -A && git commit -m "ums: <brief summary>" && git push
    ```
    Never leave ANY changes (skills, memories, etc.) as local-only uncommitted edits.

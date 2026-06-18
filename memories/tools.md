@@ -6,7 +6,7 @@
 
 ## glab (GitLab CLI)
 - Installed at `/opt/homebrew/bin/glab`
-- Authenticated as `demorrison` on `hc2-gitlab.ucdmc.ucdavis.edu`
+- Authenticated on your GitLab instance — run `glab auth status` to verify host and username
 - Use for MR comments, pipeline checks, CI job logs, etc.
 - No `GITLAB_TOKEN` env var — glab uses its own config at `~/Library/Application Support/glab-cli/config.yml`
 - Key commands:

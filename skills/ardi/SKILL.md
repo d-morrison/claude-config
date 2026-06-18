@@ -56,6 +56,9 @@ surface that to the user and ask whether to continue or accept.
 
 ## On clean
 
+Post an unclaim comment (`gh pr comment <N> --body "Done — PR is free."`) to
+unblock any parallel sessions that backed off in step 1.
+
 Always provide a clickable link to the MR/PR in the final message.
 
 Report the final verdict and round count. Don't merge unless asked.
