@@ -33,6 +33,10 @@ link_one() {
     return
   fi
 
+  # A real (non-symlink) path is already here: never clobber it. In a per-child
+  # merge this also means a tracked skill/command whose name collides with a
+  # built-in already in ~/.claude (e.g. skills/) is skipped — it can't shadow
+  # the built-in in remote sessions. Rename ours if that's not what you want.
   if [ -e "$dest" ]; then
     printf 'skip  %s (real path exists at %s — move or merge manually, then rerun)\n' "$name" "$dest"
     return
@@ -53,11 +57,16 @@ for src in "$SCRIPT_DIR"/*/; do
   dest="$CLAUDE_DIR/$name"
 
   # A real directory already lives at the target (not our symlink): merge by
-  # linking each child rather than skipping the whole group.
+  # linking each child rather than skipping the whole group. dotglob links
+  # hidden entries too (parity with the whole-dir symlink below) and, unlike
+  # "$src"/.*, never expands to . or .. ; it's scoped so the outer loop keeps
+  # ignoring .git/.github.
   if [ -d "$dest" ] && [ ! -L "$dest" ]; then
+    shopt -s dotglob
     for child in "$src"/*; do
       link_one "$child" "$dest/$(basename "$child")"
     done
+    shopt -u dotglob
   else
     link_one "$src" "$dest"
   fi

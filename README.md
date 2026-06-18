@@ -39,6 +39,9 @@ These are either machine-specific, sensitive, or pure session state:
 
 - `settings.json` / `settings.local.json` — permission allowlists and
   `additionalDirectories` bake in absolute paths and per-machine choices.
+  (This is the *user-level* `~/.claude/settings.json`. The repo-root
+  `.claude/settings.json` is a different thing — project-level hooks config
+  for the web `SessionStart` hook above — and is intentionally tracked.)
 - `sessions/`, `history.jsonl`, `tasks/`, `plans/`, `projects/` — session
   and per-CWD memory state, keyed by absolute home path.
 - `cache/`, `shell-snapshots/`, `file-history/`, `ide/`, `telemetry/`,
