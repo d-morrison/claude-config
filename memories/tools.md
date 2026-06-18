@@ -7,6 +7,7 @@
 ## Git tags (force-move / slide)
 - To move a tag to a new commit: `git tag -d <tag> && git tag <tag> <target> && git push origin :refs/tags/<tag> && git push origin <tag>`
 - Can't use `git push --force origin <tag>` on some GitLab instances (protected tags). The delete+recreate pattern always works.
+- `git fetch --tags` silently refuses to update a local tag that already exists if the remote moved it. Use `git fetch --tags --force` to get the latest remote tag positions. Without `--force`, you'll see stale local tags and draw wrong conclusions about what the tag includes.
 
 ## glab (GitLab CLI)
 - Installed via Homebrew (macOS) or system package manager — verify with `which glab`.
