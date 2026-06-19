@@ -88,6 +88,12 @@
   (a chosen threshold, a year). Example: [ucdavis/bcs#191 review comment r3437005734](https://github.com/ucdavis/bcs/pull/191/changes#r3437005734).
 - Always look for opportunities to create new reusable skills from multi-step processes.
   When a workflow emerges that could be codified, proactively suggest creating a skill for it.
+- When asked to build/create a new skill, FIRST check whether an existing skill should be
+  extended instead — search `skills/` for an adjacent one AND scan ALL branches (`git ls-tree`
+  over every remote branch) for in-flight similar work — before scaffolding a new one. Prefer
+  extending (a new alias/section/trigger) over a near-duplicate skill; if another branch is
+  already building it, continue that work rather than opening a colliding branch. (see the
+  `skill-builder` skill.)
 - "slide <tag>" means force-move a floating Git tag to current main HEAD (delete + recreate + push).
   Common for repos with floating major-version tags that consumers reference.
 
