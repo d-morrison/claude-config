@@ -82,8 +82,8 @@ fixed reporting contract:
 4. **Verdict** — is it *uniformly superior* to this repo? Almost always no —
    the agent must name what this repo has that the peer lacks.
 
-Tell agents WebFetch summaries come from a small model, so they should flag any
-mechanic they're paraphrasing rather than verifying against source.
+Tell agents WebFetch content may be truncated or paraphrased, so they should
+flag any mechanic they're paraphrasing rather than verifying against source.
 
 ### 4. License gate (do this before borrowing ANYTHING)
 

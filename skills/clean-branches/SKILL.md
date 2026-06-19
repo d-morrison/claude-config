@@ -196,7 +196,8 @@ current branch):
 #### a. Merged into main → delete
 
 ```bash
-git branch --merged origin/main | grep -vE '^\*|main|master'
+git branch --merged origin/main | grep -vE '^\s*\*|\bmain\b|\bmaster\b'
+# Word-anchored so a branch like `maintain-docs` isn't silently filtered out.
 # Compare against origin/main (just fetched), NOT local `main` — your local main
 # may be behind, which would hide branches that are actually merged.
 git branch -d <branch>          # -d refuses if NOT actually merged — a safety net
