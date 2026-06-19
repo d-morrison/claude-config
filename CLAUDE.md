@@ -105,40 +105,15 @@ run **UMS** to capture what the PR's review lifecycle taught — recurring revie
 findings, corrections, and guidance given along the way. A merge is the natural
 checkpoint to bank lessons before the context is lost.
 
-## What "fully clean" means
-
-"Fully clean" is the terminal state every ARDI / iterate loop drives toward.
-A PR/MR is **fully clean** when **both** of these hold:
-
-1. **All CI workflows are green.** Every required check passes — not just the
-   review job.
-2. **The latest review is totally clean:** no nits, and every item that wasn't
-   directly **Addressed** is either **Deferred** to a tracked follow-up issue,
-   or **Rebutted with a rebuttal that actually convinced the reviewer** — i.e.
-   the reviewer did *not* re-raise it on the next round. A rebuttal the
-   reviewer still disputes does **not** count as clean.
-
-**Threads:** at fully-clean, every **inline** review thread is resolved, and
-the only conversation left open is the final all-clear exchange — the
-reviewer's all-clear comment and your reply to it. (The all-clear is usually a
-top-level PR comment, not an inline thread.)
-
-**Deadlock → escalate to a human.** If you and the reviewer(s) can't reach
-consensus on an item (a rebuttal was exchanged and neither side is budging),
-don't loop forever and don't unilaterally override the reviewer — request a
-**human reviewer** (`d-morrison`) via the `request-pr-review` skill (or
-`gh pr edit <N> --add-reviewer d-morrison`), `@`-mention them in a comment
-summarizing the impasse, and surface the open item to me.
-
 ## Always run ARDI on PRs you touch
 
 Whenever I'm working a PR/MR, run the full **ARDI** loop by default, without
 being asked: **A**ddress every flagged item, **R**ebut findings that are wrong,
 **D**efer out-of-scope items to tracked issues, then **I**terate with a fresh
-review — repeating until the latest review is **fully clean** (see *What
-"fully clean" means* above). Don't stop at "review-clean, just needs approval"
-and hand triage back; keep the cycle going until it's genuinely clean.
-(Mechanics for each step are in the sections below.)
+review — repeating until the latest review has zero flagged items under any
+heading. Don't stop at "review-clean, just needs approval" and hand triage
+back; keep the cycle going until it's genuinely clean. (Mechanics for each
+step are in the sections below.)
 
 ## Address every in-scope review comment, even non-blockers
 
@@ -156,23 +131,15 @@ For each flagged item, exactly one of:
    reference it in a PR comment so the item isn't lost.
 
 Then trigger another `@claude review` (or the equivalent) and repeat until the
-PR is **fully clean** (see *What "fully clean" means* above) — zero flagged
-items under any heading, no "non-blocking", "harmless", "minor observation",
-"could improve", etc. sections. "Looks good" / "no findings" / "approved" with
-no follow-on bullets is the bar. Resolve every inline review thread along the
-way, leaving only the final all-clear exchange (the reviewer's comment and your
-reply).
+verdict contains zero flagged items under any heading — no "non-blocking",
+"harmless", "minor observation", "could improve", etc. sections. "Looks good"
+/ "no findings" / "approved" with no follow-on bullets is the bar.
 
 Do **not** report "ready to merge with one minor nit noted" / "harmless
 as-is" / "can address if you want" — that hedging just pushes triage back to
 the user.
 
-If you and the reviewer reach an impasse on an item (your rebuttal didn't
-convince them and you're not convinced by their re-raise), escalate to a
-**human reviewer** — request `d-morrison` via the `request-pr-review` skill (or
-`gh pr edit <N> --add-reviewer d-morrison`) and `@`-mention them with the
-impasse — for the final call rather than looping.
-Likewise, if after 3–4 rounds the reviewer keeps generating new nits each cycle
+If after 3–4 rounds the reviewer keeps generating new nits each cycle
 (asymptotic noise), surface that to the user and ask whether to keep going or
 accept the current state.
 
