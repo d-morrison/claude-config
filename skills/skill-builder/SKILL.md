@@ -121,13 +121,28 @@ local-only. Commit via a **branch + PR** (not direct to main), request
 `d-morrison` as reviewer, then **ARDI to clean**.
 
 ```bash
-cd "$(dirname "$(readlink ~/.claude/skills)")"
+cd "$(git -C ~/.claude/skills rev-parse --show-toplevel)"   # the ai-config repo
 git fetch origin main && git checkout -b add-<name>-skill origin/main
-# write skills/<name>/SKILL.md (+ alias dir, + preferences/CLAUDE.md if a rule)
-git add -A && git commit -m "skills: add <name> — <summary>"
+# write skills/<name>/SKILL.md (+ alias dir, + preferences/CLAUDE.md if it's a rule)
+git add skills/<name>/SKILL.md memories/preferences.md      # stage the files you
+                                                            # touched — NOT `-A`,
+                                                            # which sweeps in
+                                                            # unrelated edits
+git commit -m "skills: add <name> — <summary>"
 git push -u origin HEAD && gh pr create --fill
-# then: request d-morrison as reviewer, then run `ardi`
 ```
+
+Then, as their own explicit steps (don't leave them buried in a comment):
+
+1. **Request the reviewer:** `gh pr edit --add-reviewer d-morrison` (see
+   `request-pr-review`).
+2. **Drive to clean:** run the `ardi` skill on the new PR until the verdict has
+   zero findings.
+
+> Why `git -C … rev-parse --show-toplevel` over `dirname "$(readlink …)"`:
+> bare `readlink` (no `-f`) resolves only a single hop and behaves
+> inconsistently across macOS/Linux; `rev-parse --show-toplevel` returns the
+> repo root directly regardless of how the symlink chain is set up.
 
 ## Relationship to other skills
 
