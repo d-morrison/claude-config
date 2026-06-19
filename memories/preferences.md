@@ -81,6 +81,13 @@
 - Always simplify code where feasible (without feature loss) — prune dead code paths,
   remove unreachable branches, simplify variable assignments that can never take their
   fallback values given the current invocation context.
+- Avoid nested function calls and nested function definitions where feasible — prefer
+  named intermediate variables (or a pipe, e.g. `|>` / `%>%` in R) over `f(g(h(x)))`, and
+  prefer top-level function definitions over functions defined inside other functions.
+  Keep the nesting only when flattening it would be more convoluted. (CLAUDE.md "Coding
+  style" section has the full rationale.)
+- Follow the SERG lab manual (https://ucd-serg.github.io/lab-manual/) for coding and
+  collaboration conventions.
 - When mentioning GitLab/GitHub pipelines, jobs, or commits in prose, always hyperlink them:
   - Pipelines: `[#3330](https://host/project/-/pipelines/3330)`
   - Jobs: `[job 11056](https://host/project/-/jobs/11056)`
@@ -97,6 +104,13 @@
   and push everything to origin (on the current branch if a PR is already open, or
   create a new branch + PR if the change is out of scope). Never leave ANY changes in
   ai-config as local-only uncommitted edits — including memory files.
+- When committing, stage the SPECIFIC files you touched — NEVER `git add -A`. The working
+  tree often holds unrelated in-flight edits (the user's own UMS/skill commits, another
+  draft); `git add -A` silently sweeps those into your commit and onto your PR, bloating the
+  review and extending the cycle. List paths explicitly, and `git status` before committing
+  to confirm only intended files are staged. (Learned the hard way: a
+  `git add -A` swept the user's `scout-peers` skill into an unrelated `/prune` PR, adding
+  several extra review rounds.)
 - The ai-config working copy is often in use by CONCURRENT Claude sessions; untracked or
   uncommitted files there can be silently wiped by another session (branch switch /
   `git clean`). For substantial multi-file work in ai-config — and ALWAYS when the user
