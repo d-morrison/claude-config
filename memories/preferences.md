@@ -86,6 +86,13 @@
   and push everything to origin (on the current branch if a PR is already open, or
   create a new branch + PR if the change is out of scope). Never leave ANY changes in
   ai-config as local-only uncommitted edits — including memory files.
+- When committing, stage the SPECIFIC files you touched — NEVER `git add -A`. The working
+  tree often holds unrelated in-flight edits (the user's own UMS/skill commits, another
+  draft); `git add -A` silently sweeps those into your commit and onto your PR, bloating the
+  review and extending the cycle. List paths explicitly, and `git status` before committing
+  to confirm only intended files are staged. (Learned the hard way: a
+  `git add -A` swept the user's `scout-peers` skill into an unrelated `/prune` PR, adding
+  several extra review rounds.)
 - The ai-config working copy is often in use by CONCURRENT Claude sessions; untracked or
   uncommitted files there can be silently wiped by another session (branch switch /
   `git clean`). For substantial multi-file work in ai-config — and ALWAYS when the user
