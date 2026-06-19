@@ -1,6 +1,6 @@
 ---
 name: cb
-description: "Alias for clean-branches. Audit remote branches — delete dead ones, rebase stale ones onto main, open MRs for orphaned work. Use when asked to 'cb', 'clean branches', or 'prune branches'."
+description: "Alias for clean-branches. Audit branches — both local and remote — delete dead ones, rebase stale ones onto main, open MRs for orphaned work, and sweep up local stragglers. Use when asked to 'cb', 'clean branches', 'prune', or 'prune branches'."
 user-invocable: true
 allowed-tools:
   - Bash

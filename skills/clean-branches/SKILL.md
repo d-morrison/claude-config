@@ -1,6 +1,6 @@
 ---
 name: clean-branches
-description: "Clean Branches: audit remote branches in the current repo — delete dead ones (purely behind main, no open MR/issue), rebase stale-but-alive ones onto main, and open MRs for orphaned work. Checks for active sessions before touching anything. Use when asked to 'clean branches', 'cb', 'prune branches', 'tidy up branches', or 'clear dead branches'."
+description: "Clean Branches: audit branches in the current repo — both LOCAL and REMOTE — delete dead ones (purely behind main, no open MR/issue), rebase stale-but-alive ones onto main, and open MRs for orphaned work. Also prunes local-only stragglers: branches already merged into main, and tracking branches whose remote is gone. Checks for active sessions before touching anything. Use when asked to 'clean branches', 'cb', 'prune', 'prune branches', 'tidy up branches', or 'clear dead branches'."
 user-invocable: true
 allowed-tools:
   - Bash
@@ -9,16 +9,27 @@ allowed-tools:
   - Write
 ---
 
-# Clean Branches (aka CB)
+# Clean Branches (aka CB / prune)
 
-Audit remote branches in the current repo. Delete dead ones, rebase stale ones,
-and open MRs for orphaned work — without disrupting active sessions.
+Audit branches in the current repo — **both your local checkout and the
+remote**. Delete dead ones, rebase stale ones, open MRs for orphaned work, and
+sweep up local-only stragglers — all without disrupting active sessions.
 
 ## When this fires
 
-- User says "clean branches", "cb", "prune branches", "tidy up branches"
+- User says "clean branches", "cb", "prune", "prune branches", "tidy up branches"
 - User says "clear dead branches", "clean up the repo"
 - User says "what branches can we delete?"
+
+## Scope: local AND remote
+
+Prune in both places — they accumulate junk independently:
+
+- **Remote** branches — dead/stale/orphaned remote refs (the bulk of this skill).
+- **Local** branches — branches that linger in your checkout after their PR
+  merged, or whose upstream remote was deleted (`[gone]`). The remote pass
+  alone won't catch a local branch whose remote is already gone, so there's a
+  dedicated local pass (step 9).
 
 ## Definitions
 
@@ -28,6 +39,12 @@ and open MRs for orphaned work — without disrupting active sessions.
 | **Stale** | Has unique commits ahead of main but is behind main, no recent activity (>30 days), not actively being worked on | Rebase on main, open MR if none exists |
 | **Active** | Has an open MR, linked issue, recent commits (<30 days), or a claim comment | Skip — don't touch |
 | **New** | Created in the last 7 days | Skip — too fresh to judge |
+| **Local merged** | *Local* branch fully merged into main, or whose PR merged (upstream `[gone]`) | Delete locally (`git branch -d`) — step 8 |
+| **Local-only unpushed** | *Local* branch with unique commits, never pushed, no MR | Flag — ask before touching (step 8) |
+
+The first four rows apply to **remote** branches (steps 1–7); the last two are
+the **local** pass (step 8). A branch can need both — e.g. delete the remote ref
+*and* the leftover local tracking branch.
 
 ## Procedure
 
@@ -162,16 +179,79 @@ gh pr create --head=<branch> --base=main \
   --body "Orphaned branch rebased onto main. Review or close if no longer needed."
 ```
 
-### 8. Report
+### 8. Prune local branches
 
-Print a summary:
+The remote pass doesn't touch branches that only exist in your checkout. Sweep
+those too. First refresh remote-tracking state so "merged" and "gone" are
+accurate:
+
+```bash
+git fetch --prune origin                       # marks deleted upstreams as [gone]
+git branch --show-current                      # never delete the branch you're on
+```
+
+Classify each **local** branch (excluding `main`/`master`/protected and the
+current branch):
+
+#### a. Merged into main → delete
+
+```bash
+git branch --merged main | grep -vE '^\*|main|master'
+# each listed branch is fully merged into local main
+git branch -d <branch>          # -d refuses if NOT actually merged — a safety net
+```
+
+`-d` (never `-D`) is deliberate: if git refuses, the branch has unmerged
+commits — treat it as **stale**, not dead (see b).
+
+#### b. Upstream gone but the PR merged → delete
+
+A branch whose remote was deleted shows `[gone]`:
+
+```bash
+git for-each-ref --format='%(refname:short) %(upstream:track)' refs/heads \
+  | grep '\[gone\]'
+```
+
+For each, confirm the PR actually merged before deleting (never assume):
+
+```bash
+gh pr list --head <branch> --state merged --json number,mergedAt | cat
+```
+
+- PR merged → `git branch -D <branch>` is acceptable here (the work landed via
+  squash/rebase merge, so `-d` may not see it as merged). Confirm the merge
+  first.
+- No merged PR and unique commits exist → **stale local work**: don't delete;
+  offer to push it and open an MR (step 7 mechanics).
+
+#### c. Never pushed, has unique commits → keep, but flag
+
+```bash
+git for-each-ref --format='%(refname:short) %(upstream)' refs/heads \
+  | awk '$2=="" {print $1}'      # local branches with no upstream at all
+```
+
+Report these as "local-only, unpushed" and ask before doing anything — they may
+be in-progress work that hasn't been pushed yet. Don't delete without
+confirmation.
+
+Present local deletions in the same dry-run plan (step 4) and wait for
+confirmation, exactly as for remote branches.
+
+### 9. Report
+
+Print a summary covering **both** local and remote:
 
 ```
 ## Branch Cleanup Complete — <timestamp>
 
-### Deleted (dead)
+### Deleted — remote (dead)
 - `old-feature` (last commit 2025-03-15, merged into main)
-- `typo-fix` (last commit 2025-01-02, merged into main)
+
+### Deleted — local (merged / upstream gone)
+- `add-wrap-up-skill` (PR #26 merged; local straggler)
+- `ums-session-learnings` (merged into main)
 
 ### Rebased + MR opened (stale)
 - `wip-refactor` → [!85](url) (rebased, 3 commits ahead)
@@ -179,6 +259,9 @@ Print a summary:
 ### Skipped (active/new)
 - `fix/42-typo` — open MR !80
 - `experiment` — created 2 days ago
+
+### Flagged — local-only, unpushed (left alone)
+- `scratch-idea` — 4 unpushed commits, no MR; your call
 
 ### Failed (conflicts)
 - `ancient-branch` — rebase conflicts, needs manual resolution
@@ -193,6 +276,12 @@ Print a summary:
 - **Preserve local branches** the user is currently on (`git branch --show-current`).
 - **Don't delete branches newer than 7 days** — they might be in-progress work
   that just hasn't gotten an MR yet.
+- **Prefer `git branch -d` over `-D`** for local deletions — `-d` refuses unless
+  the branch is merged, which catches "I thought this landed but it didn't."
+  Only use `-D` after confirming the PR merged (squash/rebase merges can leave a
+  local branch that `-d` won't recognize as merged).
+- **Never delete a local-only unpushed branch without confirmation** — if it has
+  unique commits and no remote, that work exists nowhere else.
 
 ## Relationship to other skills
 
