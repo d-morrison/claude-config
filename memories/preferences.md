@@ -75,8 +75,8 @@
 - When committing, stage the SPECIFIC files you touched — NEVER `git add -A`. The working
   tree often holds unrelated in-flight edits (the user's own UMS/skill commits, another
   draft); `git add -A` silently sweeps those into your commit and onto your PR, bloating the
-  review and extending the cycle. List paths explicitly (or `git add -p`), and `git status`
-  before committing to confirm only intended files are staged. (Learned the hard way: a
+  review and extending the cycle. List paths explicitly, and `git status` before committing
+  to confirm only intended files are staged. (Learned the hard way: a
   `git add -A` swept the user's `scout-peers` skill into an unrelated `/prune` PR, adding
   several extra review rounds.)
 - When creating a new acronym/short-name skill (e.g., `gi`, `sup`, `ums`), always also

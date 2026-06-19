@@ -60,7 +60,10 @@ reflect, and persist.
    working tree often holds unrelated in-flight edits (the user's own UMS
    commits, another skill being drafted); `git add -A` sweeps those into your
    commit and onto your PR, where they bloat the review and extend the cycle.
-   List the specific paths instead, or `git add -p`.
+   List the specific paths instead. Then **`git status` to confirm only your
+   intended files are staged** — if something unexpected is there, the working
+   tree had in-flight work; unstage it rather than bundling it. (Avoid
+   `git add -p` here: it needs a terminal and hangs in non-interactive sessions.)
 
    *Already on the open PR's branch* (e.g. mid-ARDI): commit + push to it.
    ```bash
@@ -79,10 +82,6 @@ reflect, and persist.
    git commit -m "ums: <brief summary>"
    git push -u origin HEAD && gh pr create --fill   # then request d-morrison as reviewer
    ```
-   **Before committing, `git status` to confirm only your intended files are
-   staged** — if something unexpected is there, the working tree had in-flight
-   work; unstage it rather than bundling it.
-
    **CAUTION:** if a compound `add && commit && push` is **denied**, *nothing*
    was committed — verify with `git status` / `git log` before any `git reset
    --hard`, or you'll silently discard the still-uncommitted edits.
