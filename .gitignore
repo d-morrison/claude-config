@@ -6,3 +6,7 @@
 # Skill-upload build artifacts
 skills.zip
 skill-zips/
+
+# Python (validators in scripts/)
+__pycache__/
+*.pyc

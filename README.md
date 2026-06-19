@@ -16,6 +16,18 @@ bash ~/ai-config/bootstrap.sh
 
 Rerun `bootstrap.sh` any time a new top-level dir is added to the repo.
 
+### Verify the install
+
+After bootstrapping, confirm the symlinks resolved and the skills are visible:
+
+```sh
+ls -l ~/.claude/skills ~/.claude/commands   # should point back into this repo
+scripts/inventory.sh                         # live counts of skills/commands/docs
+```
+
+In a Claude Code session, type `/` and confirm the skills appear (e.g.
+`/scout-peers`, `/ardi`).
+
 ## Claude Code on the web
 
 In cloud (web) sessions you can't run `bootstrap.sh` by hand, and the
@@ -114,6 +126,29 @@ are picked up automatically.
 > symlink is absent (`restoreConfigFromBase` restores from the `main` at the
 > time Claude runs). Skills become available to the bot for all sessions after
 > this PR merges.
+
+## Quality gates
+
+Two lightweight checks keep the skill catalog well-formed:
+
+- **CI** (`.github/workflows/validate.yml`) runs `scripts/validate-skills.py`
+  (every `SKILL.md` has valid frontmatter; the manifests are valid JSON) and
+  `scripts/check-links.py` (no broken relative markdown links) on every push
+  and PR.
+- **Pre-commit** (`.pre-commit-config.yaml`) adds local secret-scanning
+  ([gitleaks](https://github.com/gitleaks/gitleaks)) plus the same two
+  validators. Enable once with `pre-commit install`.
+
+Run them by hand any time:
+
+```sh
+python3 scripts/validate-skills.py
+python3 scripts/check-links.py
+```
+
+Ideas borrowed from comparable projects (and their licenses) are recorded in
+[`CREDITS.md`](CREDITS.md); see the `scout-peers` skill for the survey behind
+them.
 
 ## What's tracked
 

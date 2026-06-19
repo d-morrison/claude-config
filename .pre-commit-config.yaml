@@ -1,0 +1,33 @@
+# Security + structural gates for this public, cross-machine-synced repo.
+# Enable once with:  pre-commit install
+# Run on demand with: pre-commit run --all-files
+# Pattern adapted from daymade/claude-code-skills (MIT); see CREDITS.md.
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks  # block secrets/tokens from being committed
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: detect-private-key
+      - id: check-merge-conflict
+      - id: check-json
+      - id: check-added-large-files
+
+  - repo: local
+    hooks:
+      - id: validate-skills
+        name: validate skills & manifests
+        entry: python scripts/validate-skills.py
+        language: python
+        additional_dependencies: [pyyaml==6.0.2]
+        pass_filenames: false
+        always_run: true
+      - id: check-links
+        name: check markdown links
+        entry: python scripts/check-links.py
+        language: python
+        pass_filenames: false
+        always_run: true

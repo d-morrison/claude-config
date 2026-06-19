@@ -53,6 +53,12 @@
 - Always check r-lib, tidyverse, and similar R ecosystem organizations for off-the-shelf
   solutions before building custom implementations. Prefer well-maintained upstream packages
   over hand-rolled code when they meet the requirements.
+- When borrowing code or ideas from another repo, verify its license from the source FIRST
+  (fetch its LICENSE file / `gh api repos/<o>/<r>/license`). MIT/BSD/Apache/ISC → may adapt
+  WITH attribution recorded in a root `CREDITS.md` (keep copyright notices); no-license /
+  "all rights reserved" → reimplement the *idea* clean-room, never copy text/code verbatim;
+  copyleft (GPL/AGPL/MPL) → flag the compatibility consequence before copying. The
+  `/scout-peers` skill encodes the full survey → license-gate → borrow-with-attribution loop.
 - Before starting work on an issue/MR, always review the MR history (merged and closed)
   to ensure the proposed changes don't undo past progress or re-introduce previously
   fixed problems.
@@ -80,6 +86,13 @@
   and push everything to origin (on the current branch if a PR is already open, or
   create a new branch + PR if the change is out of scope). Never leave ANY changes in
   ai-config as local-only uncommitted edits — including memory files.
+- The ai-config working copy is often in use by CONCURRENT Claude sessions; untracked or
+  uncommitted files there can be silently wiped by another session (branch switch /
+  `git clean`). For substantial multi-file work in ai-config — and ALWAYS when the user
+  says the wd is "in use" / "do this in a separate repo" — work in an isolated `git worktree`
+  off `origin/main` (`git worktree add -b <branch> ../ai-config-worktrees/<branch> origin/main`),
+  not the shared wd. Clean it up after merge with `git worktree remove`. (Learned when a
+  concurrent session deleted a freshly-written, still-untracked skill file from the wd.)
 - When creating a new acronym/short-name skill (e.g., `gi`, `sup`, `ums`), always also
   create a spelled-out alias skill (e.g., `grab-issue`, `send-upstream`,
   `update-memories-and-skills`) that points to the canonical file.
