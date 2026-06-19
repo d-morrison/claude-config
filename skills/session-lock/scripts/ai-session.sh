@@ -178,7 +178,7 @@ write_record() { # id task agent
 # Dashboard view: report any worktree or branch held by >=2 live sessions —
 # true contention anywhere in the repo, independent of who is asking.
 summarize_contention() {
-  local f n=0 i j k
+  local f n=0 i j k members count seen printed=0
   local WT=() BR=() ID=() TK=() HS=()        # parallel indexed arrays
   for f in "$REG_DIR"/*.session; do
     [ -e "$f" ] || continue
@@ -186,12 +186,11 @@ summarize_contention() {
     WT[$n]="$S_worktree"; BR[$n]="${S_branch:-?}"; ID[$n]="$S_id"
     TK[$n]="${S_task:-}"; HS[$n]="${S_host:-?}"; n=$((n + 1))
   done
-  local printed=0
   # Worktree contention (the dangerous one: shared uncommitted edits).
-  local seen=" "
+  seen=" "
   for ((i = 0; i < n; i++)); do
     case "$seen" in *" $i "*) continue;; esac
-    local members="$i" count=1
+    members="$i" count=1
     for ((j = i + 1; j < n; j++)); do
       [ "${WT[$j]}" = "${WT[$i]}" ] && { members="$members $j"; count=$((count + 1)); seen="$seen$j "; }
     done
@@ -206,7 +205,7 @@ summarize_contention() {
   seen=" "
   for ((i = 0; i < n; i++)); do
     case "$seen" in *" $i "*) continue;; esac
-    local members="$i" count=1
+    members="$i" count=1
     for ((j = i + 1; j < n; j++)); do
       if [ "${BR[$j]}" = "${BR[$i]}" ] && [ "${WT[$j]}" != "${WT[$i]}" ]; then
         members="$members $j"; count=$((count + 1)); seen="$seen$j "
