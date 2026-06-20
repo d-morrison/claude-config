@@ -1,6 +1,6 @@
 ---
 name: find-ai-tells
-description: "Scan a target text — a file, a PR/MR diff, or pasted prose — for the telltale signs of AI/LLM authorship (overused vocabulary like 'delve'/'tapestry'/'testament', the 'it's not just X, it's Y' antithesis, mechanical rule-of-three lists, hedging stacks, signposting filler, em-dash overuse, bold-leading bullets, emoji headers, promotional register) and report each tell with its location, severity, and a concrete de-slopped revision. Also a standing self-check: before presenting non-trivial prose I wrote, scan my OWN draft against this catalog first. Use when asked to 'find AI tells', 'find-ai-tells', 'ai-tells', 'does this sound like AI / ChatGPT', 'de-slop this', 'remove the AI tells', 'make this not sound AI-generated', or 'check if this was written by AI'."
+description: "Scan a target text — a file, a PR/MR diff, or pasted prose — for the telltale signs of AI/LLM authorship (overused vocabulary like 'delve'/'tapestry'/'testament', the 'it's not just X, it's Y' antithesis, mechanical rule-of-three lists, hedging stacks, signposting filler, em-dash overuse, bold-leading bullets, emoji headers, promotional register) and report each tell with its location, severity, and a concrete de-slopped revision. Also a standing self-check: before presenting non-trivial prose I wrote, scan my own draft against this catalog first. Use when asked to 'find AI tells', 'find-ai-tells', 'ai-tells', 'does this sound like AI / ChatGPT', 'de-slop this', 'remove the AI tells', 'make this not sound AI-generated', or 'check if this was written by AI'."
 user-invocable: true
 allowed-tools:
   - Bash
@@ -50,7 +50,7 @@ reflexes — **not** to ban words or flatten a real human voice.
    em-dash.
 5. **Offer to apply** *(external targets)* / **just fix it silently**
    *(self-check)*. For an external target, on request rewrite in place with
-   `Edit`, preserving the author's meaning and voice. When scanning my OWN
+   `Edit`, preserving the author's meaning and voice. When scanning my own
    draft, skip the report (step 4) and simply cut the tells before presenting.
 
 ## The catalog
@@ -75,8 +75,8 @@ pattern once, then run it through whichever tool is on hand:
 
 ```bash
 tells='delve|leverage|utilize|seamless(ly)?|robust|holistic|nuanced|multifaceted|intricate|tapestry|testament|realm|landscape|beacon|plethora|myriad|pivotal|crucial|paramount|underscore|foster|harness|embark|unlock|elevate|game-?changer|cutting-edge|state-of-the-art|ever-evolving|treasure trove|fast-paced|in the realm of|at the heart of|more than just|shed light|dive in(to)?|deep dive'
-rg -niE "\b($tells)\b" <target>      # ripgrep
-grep -rniE "($tells)" <target>       # no ripgrep — same pattern, via grep
+rg -niE "\b($tells)\b" <target>          # ripgrep
+grep -rniE "\b($tells)\b" <target>       # no ripgrep — same pattern, via grep
 ```
 
 ### B. Rhetorical tells (sentence-level reflexes)
@@ -149,12 +149,12 @@ paragraphs; reads strongly AI. Recommend a rewrite pass,"* vs. *"One stray
 
 ## Anti-patterns
 
-- ❌ Treating any single tell as proof of AI authorship — it's a heuristic;
+- **Don't** treat any single tell as proof of AI authorship — it's a heuristic;
   weigh clustering, not isolated hits.
-- ❌ Robotically purging correct words (`delve`, `robust`) or correct em-dashes
-  when they're well-used in context.
-- ❌ Rewriting until the text is flat and voiceless — de-slopping removes filler,
-  it doesn't sand off a real human style.
-- ❌ Flagging code, identifiers, or quoted source material as prose tells.
-- ❌ Skipping the self-check on my own draft, then shipping prose full of the
+- **Don't** robotically purge correct words (`delve`, `robust`) or correct
+  em-dashes when they're well-used in context.
+- **Don't** rewrite until the text is flat and voiceless — de-slopping removes
+  filler, it doesn't sand off a real human style.
+- **Don't** flag code, identifiers, or quoted source material as prose tells.
+- **Don't** skip the self-check on my own draft, then ship prose full of the
   very tells this skill exists to catch.
