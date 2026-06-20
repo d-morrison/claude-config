@@ -51,6 +51,10 @@
   which can connect asynchronously after session start. Don't conclude a tool is
   absent from one check — `ToolSearch` for what you need before deciding it's
   missing (and don't assume the `github_ci` server is present either).
+- `mcp__github__pull_request_read` `method:` enum: `get` · `get_diff` (PR
+  unified diff — equivalent to `gh pr diff`) · `get_status` · `get_files` ·
+  `get_commits` · `get_review_comments` · `get_reviews` · `get_comments` ·
+  `get_check_runs`.
 - Webhook PR-activity events cover comments/reviews/CI *failures* but NOT CI
   *success*, new pushes, or merge-conflict transitions — don't rely on events
   alone to know a PR went green or merged; re-check explicitly.

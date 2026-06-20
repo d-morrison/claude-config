@@ -77,7 +77,10 @@ the reference type:
   `Rscript -e 'library(pkg); exists("fn")'`. Shell command — `command -v`.
 - **Action ref + version** — confirm the tag/SHA exists
   (`gh api repos/<org>/<repo>/git/refs/tags/<tag>` or `.../commits/<sha>`).
-- **Skill name** — directory exists under `skills/<name>/` in ai-config.
+- **Skill name** — `ls skills/<name>/` in the local ai-config directory. If
+  not found locally, check the session's available-skills list (appears in
+  system reminders) before classifying as ❌; a globally-available system skill
+  with no local directory is ❓ Unverifiable, not ❌ Fabricated.
 - **Memory cross-link** — `[[target]]` links resolve to **skill directories**
   (`ls skills/<target>/`); if no matching skill, search memory headings
   (`grep -rn "^# .*<target>" memories/`).
