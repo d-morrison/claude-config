@@ -31,12 +31,14 @@
 ## Git — scanning for parallel/in-flight work
 - A remote-only scan (`git branch -r`) **misses** work a parallel CLI session is
   building in an **unpushed local worktree** — the branch exists only locally
-  until that session pushes. Bit PR #67: a sibling skill was caught by a stray
+  until that session pushes. Hit PR #67: a sibling skill was caught by a stray
   system-reminder, not the scan.
 - To find all in-flight work before starting (skill-builder Step 0, deconflict,
-  scout-peers, etc.), scan three layers: `git branch -a` (local + remote refs),
-  then `git worktree list --porcelain` and grep each worktree's working tree for
-  *uncommitted* files that never reached any ref. See [[use-isolated-worktree-for-ai-config]].
+  scout-peers, etc.), run two scans: `git branch -a` for local + remote refs
+  (catches committed-but-unpushed local branches), and the `git worktree list`
+  working trees for *untracked* files that never reached any ref
+  (`git -C <wt> ls-files --others --exclude-standard -- 'skills/**'`). See
+  [[use-isolated-worktree-for-ai-config]].
 
 ## GitLab Discussions API (inline diff comments)
 - Endpoint: `POST /projects/:id/merge_requests/:iid/discussions`

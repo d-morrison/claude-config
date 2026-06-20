@@ -50,9 +50,11 @@ Rule out extending an existing skill *before* scaffolding anything:
      git ls-tree -r --name-only "$b" | grep -iE "skills/[^/]*<keyword>" \
        | sed "s|^|$b: |"
    done
-   # uncommitted work in sibling worktrees — never reaches any ref yet:
+   # uncommitted, ref-less work in sibling worktrees — list only UNTRACKED
+   # files, so shipped skills (committed in the main worktree) don't false-match:
    for wt in $(git worktree list --porcelain | awk '/^worktree /{print $2}'); do
-     ls "$wt"/skills/ 2>/dev/null | grep -iE "<keyword>" | sed "s|^|$wt: |"
+     git -C "$wt" ls-files --others --exclude-standard -- 'skills/**' 2>/dev/null \
+       | grep -iE "<keyword>" | sed "s|^|$wt: |"
    done
    ```
    If a branch or worktree is already building it, **continue that work** (check
