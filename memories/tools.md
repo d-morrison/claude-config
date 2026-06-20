@@ -72,3 +72,17 @@
   `Pkg.instantiate`). BUT the build-time Setup script can't be committed to a
   repo (it's pasted into the web UI), so a SessionStart hook is the only
   in-repo lever to auto-install a toolchain for *that repo's own* sessions.
+
+## @claude CI action (d-morrison/gha `claude.yml`)
+- The reusable `claude.yml@v1` agent workflow restores config files (`CLAUDE.md`,
+  `.claude/**`) to `origin/main` during its run (`restoreConfigFromBase`), so a
+  PR can't rewrite the reviewer's own instructions. With `eager-pr: true` +
+  `contents: write`, the **residual auto-commit step then commits that reset**
+  onto the PR branch as `claude[bot]` "chore: auto-commit residual @claude
+  session changes" — **deleting the PR's own `CLAUDE.md` edits**. `memories/**`
+  and `skills/**` are untouched; only the restored-config paths are affected.
+- Workaround on a PR that edits `CLAUDE.md`: restore the section
+  (`git checkout <my-commit> -- CLAUDE.md`, commit) and **merge promptly** — it
+  can recur on later runs. Before merging, run
+  `git show origin/<branch>:CLAUDE.md` and confirm the section is still there.
+  Tracked upstream: d-morrison/gha#39.

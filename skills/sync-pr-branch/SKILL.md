@@ -68,8 +68,10 @@ Synonyms: `sync`, `resync-branch`, `merge-main` — all route here.
    ```
    Skip this when step 3 was a no-op — it would just be an empty merge.
 
-5. **Resolve any conflicts fully** in the working tree (from any of steps 2–4).
-   Don't push a half-resolved merge.
+5. **Resolve any conflicts fully** in the working tree (from any of steps 2–4)
+   — consolidate the best of both sides, don't blind-pick `--ours`/`--theirs`.
+   See the `resolve-conflicts` skill (alias `rc`) for the how-to. Don't push a
+   half-resolved merge.
 
 6. **Run the repo's pre-commit checks before committing a conflict
    resolution.** Run whatever the current repo's checks are — build, lint,

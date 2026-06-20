@@ -33,6 +33,14 @@
 - When an MR/PR addresses multiple independent concerns, proactively offer to split it into
   separate MRs/PRs (one per concern). Simpler diffs = easier review, independent merge timelines,
   and less risk of one concern blocking another.
+- When resolving a git merge/rebase/cherry-pick conflict, consolidate the best of BOTH branches —
+  read why each side changed the hunk and preserve both intents; never blind-pick `--ours`/`--theirs`,
+  which silently discards the other side's work. Remove every marker (verify with `git diff --check`),
+  run the repo's pre-commit checks (a merge clean on each side separately can break combined), then
+  stage and finish the operation — don't `--abort`/`--skip` a conflict you were asked to resolve.
+  Note: "ours"/"theirs" are reversed in a rebase vs a merge. The `resolve-conflicts` skill (alias
+  `rc`) operationalizes this; `sync-pr-branch`/`clean-branches`/`gii` delegate to it. (Distinct from
+  `session-lock`/`deconflict-sessions`, which deconflicts AI *sessions*, not git content.)
 - When deferring items to follow-up issues during a PR/MR review loop, always update the
   PR/MR description with a "Known Deferred Items" section listing each deferred issue
   (with link), description, and rationale. This gives automated reviewers context so they
@@ -158,6 +166,16 @@
 - After implementing a feature or fix, ALWAYS commit and push immediately — don't wait
   for the user to ask "why haven't you pushed?" The implementation isn't done until the
   code is committed, pushed, and (if applicable) an MR is opened.
+- Write user-facing prose in my preferred style, per my Principles of Scientific Writing
+  guide (https://d-morrison.github.io/psw/ — the authority): limit dependent (subordinate)
+  clauses; cut low-content filler and jargon ("in order to" → "to", "due to the fact that" →
+  "because", drop "it's worth noting"); prefer plain Anglish words over Latin-derived ones
+  ("before" not "prior to", "needed" not "necessary", "use" not "utilize"); prefer short
+  simple declarative sentences and active voice; and join ideas with coordinating
+  conjunctions (and/but/so/or) over subordinate constructions. Apply this by default to my
+  OWN drafts, not just on request. Keep meaning, scope, and load-bearing hedges exact. When
+  PSW and the skill disagree, PSW wins. (see the `use-preferred-style` skill, alias `style`;
+  the `find-ai-tells` detector, alias `ai-tells`, is the scan-after counterpart.)
 - Before presenting non-trivial prose I authored (PR/issue descriptions, commit bodies,
   README/doc/vignette text, long answers meant as deliverable prose), self-check the draft
   for AI tells and cut them — overused vocabulary (delve, tapestry, testament, robust,
@@ -165,4 +183,5 @@
   hedging stacks, signposting filler ("it's worth noting"), em-dash overuse, bold-leading
   bullets, emoji headers, promotional register. De-slop, don't ban words or flatten voice;
   any single tell is innocent — clustering is the signal. Code, terse status lines, and
-  short conversational replies are exempt. (see the `find-ai-tells` skill, alias `ai-tells`.)
+  short conversational replies are exempt. This is the scan-after counterpart to the
+  plain-prose style above. (see the `find-ai-tells` skill, alias `ai-tells`.)
