@@ -144,6 +144,16 @@ Then, as their own explicit steps (don't leave them buried in a comment):
 > inconsistently across macOS/Linux; `rev-parse --show-toplevel` returns the
 > repo root directly regardless of how the symlink chain is set up.
 
+> **In a worktree session, that toplevel is the MAIN checkout, not your
+> worktree.** `~/.claude/skills` symlinks into the main `ai-config` checkout, so
+> `git -C ~/.claude/skills … rev-parse --show-toplevel` returns the main repo
+> root — often on another session's branch. Don't `cd` there and don't pass that
+> path to Write/Edit: the skill files (and git commits) would land in the main
+> checkout, clobbering into another session's working tree. Instead author the
+> files in your **worktree's own** `skills/<name>/` dir and run git from the
+> worktree (it's a full checkout of the same repo). Confirm with
+> `git branch --show-current` before committing.
+
 ## Relationship to other skills
 
 - **`ums` / `record-learnings`** — when a session reveals a workflow worth
@@ -163,3 +173,7 @@ Then, as their own explicit steps (don't leave them buried in a comment):
 - ❌ `name:` not matching the directory name.
 - ❌ Encoding a standing rule in the skill but not in `preferences.md`.
 - ❌ Leaving the new skill as a local-only uncommitted file (or pushing direct to main).
+- ❌ In a worktree session, writing the skill files to the `rev-parse --show-toplevel`
+  path — it resolves to the main checkout (via the `~/.claude/skills` symlink), not
+  your worktree, so the files land on another session's branch. Author in the
+  worktree's own `skills/` dir.
