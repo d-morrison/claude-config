@@ -46,6 +46,15 @@ For each round:
 3. **Request the review.**
    - `@claude` bot reviewer: post `@claude review` on the PR (or the repo's
      equivalent trigger).
+   - **Heads-up — some repos' review workflow is *not* comment-triggered.**
+     The d-morrison Quarto / R-pkg repos run `claude-code-review.yml` on
+     `pull_request` (`opened, synchronize, ready_for_review, reopened`) and
+     `workflow_dispatch` (input `pr_number`), not on an `@claude` comment. A new
+     push auto-fires it. To force a fresh review on an existing PR **without a
+     new commit**, prefer `workflow_dispatch`
+     (`gh workflow run claude-code-review.yml -f pr_number=<N>`, or MCP
+     `mcp__github__actions_run_trigger`); closing+reopening the PR also works
+     (fires `reopened`) but adds timeline noise. See `/memories/tools.md`.
    - Human reviewer: request one directly —
      ```bash
      gh api -X POST repos/<owner>/<repo>/pulls/<N>/requested_reviewers \

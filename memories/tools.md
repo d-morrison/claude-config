@@ -4,6 +4,25 @@
 - `gh` opens a pager (alternate buffer) that hangs the agent terminal.
 - Always disable it: pipe `| cat` or set `GH_PAGER=cat` (e.g. `gh pr view 116 | cat`).
 
+## Re-triggering the @claude PR *review* (d-morrison Quarto / R-pkg repos)
+- The review workflow (`.github/workflows/claude-code-review.yml`, which calls
+  `d-morrison/gha`'s reusable review workflow) is **not** comment-triggered. It
+  runs on `pull_request` (`types: [opened, synchronize, ready_for_review,
+  reopened]`) and on `workflow_dispatch` (input `pr_number`). Posting an
+  `@claude review` *comment* drives the separate agent workflow `claude.yml`
+  (which then re-dispatches a review after it pushes) — it does not directly
+  fire the review workflow.
+- A new push (`synchronize`) auto-fires a fresh review — the normal path during
+  an iterate loop.
+- To force a fresh review on an existing PR **without a new commit**:
+  - **workflow_dispatch** (preferred — no extra PR timeline noise):
+    `gh workflow run claude-code-review.yml -f pr_number=<N>`, or via MCP
+    `mcp__github__actions_run_trigger` (workflow `claude-code-review.yml`,
+    inputs `{pr_number: "<N>"}`). Use in remote/web sessions where `gh` is absent.
+  - **Close + reopen the PR** → fires the `reopened` event, which re-runs the
+    review. Works reliably, but clutters the timeline with close/reopen events;
+    prefer workflow_dispatch unless dispatch isn't available.
+
 ## Git tags (force-move / slide)
 - To move a tag to a new commit: `git tag -d <tag> && git tag <tag> <target> && git push origin :refs/tags/<tag> && git push origin <tag>`
 - Can't use `git push --force origin <tag>` on some GitLab instances (protected tags). The delete+recreate pattern always works.
