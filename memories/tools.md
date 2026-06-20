@@ -168,10 +168,11 @@
   symlink into the repo and `git -C` there fails with "not a git repository".
   The `@claude` reviewer enforces the per-skill form on new skills (it flagged
   the bare-parent form on PR #71); `skill-builder` and `ums` already use it.
-- Open issue #36 proposes standardizing on `git -C ~/.claude/skills rev-parse
-  --show-toplevel` (the bare-parent) — its example is the unreliable one (it can
-  error with "not a git repository", not a security risk); prefer the per-skill
-  form until #36 is reconciled.
+- Issue #36 originally proposed the bare-parent `git -C ~/.claude/skills
+  rev-parse --show-toplevel` — but that example is the unreliable one (it can
+  error with "not a git repository", not a security risk). #36 was resolved
+  (PR #109) by standardizing on the **per-skill** form instead, and sweeping the
+  last stragglers (`record-learnings`, `memorize`, `find-overlap`).
 - **Worktree caveat:** the resolved toplevel is the **MAIN** checkout, often on
   another session's branch — don't author files there. Work in your own
   worktree's `skills/<name>/` dir (full rationale in `skill-builder`'s Ship-it
