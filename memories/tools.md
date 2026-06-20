@@ -136,10 +136,35 @@
   parameter questions[0].question is missing`. Easy to omit when you build the
   call from options first; include the `question` string every time.
 
-## Bash tool runs under zsh — avoid reserved variable names
+## Bash tool runs under zsh — avoid bash-isms & reserved variable names
 - The Bash tool's shell is zsh-initialized, where some names are **read-only
   special variables**: `status`, `path`, `pipestatus`, `argv`, `options`, `?`.
   Assigning to them (e.g. `status=$(...)` in a poll loop) fails with
   `read-only variable: status` and aborts the command.
 - Use neutral names instead — `st`, `rc`, `out`, `p`. Bit a `gh run view`
   status-poll loop once; renaming `status`→`st` fixed it.
+- **No bash-only builtins.** `mapfile`/`readarray` are undefined in zsh —
+  `mapfile -t arr < <(cmd)` fails with `command not found: mapfile`. Iterate the
+  glob/list directly instead, e.g. `for d in skills/*/; do s=$(basename "$d");
+  …; done`, rather than slurping into an array first. This matters double for
+  **skill command blocks**: the user's local shell is zsh too, so a command
+  block I write into a skill gets run under zsh — keep it bash/zsh-portable.
+  (A `mapfile` loop in the link-skills draft failed this way; PR #71.)
+
+## Skill command blocks — resolve the ai-config repo root with the per-skill symlink
+- To `cd` to the repo root from inside a skill, use the **per-skill** form
+  `git -C ~/.claude/skills/<this-skill> rev-parse --show-toplevel`, never the
+  bare-parent `git -C ~/.claude/skills rev-parse --show-toplevel`. `bootstrap.sh`
+  may symlink skills
+  *per-child* into a real `~/.claude/skills` directory, so the parent isn't a
+  symlink into the repo and `git -C` there fails with "not a git repository".
+  The `@claude` reviewer enforces the per-skill form on new skills (it flagged
+  the bare-parent form on PR #71); `skill-builder` and `ums` already use it.
+- Open issue #36 proposes standardizing on `git -C ~/.claude/skills rev-parse
+  --show-toplevel` (the bare-parent) — its example is the unreliable one (it can
+  error with "not a git repository", not a security risk); prefer the per-skill
+  form until #36 is reconciled.
+- **Worktree caveat:** the resolved toplevel is the **MAIN** checkout, often on
+  another session's branch — don't author files there. Work in your own
+  worktree's `skills/<name>/` dir (full rationale in `skill-builder`'s Ship-it
+  caveat).
