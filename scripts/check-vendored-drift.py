@@ -51,7 +51,7 @@ def check_manifest(manifest_path: Path, errors: list[str]) -> int:
             errors.append(f"{path_str}: path escapes the repo root; refusing to read")
             continue
         if not vendored.is_file():
-            errors.append(f"{path_str}: listed in {rel.name} but missing on disk")
+            errors.append(f"{path_str}: listed in {rel} but missing on disk")
             continue
         actual = sha256_of(vendored)
         if actual != expected:
