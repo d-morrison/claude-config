@@ -4,6 +4,25 @@
 - `gh` opens a pager (alternate buffer) that hangs the agent terminal.
 - Always disable it: pipe `| cat` or set `GH_PAGER=cat` (e.g. `gh pr view 116 | cat`).
 
+## GitHub MCP tools (Claude Code remote/web sessions)
+- In remote/web sessions the authenticated GitHub identity is the repo owner
+  (`d-morrison`), so requesting `d-morrison` as a PR reviewer fails with
+  `422 Review cannot be requested from pull request author`. Harmless — the PR
+  is still created; the reviewer just isn't added. Don't treat the 422 as a
+  failure to retry (it's expected per the standing request-pr-review rule when
+  the author == the requested reviewer).
+- `gh` is NOT available in these sessions — use the `mcp__github__*` tools for
+  all GitHub interactions (PRs, issues, comments, reviews). CI status is always
+  available via `mcp__github__pull_request_read` (`get_check_runs` / `get_status`)
+  and the `mcp__github__actions_*` tools. Some environments may *also* expose a
+  separate `github_ci` MCP server (`mcp__github_ci__*`, e.g. `get_ci_status`),
+  which can connect asynchronously after session start. Don't conclude a tool is
+  absent from one check — `ToolSearch` for what you need before deciding it's
+  missing (and don't assume the `github_ci` server is present either).
+- Webhook PR-activity events cover comments/reviews/CI *failures* but NOT CI
+  *success*, new pushes, or merge-conflict transitions — don't rely on events
+  alone to know a PR went green or merged; re-check explicitly.
+
 ## Git tags (force-move / slide)
 - To move a tag to a new commit: `git tag -d <tag> && git tag <tag> <target> && git push origin :refs/tags/<tag> && git push origin <tag>`
 - Can't use `git push --force origin <tag>` on some GitLab instances (protected tags). The delete+recreate pattern always works.
@@ -53,3 +72,17 @@
   `Pkg.instantiate`). BUT the build-time Setup script can't be committed to a
   repo (it's pasted into the web UI), so a SessionStart hook is the only
   in-repo lever to auto-install a toolchain for *that repo's own* sessions.
+
+## @claude CI action (d-morrison/gha `claude.yml`)
+- The reusable `claude.yml@v1` agent workflow restores config files (`CLAUDE.md`,
+  `.claude/**`) to `origin/main` during its run (`restoreConfigFromBase`), so a
+  PR can't rewrite the reviewer's own instructions. With `eager-pr: true` +
+  `contents: write`, the **residual auto-commit step then commits that reset**
+  onto the PR branch as `claude[bot]` "chore: auto-commit residual @claude
+  session changes" — **deleting the PR's own `CLAUDE.md` edits**. `memories/**`
+  and `skills/**` are untouched; only the restored-config paths are affected.
+- Workaround on a PR that edits `CLAUDE.md`: restore the section
+  (`git checkout <my-commit> -- CLAUDE.md`, commit) and **merge promptly** — it
+  can recur on later runs. Before merging, run
+  `git show origin/<branch>:CLAUDE.md` and confirm the section is still there.
+  Tracked upstream: d-morrison/gha#39.

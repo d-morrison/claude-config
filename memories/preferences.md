@@ -33,6 +33,14 @@
 - When an MR/PR addresses multiple independent concerns, proactively offer to split it into
   separate MRs/PRs (one per concern). Simpler diffs = easier review, independent merge timelines,
   and less risk of one concern blocking another.
+- When resolving a git merge/rebase/cherry-pick conflict, consolidate the best of BOTH branches —
+  read why each side changed the hunk and preserve both intents; never blind-pick `--ours`/`--theirs`,
+  which silently discards the other side's work. Remove every marker (verify with `git diff --check`),
+  run the repo's pre-commit checks (a merge clean on each side separately can break combined), then
+  stage and finish the operation — don't `--abort`/`--skip` a conflict you were asked to resolve.
+  Note: "ours"/"theirs" are reversed in a rebase vs a merge. The `resolve-conflicts` skill (alias
+  `rc`) operationalizes this; `sync-pr-branch`/`clean-branches`/`gii` delegate to it. (Distinct from
+  `session-lock`/`deconflict-sessions`, which deconflicts AI *sessions*, not git content.)
 - When deferring items to follow-up issues during a PR/MR review loop, always update the
   PR/MR description with a "Known Deferred Items" section listing each deferred issue
   (with link), description, and rationale. This gives automated reviewers context so they
@@ -70,6 +78,12 @@
 - Always simplify code where feasible (without feature loss) — prune dead code paths,
   remove unreachable branches, simplify variable assignments that can never take their
   fallback values given the current invocation context.
+- When fixing a bug or a fragile/duplicated pattern, grep the WHOLE repo for sibling
+  instances and fix them all in one pass — don't patch only the occurrence you happened
+  to notice. Otherwise a reviewer flags the missed copies as a separate finding, costing
+  an extra round. (Learned on d-morrison/ai-config#45: the `git -C ~/.claude/skills`
+  path fix was applied to `ums/SKILL.md` but the identical line in `skill-builder/SKILL.md`
+  was missed until review caught it.)
 - Avoid nested function calls and nested function definitions where feasible — prefer
   named intermediate variables (or a pipe, e.g. `|>` / `%>%` in R) over `f(g(h(x)))`, and
   prefer top-level function definitions over functions defined inside other functions.
@@ -88,7 +102,12 @@
   the MR/PR link so the user can click through immediately.
 - When the user provides general guidance or a new preference, always update BOTH the
   relevant skills AND `/memories/preferences.md`. Skills encode the behavior; preferences
-  ensure it persists and is visible across all contexts.
+  ensure it persists and is visible across all contexts. When the same rule lives in two
+  copies (an expanded one in `CLAUDE.md`, a terse one in `preferences.md`), keep
+  load-bearing qualifiers/caveats consistent across both — the short copy is the one that
+  most easily drops a qualifier and becomes misleading. (Learned on PR #43: the terse
+  pipe-examples bullet dropped the "in R" qualifier that `CLAUDE.md` had, which a reviewer
+  flagged as implying `|>` / `%>%` exist in Python/JS.)
 - After adding or updating skills OR memory files in the ai-config repo, always commit
   and push everything to origin (on the current branch if a PR is already open, or
   create a new branch + PR if the change is out of scope). Never leave ANY changes in
@@ -107,6 +126,10 @@
   off `origin/main` (`git worktree add -b <branch> ../ai-config-worktrees/<branch> origin/main`),
   not the shared wd. Clean it up after merge with `git worktree remove`. (Learned when a
   concurrent session deleted a freshly-written, still-untracked skill file from the wd.)
+  The `session-lock` skill (alias `deconflict-sessions`) tooling automates this:
+  `ai-session.sh worktree <branch> [--base origin/main]` creates the isolated worktree,
+  `register`/`check` surface collisions, and the registry under `.git/ai-sessions/` lets
+  parallel sessions see each other before they clobber the shared checkout.
 - When creating a new acronym/short-name skill (e.g., `gi`, `sup`, `ums`), always also
   create a spelled-out alias skill (e.g., `grab-issue`, `send-upstream`,
   `update-memories-and-skills`) that points to the canonical file.
@@ -149,3 +172,22 @@
 - After implementing a feature or fix, ALWAYS commit and push immediately — don't wait
   for the user to ask "why haven't you pushed?" The implementation isn't done until the
   code is committed, pushed, and (if applicable) an MR is opened.
+- Write user-facing prose in my preferred style, per my Principles of Scientific Writing
+  guide (https://d-morrison.github.io/psw/ — the authority): limit dependent (subordinate)
+  clauses; cut low-content filler and jargon ("in order to" → "to", "due to the fact that" →
+  "because", drop "it's worth noting"); prefer plain Anglish words over Latin-derived ones
+  ("before" not "prior to", "needed" not "necessary", "use" not "utilize"); prefer short
+  simple declarative sentences and active voice; and join ideas with coordinating
+  conjunctions (and/but/so/or) over subordinate constructions. Apply this by default to my
+  OWN drafts, not just on request. Keep meaning, scope, and load-bearing hedges exact. When
+  PSW and the skill disagree, PSW wins. (see the `use-preferred-style` skill, alias `style`;
+  the `find-ai-tells` detector, alias `ai-tells`, is the scan-after counterpart.)
+- Before presenting non-trivial prose I authored (PR/issue descriptions, commit bodies,
+  README/doc/vignette text, long answers meant as deliverable prose), self-check the draft
+  for AI tells and cut them — overused vocabulary (delve, tapestry, testament, robust,
+  seamless…), the "it's not just X, it's Y" antithesis, mechanical rule-of-three lists,
+  hedging stacks, signposting filler ("it's worth noting"), em-dash overuse, bold-leading
+  bullets, emoji headers, promotional register. De-slop, don't ban words or flatten voice;
+  any single tell is innocent — clustering is the signal. Code, terse status lines, and
+  short conversational replies are exempt. This is the scan-after counterpart to the
+  plain-prose style above. (see the `find-ai-tells` skill, alias `ai-tells`.)
