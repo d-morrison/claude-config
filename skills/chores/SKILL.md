@@ -176,7 +176,8 @@ hide a behavior change. For each:
 ### 6. Report
 
 A linked wrap-up table — every PR number a markdown link (repo policy) — plus a
-Pacific-time timestamp (`date "+%Y-%m-%d %H:%M %Z"`):
+Pacific-time timestamp (`TZ=America/Los_Angeles date "+%Y-%m-%d %H:%M %Z"`; the
+explicit `TZ` enforces PT on a machine set to any other zone):
 
 ```
 ## Chores swept — <repo> — <PT timestamp>

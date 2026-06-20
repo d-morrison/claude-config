@@ -65,8 +65,9 @@ List, don't bury:
 
 - A table of the session's PRs/issues with outcomes, where **every** PR/MR/issue
   number is a markdown link (repo policy — never a bare `#N`).
-- A Pacific-time timestamp (`date "+%Y-%m-%d %H:%M %Z"`) so "as of when" is
-  unambiguous when the user re-reads it later.
+- A Pacific-time timestamp (`TZ=America/Los_Angeles date "+%Y-%m-%d %H:%M %Z"`;
+  the explicit `TZ` enforces PT on a machine set to any other zone) so "as of
+  when" is unambiguous when the user re-reads it later.
 
 ### 4. Run a UMS review
 

@@ -37,7 +37,7 @@ unpushed commits, no open decisions) — there's nothing to hand off.
 Gather the facts. Run what's relevant; don't invent values.
 
 ```bash
-date "+%Y-%m-%d %H:%M %Z"                       # local-time stamp (Pacific)
+TZ=America/Los_Angeles date "+%Y-%m-%d %H:%M %Z"  # local-time stamp (Pacific)
 git rev-parse --abbrev-ref HEAD                  # branch
 git log --oneline -1                             # local HEAD
 git log --oneline @{u}..HEAD 2>/dev/null         # UNPUSHED commits

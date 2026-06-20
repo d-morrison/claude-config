@@ -20,8 +20,9 @@ with the clear.
 
 When printing a status recap or summary, include a timestamp in the user's
 local time zone (Pacific Time, `America/Los_Angeles` — get it from
-`date "+%Y-%m-%d %H:%M %Z"`). This makes "as of when" unambiguous when the
-user reads the recap later.
+`TZ=America/Los_Angeles date "+%Y-%m-%d %H:%M %Z"`; the explicit `TZ` enforces
+PT on a machine set to any other zone). This makes "as of when" unambiguous when
+the user reads the recap later.
 
 ## Bare queue-command keywords
 
