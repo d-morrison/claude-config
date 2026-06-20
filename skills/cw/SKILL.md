@@ -2,6 +2,11 @@
 name: cw
 description: "Alias for `clean-worktrees`. Sweep dead git worktrees in the current repo — prune admin stubs, then remove linked worktrees whose branch merged (or is gone) and whose tree is clean, never touching the main/current worktree, a dirty tree, or one with a live session. Use when asked to 'cw', 'clean worktrees', 'prune worktrees', or 'clean dead worktrees'."
 user-invocable: true
+allowed-tools:
+  - Bash
+  - Read
+  - Edit
+  - Write
 ---
 
 # cw (alias for `clean-worktrees`)
