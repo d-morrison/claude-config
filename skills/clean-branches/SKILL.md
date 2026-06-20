@@ -152,7 +152,8 @@ git rebase origin/main
 ```
 
 If rebase has conflicts:
-- Attempt to resolve automatically
+- Attempt to resolve automatically (see the `resolve-conflicts` skill —
+  consolidate both sides, don't blind-pick)
 - If conflicts are non-trivial, skip this branch and report it
 - Don't force-push a broken rebase
 
