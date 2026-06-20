@@ -76,6 +76,16 @@ the natural checkpoint to bank those lessons before the context is gone. If
 nothing durable emerged, say so explicitly rather than manufacturing edits.
 (UMS commits its own changes via a branch + PR.)
 
+**Guard against recursion: skip this step when the merged PR was itself a
+UMS/learnings PR** (its diff is the memory/skill edits that captured a previous
+PR's lessons) **and no new lessons emerged from its own review loop.** Re-running
+UMS there is redundant — the lessons are already encoded in the PR that just
+merged — and spawns an endless UMS-on-UMS chain (each UMS PR merges → triggers
+post-merge → triggers another UMS PR). Still do steps 1–3 and 5; just don't
+manufacture a fresh UMS PR. (If the UMS PR's *own* review surfaced a genuinely
+new, separate lesson, capture that — but not a restatement of what the PR
+already banked.)
+
 ### 5. Report
 
 A linked summary: the merged PR, the auto-closed issue, any deferred follow-up
@@ -95,6 +105,10 @@ issues, what UMS updated, and a Pacific-time timestamp
 
 - ❌ Deleting the branch before confirming the merge actually landed.
 - ❌ Reaching for `git branch -D` (force) without checking why `-d` refused.
-- ❌ Skipping UMS — the just-merged PR is exactly when the lessons are freshest.
+- ❌ Skipping UMS on a normal PR — the just-merged PR is exactly when the
+  lessons are freshest.
+- ❌ Recursing UMS on a UMS PR — running UMS again when the just-merged PR was
+  itself the learnings PR, restating lessons it already banked (see step 4's
+  guard). The chain has to terminate somewhere.
 - ❌ Leaving deferred/acknowledged items without follow-up issues.
 - ❌ Reporting "all cleaned up" while a stacked sibling branch dangles unmentioned.
