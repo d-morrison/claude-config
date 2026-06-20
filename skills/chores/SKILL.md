@@ -127,7 +127,7 @@ settings.
 If checks are still running and you want it to land once they pass:
 
 ```bash
-gh pr merge "$N" --repo "$REPO" --squash --auto   # needs auto-merge enabled on the repo
+gh pr merge "$N" --repo "$REPO" --squash --auto   # needs auto-merge enabled; swap --squash for --merge/--rebase if squash is disabled
 ```
 
 For **Dependabot** you can also hand the merge back to the bot — it waits for
