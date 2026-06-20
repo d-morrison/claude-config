@@ -4,6 +4,38 @@
 - `gh` opens a pager (alternate buffer) that hangs the agent terminal.
 - Always disable it: pipe `| cat` or set `GH_PAGER=cat` (e.g. `gh pr view 116 | cat`).
 
+## Re-triggering the @claude PR *review* (d-morrison Quarto / R-pkg repos, e.g. `psw`)
+- Filenames below are those in the **content/package repos** (verified in
+  `d-morrison/psw`): the review workflow is `.github/workflows/claude-code-review.yml`
+  and the comment-triggered agent workflow is `.github/workflows/claude.yml`.
+  (ai-config's *own* bot uses different names — `claude-review.yml` /
+  `claude-bot.yml` — so don't infer these from *this* repo's `.github/workflows/`.)
+- The review workflow (which calls `d-morrison/gha`'s reusable review workflow)
+  is **not** comment-triggered. It runs on `pull_request` (`types: [opened,
+  synchronize, ready_for_review, reopened]`) and on `workflow_dispatch` (input
+  `pr_number`). Posting an `@claude review` *comment* drives the separate agent
+  workflow `claude.yml` (which then re-dispatches a review after it pushes) — it
+  does not directly fire the review workflow.
+- A new push (`synchronize`) auto-fires a fresh review — the normal path during
+  an iterate loop.
+- To force a fresh review on an existing PR **without a new commit**:
+  - **workflow_dispatch** (preferred — no extra PR timeline noise). Same
+    dispatch, three ways to send it:
+    - **`gh`:** `gh workflow run claude-code-review.yml -f pr_number=<N>`
+      (dispatches the workflow as defined on the **default branch** — `gh`
+      defaults `--ref` to it).
+    - **REST** (remote/web sessions, no `gh`):
+      `POST /repos/<owner>/<repo>/actions/workflows/claude-code-review.yml/dispatches`
+      with body `{"ref":"main","inputs":{"pr_number":"<N>"}}` (`"main"` = the
+      repo's **default branch**; the `ref` must be a branch/tag that *contains*
+      the workflow file, not the PR branch, unless you mean to dispatch a
+      modified version).
+    - **GitHub MCP:** your workflow-dispatch tool if available (e.g.
+      `mcp__github__actions_run_trigger`).
+  - **Close + reopen the PR** → fires the `reopened` event, which re-runs the
+    review. Works reliably, but clutters the timeline with close/reopen events;
+    prefer workflow_dispatch unless dispatch isn't available.
+
 ## GitHub MCP tools (Claude Code remote/web sessions)
 - In remote/web sessions the authenticated GitHub identity is the repo owner
   (`d-morrison`), so requesting `d-morrison` as a PR reviewer fails with
