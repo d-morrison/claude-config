@@ -79,8 +79,9 @@ leading number:
 
 - **patch / minor** — same major and the major is ≥ 1 (`3.0.2 → 3.0.3`,
   `2.4 → 2.7`) → **safe**.
-- **`0.x` bump** (`0.4 → 0.5`) → **review**; under semver a `0.x` release may
-  break between minor versions, so don't wave these through as safe.
+- **`0.x` bump** (`0.4 → 0.5`, `0.4.1 → 0.4.2`) → **review**; under semver a
+  `0.x` release may break between minor versions, so don't wave these through as
+  safe.
 - **major** — leading number increases (`4 → 7`, `2 → 3`, `1 → 2`) → **review**.
 - **submodule** (`chore(submodule):`) — no semver; it tracks a moving branch by
   design. Treat a green submodule bump as **safe** (auto-advancing the pointer
