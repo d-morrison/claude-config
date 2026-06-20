@@ -46,8 +46,9 @@ bounded window and **say what window you used**. Let `$ARGUMENTS` narrow it:
 gh repo view --json nameWithOwner --jq .nameWithOwner   # confirm the repo
 ```
 
-(GitLab: use `glab mr list`/`glab issue list`; the shape is the same. If neither
-CLI is installed, say so and stop — don't hit the raw API blind.)
+The commands below are written for GitHub/`gh`; the GitLab/`glab` equivalents
+follow each block. If the matching CLI isn't installed, say so and stop — don't
+hit the raw API blind.
 
 ### 2. Pull the closed items + their discussion
 
@@ -68,6 +69,17 @@ gh api repos/{owner}/{repo}/pulls/<N>/comments --jq '.[] | {user: .user.login, b
 gh issue view <N> --json number,title,url,body,comments
 ```
 
+GitLab equivalents (same shape):
+
+```bash
+glab mr list    --closed --per-page 30
+glab issue list --closed --per-page 30
+glab mr view <N> --comments          # body + discussion
+glab issue view <N> --comments
+# inline MR-thread notes, the glab counterpart to `gh api …/pulls/<N>/comments`:
+glab api "projects/:id/merge_requests/<N>/notes" --paginate
+```
+
 ### 3. Extract candidate follow-up mentions
 
 Scan the gathered text for **intent-to-defer** language, not just any keyword.
@@ -77,15 +89,19 @@ Signal phrases:
 - `defer`, `deferred`, `leave for later`, `for later`, `down the line`,
   `eventually`, `out of scope`
 - `separate PR`, `separate issue`, `future PR`, `another PR`, `in a follow-up`
-- `TODO`, `FIXME`, `we should`, `should probably`, `worth doing`
+- `TODO`, `FIXME`, `we should`, `we'll need to`, `should probably`,
+  `worth doing`, `let's revisit`, `I'll open an issue`, `for the next release`
 - ARD-summary sections — a `**Deferred**` or `**Acknowledged**` heading in a
   `@claude`/reviewer comment is the highest-value source: those are explicit
   "not doing this now" decisions.
 
-A starting regex (tune per repo):
+A starting regex (tune per repo) — pipe the fetched bodies straight into it
+(`\b` is GNU-only, so this avoids word boundaries for portability to BSD/macOS
+grep; `TODO`/`FIXME` may over-match, which the false-positive cull below handles):
 
 ```bash
-grep -inE 'follow[- ]?up|defer|out of scope|separate (pr|issue)|future pr|\bTODO\b|\bFIXME\b|leave .* later|down the line|acknowledged' <<<"$text"
+gh pr view <N> --json body,comments,reviews --jq '.body, (.comments[].body), (.reviews[].body)' \
+  | grep -inE "follow[- ]?up|defer|out of scope|separate (pr|issue)|future pr|TODO|FIXME|we'll need to|let's revisit|leave .* later|down the line|acknowledged"
 ```
 
 Keep, for each hit: the **source** (PR/issue # + the comment's `html_url`), the
@@ -98,13 +114,19 @@ the same thread says was already done.
 For each candidate decide whether it's **already tracked**:
 
 1. **Does the snippet cite an issue?** (`#123`, `Followup: #123`, a
-   `.../issues/123` URL.) If so, check that issue:
+   `.../issues/123` URL.) If so, check that issue — and, if closed, *why* it
+   closed:
    ```bash
-   gh issue view 123 --json number,state,title
+   gh issue view 123 --json number,state,stateReason,title,closedByPullRequestsReferences
    ```
    - exists & open → **tracked** (drop it).
-   - exists & closed *with the work done* → tracked (drop it).
-   - doesn't exist / closed-not-done → **dangling reference → untracked**.
+   - exists & closed **as completed** — `stateReason == "COMPLETED"`, or a
+     merged PR in `closedByPullRequestsReferences`, or a "fixed in #X" comment →
+     the work landed → tracked (drop it).
+   - exists & closed **as not-planned** — `stateReason == "NOT_PLANNED"`
+     (won't-fix / duplicate) with no merged PR → the work did **not** land →
+     still **untracked** (keep it; a won't-fix close doesn't mean done).
+   - doesn't exist → **dangling reference → untracked**.
 2. **No citation?** Search open issues for a match:
    ```bash
    gh issue list --state open --search "<keywords from the snippet>" \
@@ -124,8 +146,9 @@ A linked table — never a bare `#N` (repo policy):
 
 Order by confidence (explicit `**Deferred**` items first, fuzzy `we should…`
 last). Add the **window you swept** ("last 30 closed PRs + issues") and a
-Pacific-time timestamp (`date "+%Y-%m-%d %H:%M %Z"`), so the user knows the
-coverage and the "as of when".
+Pacific-time timestamp (`TZ=America/Los_Angeles date "+%Y-%m-%d %H:%M %Z"` —
+the explicit `TZ` enforces PT on a machine set to any other zone), so the user
+knows the coverage and the "as of when".
 
 If the sweep came back empty, say so plainly — don't manufacture candidates.
 
