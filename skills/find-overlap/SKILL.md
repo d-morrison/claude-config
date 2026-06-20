@@ -22,9 +22,10 @@ allowed-tools:
 # find-overlap — read-only overlap / redundancy detector
 
 Find where a corpus says the same thing twice — and change nothing. This is the
-*detection* half of de-duplication, factored out so it's reusable: the action
-skills (`consolidate-skills`, `consolidate-memory`) call it for their audit, and
-you can run it standalone to ask "what's redundant here?" over any body of
+*detection* half of de-duplication, factored out so it's reusable: an action
+skill calls it for its audit (today `consolidate-skills`; a memory-corpus
+`consolidate-memory` is planned — [#97](https://github.com/d-morrison/ai-config/issues/97)),
+and you can run it standalone to ask "what's redundant here?" over any body of
 content. It is to `consolidate-skills` what `pr-status` is to `ardi` — it reports,
 it does not act.
 
@@ -79,11 +80,18 @@ For skills:
 ```bash
 cd "$(git -C ~/.claude/skills rev-parse --show-toplevel)"
 for d in skills/*/; do n=$(basename "$d")
-  desc=$(awk -F'description:' '/^description:/{print $2; exit}' "$d/SKILL.md" | sed 's/^[ ">]*//' | cut -c1-70)
+  # robust for both inline and block-scalar (`description: >`) frontmatter:
+  desc=$(python3 -c "
+import re
+t=open('$d/SKILL.md').read()
+m=re.search(r'^description:[ \t]*[>|]?[ \t]*\n?(.*?)(?=\n\S|\Z)', t, re.M|re.S)
+print(re.sub(r'\s+',' ', m.group(1) if m else '').strip().strip('\"')[:70])")
   lc=$(wc -l < "$d/SKILL.md" | tr -d ' ')
   printf '%4s  %-34s %s\n' "$lc" "$n" "$desc"
 done | sort -n
 ```
+(A plain `awk -F'description:'` drops `description: >` block scalars — including
+this skill's own — to blank; the `python3` extractor handles both forms.)
 For memories: the same shape over `memories/*.md` (`name` + `description` from
 frontmatter). The line count separates thin stubs from real bodies at a glance.
 
@@ -108,22 +116,26 @@ that would carry it out:
 
 | Cluster | Members | Bucket | Shared | Recommended |
 |---------|---------|--------|--------|-------------|
-| review loop | `iterate`, `ardi` | genuine duplicate | same loop + bar | merge → `consolidate-skills` |
+| deploy | `deploy-staging`, `push-to-staging` | genuine duplicate | same deploy steps | merge → `consolidate-skills` |
 | sync trio | `merge-main`, `sync` | intentional alias | redirect stubs | leave |
 | tidy/simplify | `tidy`, `simplify` | adjacent-distinct | "clean up code" | cross-link → `link-skills` |
 
+(The first row is illustrative — a hypothetical pair, not a live finding. The
+other two model real corpus relationships.)
+
 Disposition routing: duplicate skills → `consolidate-skills`; duplicate memories
-→ `consolidate-memory`; adjacent-but-distinct missing a link → `link-skills`;
-redundant code → `tidy` / `simplify`; prose/docs → a manual edit. Always end with
-a recommendation per cluster — a raw similarity list with no disposition just
-pushes the judgment back to the reader.
+→ `consolidate-memory` (planned — [#97](https://github.com/d-morrison/ai-config/issues/97));
+adjacent-but-distinct missing a link → `link-skills`; redundant code → `tidy` /
+`simplify`; prose/docs → a manual edit. Always end with a recommendation per
+cluster — a raw similarity list with no disposition just pushes the judgment back
+to the reader.
 
 ## Relationship to other skills
 
 - **`consolidate-skills`** — the action counterpart for the skills corpus; it
   delegates its audit to this skill, then merges the genuine-duplicate clusters.
   find-overlap finds; consolidate-skills acts.
-- **`consolidate-memory`** — the action counterpart for the memory corpus.
+- **`consolidate-memory`** (planned — [#97](https://github.com/d-morrison/ai-config/issues/97)) — the action counterpart for the memory corpus.
 - **`link-skills`** — finds the *inverse* (distinct skills that should reference
   each other but don't); hand it the adjacent-but-distinct clusters.
 - **`find-ai-tells`** — sibling read-only scanner over prose, for a different

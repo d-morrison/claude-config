@@ -146,6 +146,9 @@ paragraphs; reads strongly AI. Recommend a rewrite pass,"* vs. *"One stray
   the quality check.
 - **`memorize` / `ums`** — if a new recurring tell surfaces, add it here and
   note it; keep the catalog living.
+- **`find-overlap`** — the sibling read-only scanner: this skill scans prose for
+  AI tells; `find-overlap` scans a corpus for duplicated/redundant content. Same
+  detect-and-report posture, different signal.
 
 ## Anti-patterns
 
