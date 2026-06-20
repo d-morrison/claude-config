@@ -1,6 +1,6 @@
 ---
 name: memorize
-description: "Persist a fact or preference to memory that survives across sessions, machines, and agents — routed by relevance to project-specific or general scope. Use when the user says 'memorize', 'remember that …', '/remember', 'from now on …', 'always/never …', 'note that …', or 'add to memories'. (`remember` is a synonym.)"
+description: "Persist a fact or preference to memory that survives across sessions, machines, and agents — routed by relevance to project-specific or general scope. Use when the user says 'memorize', 'remember that …', '/remember', 'from now on …', 'always/never …', 'note that …', or 'add to memories'. (`remember` / `/remember` and `always` / `/always` are synonyms.)"
 user-invocable: true
 allowed-tools:
   - Read
@@ -12,9 +12,9 @@ allowed-tools:
 # Memorize
 
 Persist a single fact or preference so it survives across sessions, machines,
-and agents. **`remember` / `/remember` and `always` are synonyms for this
-skill** — same behavior; the wording the user happens to use doesn't change
-anything.
+and agents. **`remember` / `/remember` and `always` / `/always` are synonyms
+for this skill** — same behavior; the wording the user happens to use doesn't
+change anything.
 
 Unlike `ums` (which reviews the whole session and may also update skill
 definitions), this stores exactly what the user says — no scanning, no skill
