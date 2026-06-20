@@ -223,3 +223,9 @@
   any single tell is innocent — clustering is the signal. Code, terse status lines, and
   short conversational replies are exempt. This is the scan-after counterpart to the
   plain-prose style above. (see the `find-ai-tells` skill, alias `ai-tells`.)
+- It's always OK to register a repo as a consumer in one of our upstream repos'
+  reverse-dependency list, without asking — e.g. add it to `d-morrison/gha`'s `REVDEPS.md`
+  when a repo starts calling its reusable workflows. Open a small doc-only PR off the
+  upstream's `main`. Applies across our orgs: d-morrison, UCD-SERG, ucdavis, UCLA-PHP,
+  UCD-IDDRC. The REVDEPS list lets us warn consumers before a breaking tag move, so adding
+  is pure upside.

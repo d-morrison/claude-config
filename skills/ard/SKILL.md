@@ -67,6 +67,8 @@ glab api "projects/:id/merge_requests/<N>/discussions"   # inline threads
 
 Bots often post the same finding twice — once inline and once in the summary comment. Collect the **union and dedupe** before numbering, so one issue doesn't get two rows (or two conflicting dispositions). Then number 1..n; every number must end up with a row in the summary.
 
+A PR can also carry **more than one review surface from different reviewers**: an inline code-review bot, a separate *agent* post-step that posts its own top-level summary, and Copilot are each distinct. `gh pr view <N> --comments` returns every top-level comment, so disposition each reviewer's findings — not just the inline review or the most recent comment. A whole review summary left un-dispositioned reads as ignored even when every inline thread was handled.
+
 ### 2. Disposition each one
 
 Apply the decision order above. For Address items, make the edits now.
