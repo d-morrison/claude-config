@@ -123,16 +123,16 @@ dangling invocation. Only the survivor remains. Never delete a whole memory
 
 ### 6. Fix every dangling reference
 
-A merged-away entry may be referenced elsewhere — by a `[[name]]` cross-link or
-by prose that names it. Grep for every such reference across the memory files
-and skill bodies, then repoint any that pointed at an absorbed entry at the
-surviving canonical:
+A merged-away entry may be referenced by a `[[name]]` cross-link. List every
+`[[...]]` use across the memory files and skill bodies, then repoint any that
+pointed at an absorbed entry at the surviving canonical:
 
 ```bash
 grep -rn "\[\[" memories/ skills/*/SKILL.md CLAUDE.md 2>/dev/null
 ```
 
-Don't leave a reference resolving to an entry you removed.
+If you also named the absorbed entry in prose, grep that distinctive text and
+repoint it too. Don't leave a reference resolving to an entry you removed.
 
 ### 7. Validate, then ship via branch + PR
 
@@ -148,7 +148,8 @@ then **ARDI to clean** (`ardi`).
 ```bash
 git checkout -b consolidate-memory-<topic> origin/main
 # build the canonical entry, remove the absorbed copies, repoint links
-git add memories/   # only the memory files you touched — never `git add -A`
+git add memories/<file>.md   # only the files you touched — never a bare
+                             # `git add memories/` (sweeps in unrelated edits) or `git add -A`
 git commit -m "memories: consolidate <topic> duplicates into one canonical entry"
 git push -u origin HEAD && gh pr create --fill
 ```
