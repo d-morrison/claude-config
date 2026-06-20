@@ -23,8 +23,8 @@ issue, then offers to file them.
   review thread or PR body fell on the floor.
 
 This is the retroactive, cross-PR sweep that the forward and single-scope skills
-don't do. `defer-issue` files a follow-up at defer-time, `post-merge` checks only
-the one PR that just merged, and `wrap-up` covers only the current session.
+don't do. `defer-issue` files a follow-up at defer-time. `post-merge` checks only
+the one PR that just merged. `wrap-up` covers only the current session.
 
 ## Procedure
 
