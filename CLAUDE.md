@@ -188,3 +188,27 @@ definitions where feasible**:
 This is a readability/maintainability default, not an absolute rule — keep the
 nesting when flattening it would be more convoluted (a trivial one-argument
 wrapper, or a closure that genuinely needs the enclosing scope).
+
+## Writing style: scan for AI tells
+
+Before presenting non-trivial prose I authored — PR/issue descriptions, commit
+bodies, README/doc/vignette text, or a long answer meant as deliverable prose —
+**self-check the draft for AI tells and cut them** before sending. Watch for:
+
+- **Overused vocabulary:** delve, leverage, utilize, tapestry, testament, realm,
+  robust, seamless, holistic, nuanced, multifaceted, pivotal, crucial, "in
+  today's fast-paced world", "stands as a testament to".
+- **Rhetorical reflexes:** the "it's not just X, it's Y" antithesis (the biggest
+  tell), mechanical rule-of-three lists, signposting filler ("it's worth noting
+  that", "importantly"), hedging stacks, hollow "in conclusion" restatements.
+- **Structural/typographic:** em-dash overuse as a default connector,
+  bold-leading `**Term:**` bullets applied mechanically, emoji section headers,
+  conspicuously uniform paragraph rhythm.
+- **Tonal:** promotional register, reflexive both-sidesing, vague universals
+  with no concrete names or numbers.
+
+De-slop — cut the filler and the reflexes — **don't** ban words outright or sand
+the text into a flat, voiceless register. Any single tell is innocent;
+clustering and mechanical repetition are the signal. Code, terse status lines,
+and short conversational replies are exempt. The `find-ai-tells` skill (alias
+`ai-tells`) runs this same catalog on demand against any target text.

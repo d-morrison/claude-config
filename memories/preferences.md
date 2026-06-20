@@ -153,3 +153,11 @@
 - After implementing a feature or fix, ALWAYS commit and push immediately — don't wait
   for the user to ask "why haven't you pushed?" The implementation isn't done until the
   code is committed, pushed, and (if applicable) an MR is opened.
+- Before presenting non-trivial prose I authored (PR/issue descriptions, commit bodies,
+  README/doc/vignette text, long answers meant as deliverable prose), self-check the draft
+  for AI tells and cut them — overused vocabulary (delve, tapestry, testament, robust,
+  seamless…), the "it's not just X, it's Y" antithesis, mechanical rule-of-three lists,
+  hedging stacks, signposting filler ("it's worth noting"), em-dash overuse, bold-leading
+  bullets, emoji headers, promotional register. De-slop, don't ban words or flatten voice;
+  any single tell is innocent — clustering is the signal. Code, terse status lines, and
+  short conversational replies are exempt. (see the `find-ai-tells` skill, alias `ai-tells`.)
