@@ -35,12 +35,14 @@ read_json_field() { # field-name
     printf '%s' "$payload" | jq -r --arg f "$field" '.[$f] // empty' 2>/dev/null && return
   fi
   if command -v python3 >/dev/null 2>&1; then
-    # Pass the field name as a positional arg so code and data stay separate.
-    printf '%s' "$payload" | python3 -c "
+    # Single-quote the program so the shell never expands anything inside the
+    # Python body, and pass the field name as a positional arg — code and data
+    # stay fully separate (no $-interpolation into the source, now or later).
+    printf '%s' "$payload" | python3 -c '
 import json,sys
-try: print(json.load(sys.stdin).get(sys.argv[1],''))
+try: print(json.load(sys.stdin).get(sys.argv[1],""))
 except Exception: pass
-" "$field" 2>/dev/null && return
+' "$field" 2>/dev/null && return
   fi
 }
 
