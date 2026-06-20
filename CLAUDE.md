@@ -148,3 +148,19 @@ The detector counterpart to the plain-prose guide above.
 
 The `find-ai-tells` skill (alias `ai-tells`) runs this same catalog on demand
 against any target text.
+
+## Useful prompt formats for coding agents
+
+<!-- Vendored from UCD-SERG/lab-manual; edit there, not here. See README, "Shared content". -->
+@shared/vendored/prompt-formats.md
+
+## Review with Copilot before requesting human review
+
+This is shared lab guidance on getting an automated review before asking a human
+reviewer. When *I* iterate a PR, the ARDI loop above is the mechanism — it
+already addresses whatever the `@claude` or Copilot reviewer flags — so read this
+as the lab-member-facing statement of the same principle, not a second loop to
+run.
+
+<!-- Vendored from UCD-SERG/lab-manual; edit there, not here. See README, "Shared content". -->
+@shared/vendored/copilot-review-before-human.md

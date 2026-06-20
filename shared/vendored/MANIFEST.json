@@ -1,0 +1,20 @@
+{
+  "source_repo": "UCD-SERG/lab-manual",
+  "source_ref": "main",
+  "files": [
+    {
+      "path": "shared/vendored/prompt-formats.md",
+      "source_path": "shared/prompt-formats.md",
+      "commit": "d0bd1e6c33d0b77de22d02e71310c1c736767618",
+      "sha256": "0de939768a35cb65bda6f5cdf99c1dad91f89b5a86d8d62ff82d91146a4ea3c3",
+      "source_url": "https://github.com/UCD-SERG/lab-manual/blob/d0bd1e6c33d0b77de22d02e71310c1c736767618/shared/prompt-formats.md"
+    },
+    {
+      "path": "shared/vendored/copilot-review-before-human.md",
+      "source_path": "shared/copilot-review-before-human.md",
+      "commit": "d0bd1e6c33d0b77de22d02e71310c1c736767618",
+      "sha256": "335a52dc0d0c58029c16ae838dd3ce136376cdcc3358b08aedbf4f14e5494585",
+      "source_url": "https://github.com/UCD-SERG/lab-manual/blob/d0bd1e6c33d0b77de22d02e71310c1c736767618/shared/copilot-review-before-human.md"
+    }
+  ]
+}
