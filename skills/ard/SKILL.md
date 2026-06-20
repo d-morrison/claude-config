@@ -36,6 +36,15 @@ For anything that requests a change, choose among the first three (Acknowledge i
 2. **Rebut** — only when you're confident the reviewer is mistaken. A rebuttal that isn't falsifiable ("I think it's fine") is not a rebuttal.
 3. **Defer** — only when the fix genuinely expands scope. Never defer just because a fix is "minor" — minor fixes get Addressed.
 
+> **"You deleted/removed X" findings — check for branch-behind-main first.** When
+> a reviewer says the PR removed something you don't recall touching, run
+> `git log HEAD..origin/main` and `git show HEAD:<file>` before Addressing. Main
+> may have *added* X after you branched, so X is absent only because the branch is
+> stale — not because your diff deleted it. The fix is **merge `origin/main` in**
+> (the standing keep-synced rule), not "restore" a line you never removed. Verify
+> the actual committed diff (`git show <commit> -- <file>`) rather than trusting
+> the finding's framing. (Seen on ai-config PR #52.)
+
 ## Procedure
 
 ### 1. Gather every finding
