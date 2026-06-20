@@ -30,7 +30,7 @@ Rule out extending an existing skill *before* scaffolding anything:
 1. **Search the live skills** for something that already owns (or is adjacent
    to) this concern:
    ```bash
-   cd "$(git -C ~/.claude/skills rev-parse --show-toplevel)"   # the ai-config repo
+   cd "$(git -C ~/.claude/skills/skill-builder rev-parse --show-toplevel)"   # the ai-config repo
    ls skills/
    grep -ril "<keywords>" skills/*/SKILL.md
    ```
@@ -121,7 +121,7 @@ local-only. Commit via a **branch + PR** (not direct to main), request
 `d-morrison` as reviewer, then **ARDI to clean**.
 
 ```bash
-cd "$(git -C ~/.claude/skills rev-parse --show-toplevel)"   # the ai-config repo
+cd "$(git -C ~/.claude/skills/skill-builder rev-parse --show-toplevel)"   # the ai-config repo
 git fetch origin main && git checkout -b add-<name>-skill origin/main
 # write skills/<name>/SKILL.md (+ alias dir, + preferences/CLAUDE.md if it's a rule)
 git add skills/<name>/SKILL.md memories/preferences.md      # stage the files you

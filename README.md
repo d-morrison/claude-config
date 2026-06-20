@@ -127,6 +127,19 @@ are picked up automatically.
 > time Claude runs). Skills become available to the bot for all sessions after
 > this PR merges.
 
+## Deconflicting parallel local sessions
+
+When several AI sessions have the **same local checkout** open at once (two
+Claude Code tabs, a CLI + the IDE extension, two terminals) they can clobber
+each other — branch switches under uncommitted edits, racing pushes, duplicate
+builds. The **`session-lock`** skill (alias `deconflict-sessions`) is the
+local-filesystem counterpart to `claim-pr`: a small registry CLI
+(`skills/session-lock/scripts/ai-session.sh`) keeps a machine-local list of
+active sessions under `.git/ai-sessions/`, so sessions can see each other,
+refuse to share a working tree, isolate into a `git worktree`, and auto-recover
+after a crash. There's an optional `SessionStart` hook for hands-off
+registration. See [`docs/local-session-deconfliction.md`](docs/local-session-deconfliction.md).
+
 ## Quality gates
 
 Two lightweight checks keep the skill catalog well-formed:

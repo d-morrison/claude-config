@@ -25,3 +25,28 @@
 - Diagnose: `sed -n 'A,Bp' file | od -c | head` and look for `\r \n`.
 - Fix: `perl -i -pe 's/\r\n/\n/g' file`, then re-run `bash -n file`.
 - Prevent: add `.gitattributes` with `*.sh text eol=lf`.
+
+## Writing robust bash scripts (recurring review findings)
+Lessons the reviewer flagged across the `session-lock` PR (d-morrison/ai-config#38) —
+pre-empt these when authoring shell, especially under `set -euo pipefail`:
+- **`mktemp` + rename: add a cleanup trap.** A process killed between `mktemp`
+  and the `mv` orphans temp files forever. Pattern: `tmp=$(mktemp <dir>/.tmp.XXXXXX);
+  trap 'rm -f "${tmp:-}"' EXIT; … > "$tmp"; mv -f "$tmp" "$dest"; trap - EXIT`.
+  Belt-and-suspenders for `SIGKILL` (trap can't fire): a prune path that sweeps
+  `find <dir> -name '.tmp.*' -mmin +60 -delete` — but the `-name` glob must match
+  the `mktemp` prefix you chose, or it silently misses every orphan
+  (`.tmp.XXXXXX` → `'.tmp.*'`; mktemp's bare `tmp.XXXXXX` default → `'tmp.*'`).
+- **Bounds-check value-taking flags before `shift 2`.** In a `set -e` arg
+  parser, `--flag` as the last arg makes `${2:-}` expand to "" but the following
+  `shift 2` fail (count out of range) → script aborts with a cryptic error.
+  Guard with the `set -u`-safe presence test:
+  `--flag) [ "${2+set}" = set ] || die "--flag requires a value"; V="$2"; shift 2 ;;`
+  (`${2+set}` → `set` when `$2` is present even if empty, `""` when absent.)
+- **Never interpolate shell vars into a `python3 -c` / `awk` program string.**
+  Pass them as arguments: `python3 -c '…sys.argv[1]…' "$val"` (not `"…'$val'…"`)
+  — keeps code and data separate and avoids quoting/injection breakage.
+- **Declare loop-local vars once** in the function's top `local` line; bash
+  `local` is function-scoped, so re-declaring inside loop bodies is redundant.
+- **bash 3.2 (macOS default) compatibility:** indexed arrays, C-style
+  `for ((…))`, and `${2+set}` all work; **associative arrays do NOT** (4.0+).
+  Parse key=value records with `while IFS='=' read -r k v; do case "$k" in …`.

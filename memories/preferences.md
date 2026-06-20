@@ -81,6 +81,12 @@
 - Always simplify code where feasible (without feature loss) — prune dead code paths,
   remove unreachable branches, simplify variable assignments that can never take their
   fallback values given the current invocation context.
+- When fixing a bug or a fragile/duplicated pattern, grep the WHOLE repo for sibling
+  instances and fix them all in one pass — don't patch only the occurrence you happened
+  to notice. Otherwise a reviewer flags the missed copies as a separate finding, costing
+  an extra round. (Learned on d-morrison/ai-config#45: the `git -C ~/.claude/skills`
+  path fix was applied to `ums/SKILL.md` but the identical line in `skill-builder/SKILL.md`
+  was missed until review caught it.)
 - Avoid nested function calls and nested function definitions where feasible — prefer
   named intermediate variables (or a pipe, e.g. `|>` / `%>%` in R) over `f(g(h(x)))`, and
   prefer top-level function definitions over functions defined inside other functions.
@@ -118,6 +124,10 @@
   off `origin/main` (`git worktree add -b <branch> ../ai-config-worktrees/<branch> origin/main`),
   not the shared wd. Clean it up after merge with `git worktree remove`. (Learned when a
   concurrent session deleted a freshly-written, still-untracked skill file from the wd.)
+  The `session-lock` skill (alias `deconflict-sessions`) tooling automates this:
+  `ai-session.sh worktree <branch> [--base origin/main]` creates the isolated worktree,
+  `register`/`check` surface collisions, and the registry under `.git/ai-sessions/` lets
+  parallel sessions see each other before they clobber the shared checkout.
 - When creating a new acronym/short-name skill (e.g., `gi`, `sup`, `ums`), always also
   create a spelled-out alias skill (e.g., `grab-issue`, `send-upstream`,
   `update-memories-and-skills`) that points to the canonical file.
@@ -142,6 +152,13 @@
   `skill-builder` skill.)
 - "slide <tag>" means force-move a floating Git tag to current main HEAD (delete + recreate + push).
   Common for repos with floating major-version tags that consumers reference.
+- When starting a *write* session on a repo that another LOCAL session might also have open
+  (multiple Claude Code tabs / CLI + IDE / two terminals on the same checkout), use the
+  `session-lock` skill (alias `deconflict-sessions`): register at start, `check` before
+  editing, and on a SAME-WORKING-TREE conflict isolate into a `git worktree` before touching
+  files. This is the LOCAL counterpart to `claim-pr` (remote) and `sync-pr-branch` (reconcile
+  with origin) — use all three together on shared PR work. Registry lives under `.git/ai-sessions/`
+  (never committed). Script: `~/.claude/skills/session-lock/scripts/ai-session.sh`.
 
 - "dew it" means "do it".
 - After implementing a feature or fix, ALWAYS commit and push immediately — don't wait
