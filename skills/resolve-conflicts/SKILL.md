@@ -20,7 +20,8 @@ floor. Don't. **Consolidate, don't choose.**
 ## When this fires
 
 - Any git operation stops on a conflict: `git merge`, `git rebase`,
-  `git cherry-pick`, `git stash pop`, `git pull`, `git revert`. The tell is
+  `git cherry-pick`, `git stash pop`, `git pull` (merge *or* rebase),
+  `git revert`. The tell is
   `CONFLICT (content): Merge conflict in …` and `Unmerged paths:` in
   `git status`.
 - "resolve the conflicts", "fix the merge conflicts", "I have a merge
@@ -78,7 +79,7 @@ go read the history first (step 2).
 4. **Prove no markers (or whitespace damage) slipped through:**
    ```bash
    git diff --check                      # flags leftover markers + whitespace errors
-   grep -rnE '^(<<<<<<<|=======|>>>>>>>)' . --exclude-dir=.git   # belt and suspenders (portable -E)
+   grep -rnE '^(<<<<<<< |======= *$|>>>>>>> )' . --exclude-dir=.git   # precise markers, portable -E
    ```
 
 5. **Run the repo's pre-commit checks before committing the resolution.** A
@@ -88,12 +89,15 @@ go read the history first (step 2).
    resolution that fails checks.
 
 6. **Stage the resolved files, then finish the operation** — never `--abort` or
-   `--skip` away a conflict you were asked to resolve:
+   `--skip` away a conflict you were asked to resolve. The finish command
+   matches the operation `git status` names, **not** the command you typed
+   (a `git pull` is a merge *or* a rebase underneath — check which):
    ```bash
    git add <file> …
-   git commit                 # for a merge (message is prefilled)
-   git rebase --continue      # for a rebase
-   git cherry-pick --continue # for a cherry-pick
+   git commit                 # merge / revert with no auto-message → also: git revert --continue
+   git rebase --continue      # rebase (incl. `git pull --rebase`)
+   git cherry-pick --continue # cherry-pick
+   git stash drop             # stash pop: nothing to commit; drop the now-applied stash
    ```
 
 ## ⚠️ "ours" and "theirs" flip between merge and rebase
