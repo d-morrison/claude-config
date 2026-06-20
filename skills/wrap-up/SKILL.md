@@ -33,6 +33,7 @@ gh pr list --state open --json number,title,headRefName,author \
   --jq '.[] | "#\(.number) [\(.author.login)] \(.title)"'
 gh issue list --state open --json number,title --jq '.[] | "#\(.number) \(.title)"'
 git status --short                         # uncommitted work?
+git worktree list                          # leftover worktrees (agent isolation / session-lock)?
 git log --oneline -5 origin/main           # what actually landed on main
 ```
 
@@ -50,6 +51,9 @@ List, don't bury:
   `@claude`-bot-opened PR) instead of silently passing over it.
 - **Open issues**, **uncommitted working-tree changes**, **unmerged local
   branches**, and any **deferred follow-up issues** filed this session.
+- **Leftover git worktrees** — agent isolation and `session-lock` leave
+  worktrees behind (esp. ones whose PR already merged). Flag them and offer to
+  run `clean-worktrees` (`cw`) to sweep the dead ones.
 - Never report "all done" while something is open — name it and say whose call
   it is (e.g. "PR #25 is the bot's; yours to merge or close").
 

@@ -232,7 +232,9 @@ git worktree prune -v               # clears any record left by the removals
   after this skill (or let step 5 delete branches inline) so a removed
   worktree's branch doesn't linger. Same dry-run-then-confirm discipline.
 - **`post-merge`** — after a PR merges, removing its worktree is part of the
-  tidy-up; that skill can hand off here for a repo-wide sweep.
+  tidy-up (step 2 there); that skill can hand off here for a repo-wide sweep.
+- **`wrap-up`** — the session-level bookend surfaces leftover worktrees and
+  offers to run this skill to sweep the dead ones.
 
 ## Anti-patterns
 
