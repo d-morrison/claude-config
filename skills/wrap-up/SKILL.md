@@ -15,14 +15,15 @@ Close out a work session cleanly: confirm where everything *actually* landed,
 report it with clickable links (surfacing anything still open), and capture
 what was learned before the context is gone.
 
-Synonyms: `merged` — routes here, and can name the just-merged PR to anchor the
-summary (e.g. `/merged #74`). (Distinct from `post-merge`, which wraps up a
-single just-merged PR rather than the whole session.)
+Synonyms: `done` and `merged` both route here. `merged` can name the
+just-merged PR to anchor the summary (e.g. `/merged #74`). (Distinct from
+`post-merge`, which wraps up a single just-merged PR rather than the whole
+session.)
 
 ## When this fires
 
-- "wrap up", "wrap up the session", "finish up", "let's close out", "are we
-  done?"
+- "wrap up", "wrap up the session", "finish up", "let's close out", "done",
+  "all done", "are we done?"
 - The end of a multi-PR / multi-issue session.
 
 ## Procedure
