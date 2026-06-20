@@ -25,6 +25,18 @@ finding → push → post summary → re-request review → repeat until clean.
 2. **Read the latest review.** Pull the most recent reviewer comment (bot or
    human). Don't trust earlier cached verdicts.
 
+   **If the latest review is a cancellation, the live verdict is stale —
+   don't re-do already-applied fixes.** A `cancel-in-progress` cancellation
+   (the d-morrison/gha setup cancels superseded review runs) means the last
+   *complete* review's findings may already have been fixed by a commit that
+   landed after it, with the confirming re-review killed before it could post.
+   Before treating those findings as outstanding work, **diff the current code
+   against each one** to see what's already addressed — then push only what's
+   genuinely needed and let a fresh review confirm. Re-applying fixes that are
+   already in the tree wastes a round and muddies the diff. If *nothing*
+   remains outstanding (every finding is already applied), don't push an empty
+   commit — skip to step 6 and re-request the review directly.
+
 3. **ARD every finding.** For each flagged item, choose exactly one:
    - **Address** — fix it, commit.
    - **Rebut** — explain why it's correct (with evidence).

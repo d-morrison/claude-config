@@ -103,3 +103,11 @@
   text) — `header` + `options` alone fail with `InputValidationError: required
   parameter questions[0].question is missing`. Easy to omit when you build the
   call from options first; include the `question` string every time.
+
+## Bash tool runs under zsh — avoid reserved variable names
+- The Bash tool's shell is zsh-initialized, where some names are **read-only
+  special variables**: `status`, `path`, `pipestatus`, `argv`, `options`, `?`.
+  Assigning to them (e.g. `status=$(...)` in a poll loop) fails with
+  `read-only variable: status` and aborts the command.
+- Use neutral names instead — `st`, `rc`, `out`, `p`. Bit a `gh run view`
+  status-poll loop once; renaming `status`→`st` fixed it.
