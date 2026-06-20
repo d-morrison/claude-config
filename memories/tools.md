@@ -62,7 +62,7 @@
 
 ## Git branch create/reset (`git switch -C`)
 - `git switch -C "$BRANCH"` is already safe against flag-shaped branch names: `$BRANCH` is the argument *to* `-C`, so a value like `--weird` fails cleanly as `fatal: '--weird' is not a valid branch name` rather than being parsed as an option.
-- Do NOT "harden" it to `git switch -C -- "$BRANCH"` — that form is **broken**: the `--` makes git read the next token as a start-point/ref, so it fails with `fatal: invalid reference: <name>` and never creates the branch. (Verified on git 2.x; a review bot suggested the broken form on d-morrison/gha#58.)
+- Do NOT "harden" it to `git switch -C -- "$BRANCH"` — that form is **broken**: the `--` is consumed as the branch name (the required argument to `-C`), so `$BRANCH` is parsed as the start-point instead and the command fails without creating the branch. (Verified on git 2.x; a review bot suggested the broken form on d-morrison/gha#58.)
 
 ## GitLab Discussions API (inline diff comments)
 - Endpoint: `POST /projects/:id/merge_requests/:iid/discussions`
