@@ -151,6 +151,9 @@ git -C <submodule-path> fetch && git -C <submodule-path> log HEAD..FETCH_HEAD --
 
 ## Relationship to other skills
 
+- **`chores`** — the processing counterpart. This skill *finds* stale pins (and
+  recommends a `dependabot.yml`); once Dependabot opens the resulting bump PRs,
+  `chores` triages and merges/flags them.
 - **`prefer-upstream`** — the write-time counterpart: choose a maintained
   upstream dependency instead of hand-rolling. This skill keeps those choices
   current over time.
