@@ -70,6 +70,12 @@
 - Always simplify code where feasible (without feature loss) — prune dead code paths,
   remove unreachable branches, simplify variable assignments that can never take their
   fallback values given the current invocation context.
+- When fixing a bug or a fragile/duplicated pattern, grep the WHOLE repo for sibling
+  instances and fix them all in one pass — don't patch only the occurrence you happened
+  to notice. Otherwise a reviewer flags the missed copies as a separate finding, costing
+  an extra round. (Learned on d-morrison/ai-config#45: the `git -C ~/.claude/skills`
+  path fix was applied to `ums/SKILL.md` but the identical line in `skill-builder/SKILL.md`
+  was missed until review caught it.)
 - Avoid nested function calls and nested function definitions where feasible — prefer
   named intermediate variables (or a pipe, e.g. `|>` / `%>%` in R) over `f(g(h(x)))`, and
   prefer top-level function definitions over functions defined inside other functions.
