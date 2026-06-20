@@ -94,6 +94,16 @@ gh pr comment <N> --body-file ard-summary.md         # GitHub
 glab mr note <N> -F ard-summary.md                   # GitLab
 ```
 
+**Keep the bot's trigger phrase out of the summary body.** The `issue_comment`
+trigger fires on the bare bot `@`-mention **anywhere** in a comment — even in a
+sentence saying you're *not* re-requesting a review. Refer to it obliquely
+("re-request review", "the review-trigger mention") or split the tokens (e.g.
+`@ claude`, with a space, so the raw body never contains the contiguous handle);
+paste the literal `@`-mention only when you actually intend to dispatch a review. A
+stray mention spawns a run that cancels the push-triggered review on
+`cancel-in-progress` setups. On the d-morrison/gha mention bot it also starts a
+session whose residual-commit sweep can churn the branch.
+
 Summary format:
 
 ```

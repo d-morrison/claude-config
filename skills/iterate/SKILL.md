@@ -62,6 +62,17 @@ For each round:
      author — GitHub returns 422; surface that, don't swallow it. (If your
      config ships a `request-pr-review` skill, use it — it does the same.)
 
+   **Don't let the trigger phrase leak into prose.** The `issue_comment`
+   trigger fires on the bare bot `@`-mention **anywhere** in a comment body —
+   even inside a sentence saying you're *not* triggering a review. In ARD
+   summaries and status comments, refer to it obliquely ("re-request review",
+   "the review-trigger mention") or split the tokens (e.g. `@ claude`, with a
+   space, so the raw body never contains the contiguous handle); paste the
+   literal `@`-mention only when you actually intend to dispatch. A stray mention
+   spawns a run that cancels the push-triggered review on `cancel-in-progress`
+   setups. On the d-morrison/gha mention bot it also starts a session whose
+   residual-commit sweep can churn the branch.
+
 4. **Wait for the review to land, then read the LATEST one.** Don't trust an
    earlier cached verdict — a newer review may have landed since (bot, human,
    or re-trigger). **You MUST actively poll** until a new review appears that
