@@ -50,6 +50,20 @@ Use `git branch -d` (not `-D`): `-d` refuses to delete a branch with commits
 that aren't merged. If it refuses, the branch has unmerged work — investigate
 before forcing anything.
 
+If the PR was built in a **git worktree** (agent isolation or `session-lock`),
+remove the worktree as part of the tidy — a worktree pins its branch, so
+`git branch -d` *refuses* while the worktree still holds it ("branch is checked
+out at <path>"). Remove it first, then delete the branch:
+
+```bash
+git worktree list                 # find the merged branch's worktree path
+git worktree remove <path>        # refuses on a dirty tree — don't blindly --force
+git branch -d <merged-branch>     # now succeeds
+```
+
+For a repo-wide sweep of *all* dead worktrees (not just this PR's), run
+`clean-worktrees` (`cw`).
+
 If other local branches were **stacked** on this one, offer to rebase them onto
 the new `main` rather than deleting silently (see `cb` / `clean-branches`).
 
@@ -101,6 +115,9 @@ issues, what UMS updated, and a Pacific-time timestamp
   end. They share the verify-then-UMS shape.
 - **`ums`** — step 4 invokes it.
 - **`cb` / `clean-branches`** — for stacked or stale sibling branches.
+- **`clean-worktrees` / `cw`** — if the PR was built in a git worktree, remove
+  it during the tidy (step 2); a leftover worktree pins its branch and blocks
+  `git branch -d`.
 - **`st` / `gi`** — the front of the lifecycle that `post-merge` closes.
 
 ## Anti-patterns

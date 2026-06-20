@@ -173,3 +173,7 @@ conflict. See `docs/local-session-deconfliction.md` for the exact
 - Works for any agent that can run the script — it is not Claude-specific.
 - This guards *local* contention only. Still use `claim-pr` for the PR/issue and
   `sync-pr-branch` before pushing, so remote and local stay in sync.
+- This skill *creates* worktrees (step 3) and removes your own at session end.
+  For the bulk sweep of dead worktrees left behind by ended sessions, use
+  **`clean-worktrees`** (`cw`) — it consults this registry so it never removes a
+  worktree a live session still holds.
