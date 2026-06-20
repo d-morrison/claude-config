@@ -64,9 +64,9 @@ Say so and route it there; don't store a note that will never fire.
    repo); **everything else — including `~/.claude/CLAUDE.md` writes — gets
    committed**. This assumes `bootstrap.sh` has symlinked `memories/` and
    `CLAUDE.md` into the ai-config repo (the expected setup). Resolve the repo
-   root from the `memories/` symlink with `git -C` (portable, and it follows the
-   symlink chain in one shot — unlike bare `readlink`, which resolves only a
-   single hop), then stage the file by its path *within* the repo:
+   from the `memories/` symlink and stage the file by its path *within* the
+   repo (`git rev-parse --show-toplevel` follows the symlink to the repo root,
+   robust across one or many hops — unlike single-hop `readlink`):
 
    ```bash
    [ -L ~/.claude/memories ] || { echo "~/.claude/memories isn't a symlink — run bootstrap.sh first"; exit 1; }

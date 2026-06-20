@@ -170,9 +170,9 @@
   the bare-parent form on PR #71); `skill-builder` and `ums` already use it.
 - Issue #36 originally proposed the bare-parent `git -C ~/.claude/skills
   rev-parse --show-toplevel` — but that example is the unreliable one (it can
-  error with "not a git repository", not a security risk). #36 was resolved
-  (PR #109) by standardizing on the **per-skill** form instead, and sweeping the
-  last stragglers (`record-learnings`, `memorize`, `find-overlap`).
+  error with "not a git repository", not a security risk). #36 was closed by
+  PR #110, which standardized on the **per-skill** form for `record-learnings`
+  and `memorize`; PR #109 swept the last straggler #110 missed (`find-overlap`).
 - **Worktree caveat:** the resolved toplevel is the **MAIN** checkout, often on
   another session's branch — don't author files there. Work in your own
   worktree's `skills/<name>/` dir (full rationale in `skill-builder`'s Ship-it
