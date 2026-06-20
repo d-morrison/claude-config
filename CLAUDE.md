@@ -27,12 +27,14 @@ the user reads the recap later.
 ## Bare queue-command keywords
 
 I maintain a family of slash skills for managing the task queue and amending
-requests: `/also`, `/first`, `/next`, `/before`, `/last`, `/and`, and
-`/remember`. When I write one of these keywords **without the leading slash** as
-a directive — e.g. "also fix the test", "remember that ...", "and bold it",
-"next, run the spellcheck", "first, revert that" — interpret it using the
-corresponding skill's semantics rather than as ordinary prose. When the word is
-genuinely just part of a sentence (ambiguous), fall back to the plain reading.
+requests: `/also`, `/first`, `/next`, `/before`, `/last`, `/and`, `/remember`,
+and `/always`. When I write one of these keywords **without the leading slash**
+as a directive — e.g. "also fix the test", "remember that ...", "always link
+PRs in tables", "and bold it", "next, run the spellcheck", "first, revert
+that" — interpret it using the corresponding skill's semantics rather than as
+ordinary prose. (`/remember` and `/always` both route to the `memorize` skill.)
+When the word is genuinely just part of a sentence (ambiguous), fall back to
+the plain reading.
 
 ## Link PRs in tables
 
