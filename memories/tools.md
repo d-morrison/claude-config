@@ -80,8 +80,9 @@
   `contents: write`, the **residual auto-commit step then commits that reset**
   onto the PR branch as `claude[bot]` "chore: auto-commit residual @claude
   session changes" — **deleting the PR's own `CLAUDE.md` edits**. `memories/**`
-  and `skills/**` are untouched; only the restored-config paths.
+  and `skills/**` are untouched; only the restored-config paths are affected.
 - Workaround on a PR that edits `CLAUDE.md`: restore the section
   (`git checkout <my-commit> -- CLAUDE.md`, commit) and **merge promptly** — it
-  can recur on later runs. Re-verify `origin/<branch>:CLAUDE.md` still has the
-  section right before merging. Tracked upstream: d-morrison/gha#39.
+  can recur on later runs. Before merging, run
+  `git show origin/<branch>:CLAUDE.md` and confirm the section is still there.
+  Tracked upstream: d-morrison/gha#39.
