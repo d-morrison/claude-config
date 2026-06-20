@@ -58,18 +58,39 @@ Give each subagent its PR number and `headRefName`, and have it gather the
 disciplines into the prompt — a subagent that doesn't follow *Read the LATEST
 review* will silently misreport:
 
+A subagent starts **fresh** — it sees only this prompt, not this skill file —
+so **inline the exact commands**; don't point it at a section it can't read.
+Fill in `<N>`, `<headRefName>`, `<owner>`, `<repo>` for each PR:
+
 > Gather the status of PR **#<N>** (branch `<headRefName>`) in this repo and
 > return a single structured row. Do not push, merge, or modify anything.
 >
-> 1. **Latest review verdict** — read the *most recent* review comment with the
->    `gh pr view` snippet in the skill's *Read the LATEST review* section and
->    parse it for findings. Never report a `null` filter result as "clean";
->    broaden the filter or say no review was found.
+> 1. **Latest review verdict** — read the *most recent* review comment and parse
+>    it for findings. Run exactly:
+>    ```bash
+>    gh pr view <N> --json comments \
+>      --jq '[.comments[] | select(.author.login | startswith("claude"))] | last | .body'
+>    ```
+>    The reviewer login varies (`claude`, `claude[bot]`, `github-actions[bot]`);
+>    `startswith("claude")` covers the common cases. If the result is `null`,
+>    **never report "clean"** — broaden the filter or say no review was found.
+>    The bar for `clean`: "Looks good" / "no findings" / "approved" with zero
+>    follow-on bullets under any heading. A rebuttal the reviewer still disputes
+>    is **open**, not clean.
 > 2. **CI state** — `gh pr checks <N>`; name any failing/pending check, don't
 >    just say "red".
-> 3. **Unresolved threads** — count open inline review threads (the GraphQL
->    snippet in `pr-status`). >0 means not fully clean even if the body says
->    "approved".
+> 3. **Unresolved threads** — count open inline review threads. Run exactly:
+>    ```bash
+>    gh api graphql -f query='query {
+>      repository(owner:"<owner>", name:"<repo>") {
+>        pullRequest(number:<N>) {
+>          reviewThreads(first:100) { nodes { isResolved } }
+>        }
+>      }
+>    }' --jq '[.data.repository.pullRequest.reviewThreads.nodes[]
+>              | select(.isResolved | not)] | length'
+>    ```
+>    >0 means not fully clean even if the body says "approved".
 > 4. **Behind main?** — `git fetch origin main -q && git rev-list --count
 >    <headRefName>..origin/main`. >0 means main has moved ahead.
 >
@@ -79,9 +100,11 @@ review* will silently misreport:
 
 ### 3. Assemble (orchestrator)
 
-Collect the rows the subagents return and render the table + per-PR findings
-list (see *Output*). The output is **identical** to the series version — only
-the way the signals are gathered changed.
+Collect the rows the subagents return and **pair each with the `title`,
+`headRefName`, and `isDraft`** the orchestrator already has from step 1 (the
+subagent doesn't re-fetch these), then render the table + per-PR findings list
+(see *Output*) — marking draft PRs from `isDraft`. The output is **identical**
+to the series version — only the way the signals are gathered changed.
 
 ### Graceful degradation to series
 
