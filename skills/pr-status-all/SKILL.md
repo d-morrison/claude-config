@@ -124,11 +124,11 @@ gh pr view <N> --json comments \
   --jq '[.comments[] | select(.author.login | startswith("claude"))] | last | .body'
 ```
 
-The reviewer bot login **varies by API/setup**: `gh pr view` reports `claude`;
-the REST API reports `claude[bot]`; some setups post as `github-actions[bot]`.
-`startswith("claude")` covers the common cases — if a PR's reviewer posts under
-a different login the `--jq` returns `null`, which you must **not** silently
-report as "clean": broaden the filter or flag that no review was found.
+`startswith("claude")` matches the @claude bot across both API modes
+(`gh pr view` → `claude`; REST API → `claude[bot]`). If the result is `null`,
+the reviewer may post as `github-actions[bot]` or another login — you must
+**not** silently report that as "clean": broaden the filter or flag that no
+review was found.
 
 Scan the latest body for any "Findings", "Issues", "Remaining",
 "Non-blocking", "Minor", "Could improve", "Consider", etc. section. The bar for
