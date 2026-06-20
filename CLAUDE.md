@@ -107,6 +107,12 @@ means* above; the mechanics for each step are in the sections around here.)
 <!-- Shared with the lab manual; edit shared/workflow/address-every-comment.md, not here. -->
 @shared/workflow/address-every-comment.md
 
+If you and the reviewer reach an impasse on a single item (your rebuttal didn't
+convince them and their re-raise didn't convince you), escalate that item to a
+**human reviewer** — request `d-morrison` via the `request-pr-review` skill (or
+`gh pr edit <N> --add-reviewer d-morrison`) and `@`-mention them with the
+impasse — for the final call rather than looping.
+
 ## Keep PR branches synced with main
 
 <!-- Shared with the lab manual; edit shared/workflow/sync-with-main.md, not here. -->
