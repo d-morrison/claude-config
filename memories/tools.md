@@ -20,11 +20,14 @@
   an iterate loop.
 - To force a fresh review on an existing PR **without a new commit**:
   - **workflow_dispatch** (preferred — no extra PR timeline noise):
-    `gh workflow run claude-code-review.yml -f pr_number=<N>`. Without `gh`
-    (remote/web sessions), use the REST workflow-dispatch endpoint —
+    `gh workflow run claude-code-review.yml -f pr_number=<N>` (dispatches the
+    workflow as defined on the **default branch** — `gh` defaults `--ref` to it).
+    Without `gh` (remote/web sessions), the REST endpoint does the same —
     `POST /repos/<owner>/<repo>/actions/workflows/claude-code-review.yml/dispatches`
-    with body `{"ref":"<pr-branch>","inputs":{"pr_number":"<N>"}}` — or your
-    GitHub MCP workflow-dispatch tool if available (e.g.
+    with body `{"ref":"main","inputs":{"pr_number":"<N>"}}`. The `ref` must be a
+    branch/tag that *contains* the workflow file, so use the **default branch**
+    (not the PR branch) unless you intend to dispatch a modified version of the
+    workflow. Or use your GitHub MCP workflow-dispatch tool if available (e.g.
     `mcp__github__actions_run_trigger`).
   - **Close + reopen the PR** → fires the `reopened` event, which re-runs the
     review. Works reliably, but clutters the timeline with close/reopen events;

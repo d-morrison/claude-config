@@ -44,8 +44,10 @@ For each round:
    "Update branch" button.
 
 3. **Request the review.**
-   - `@claude` bot reviewer: post `@claude review` on the PR (or the repo's
-     equivalent trigger).
+   - `@claude` bot reviewer: trigger it the way the repo is wired — post
+     `@claude review` where the review (or agent) workflow is comment-triggered,
+     **or** dispatch the review workflow directly (`workflow_dispatch`). See the
+     heads-up below for which applies to the d-morrison Quarto / R-pkg repos.
    - **Heads-up — some repos' review workflow is *not* comment-triggered.**
      The d-morrison Quarto / R-pkg repos (e.g. `d-morrison/psw`) run their review
      workflow `claude-code-review.yml` on `pull_request` (`opened, synchronize,
