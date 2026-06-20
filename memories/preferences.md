@@ -141,6 +141,18 @@
   `ai-session.sh worktree <branch> [--base origin/main]` creates the isolated worktree,
   `register`/`check` surface collisions, and the registry under `.git/ai-sessions/` lets
   parallel sessions see each other before they clobber the shared checkout.
+- When the session runs INSIDE a worktree, do NOT prefix git commands with
+  `cd <main-checkout>`. The Bash tool resets cwd to the worktree each call, so a
+  `cd <main-repo> && git …` silently runs against the main checkout, not your worktree.
+  That checkout is on a different branch, often another session's. Run git in the worktree
+  with no `cd`. If you must touch another checkout, use `git -C <path>`. Run
+  `git branch --show-current` before committing or pushing to confirm. `gh` commands keyed
+  by PR or issue number are cwd-agnostic, so only `git` breaks. Learned on PR #62: a
+  `cd`-prefixed push hit `main` and made my own worktree commits look missing.
+- Before pushing skill/memory changes to ai-config, run the two local validators that
+  `validate.yml` runs in CI — `python3 scripts/validate-skills.py` and
+  `python3 scripts/check-links.py` — to catch frontmatter and broken-relative-link errors
+  before they cost an ARDI round.
 - When creating a new acronym/short-name skill (e.g., `gi`, `sup`, `ums`), always also
   create a spelled-out alias skill (e.g., `grab-issue`, `send-upstream`,
   `update-memories-and-skills`) that points to the canonical file.
