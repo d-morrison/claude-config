@@ -14,7 +14,8 @@ allowed-tools:
 This is a **synonym for [`wrap-up`](../wrap-up/SKILL.md)** — invoking `/done`
 runs the wrap-up procedure unchanged. The two are interchangeable for dispatch:
 any phrasing that fires `wrap-up` ("wrap up", "finish up", "are we done?") fires
-`done` too, and both run the same procedure.
+`done` too, and both run the same procedure. That is why this skill's
+`description` repeats those triggers.
 
 **Do this:** read `~/.claude/skills/wrap-up/SKILL.md` and follow its
 instructions exactly. Everything that skill says — verify the real state of
