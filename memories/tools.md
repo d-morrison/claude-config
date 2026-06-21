@@ -185,7 +185,7 @@
 
 ## ai-config memory file structure
 - Memory files (`memories/*.md`) have **no YAML frontmatter** — the file starts
-  directly with a `#` heading. `grep "^name:" memories/` always returns empty;
+  directly with a `#` heading. `grep -r "^name:" memories/` always returns empty;
   don't use frontmatter fields to locate or identify a memory file.
 - `[[link]]` cross-links in skills and memories resolve to **skill directories**
   (`skills/<target>/`), not to named entries in memory files. To verify a
