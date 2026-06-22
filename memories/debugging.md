@@ -75,6 +75,13 @@ reverted fixes. Defenses:
   force-pushes — that's the claim-pr/parallel-session collision, and one driver
   should own it.
 
+## Appending to skill/memory files: grep for duplicate sections first
+Before adding a new `##` section to an existing skill or memory file, grep the
+file for the section heading. It's easy to append a section that already exists —
+the scout-peers duplicate `## Relationship to other skills` bug (ai-config#132)
+happened because an existing section was missed and a duplicate was appended at
+the end. Run `grep -n "^## " <file>` before appending.
+
 ## Writing robust bash scripts (recurring review findings)
 Lessons the reviewer flagged across the `session-lock` PR (d-morrison/ai-config#38) —
 pre-empt these when authoring shell, especially under `set -euo pipefail`:

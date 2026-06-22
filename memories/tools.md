@@ -57,6 +57,9 @@
   `get_check_runs`.
 - `mcp__github__pull_request_read` parameter names are **camelCase** — use
   `pullNumber`, NOT `pull_number`. Snake_case fails silently or errors.
+- `mcp__github__add_issue_comment` parameter is **`issue_number`** (snake_case),
+  NOT `issueNumber`. This is the opposite of `pull_request_read`. Reload the
+  tool schema when unsure rather than guessing.
 - `mcp__github__pull_request_review_write` with `method: resolve_thread`
   requires **only `threadId`** (node ID, e.g. `PRRT_kwDO...`); `owner`,
   `repo`, and `pullNumber` are ignored for that method. Thread node IDs come
