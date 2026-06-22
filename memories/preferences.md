@@ -191,6 +191,12 @@
   `origin/<branch>`: sync to the bot's commit and don't redo fixes it already landed. Two
   Claude sessions on one branch is the parallel-session collision `claim-pr`/`session-lock`
   warn about. (ai-config#120: the bot fixed 3 of 4 findings while I worked the same branch.)
+- A reviewer's *suggested fix* (a `suggestion` block or proposed code) can itself be wrong —
+  verify it before applying; don't paste it in blind. Check it handles the GENERAL case, not
+  just the one flagged spot. If the correct fix differs, apply that and say so in the ARD reply
+  so the reviewer sees why you diverged. (ai-config#94: a suggested regex `[>|][-+]?` would have
+  blanked every inline `description:` — the very round-1 bug under review; the right fix kept the
+  block indicator optional, `[>|]?[-+]?`.)
 - In R/Quarto/Rmd prose, prefer inline R expressions (`` `r ...` ``) over hard-coded
   numbers that came from the analysis (means, counts, p-values, sample sizes) so the
   text never goes stale on re-render. Hard-coded literals are fine for genuine constants

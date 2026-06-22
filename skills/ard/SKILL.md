@@ -199,6 +199,7 @@ Tell the user what you did and give a **clickable URL** to the PR/MR (and to the
 - **Rebuttals must be falsifiable** — point to specific code, behavior, or documentation.
 - **Deferrals must be tracked.** A defer without a filed issue is just ignoring with extra words.
 - **Push before you post.** The reviewer should be able to verify Addressed fixes are on the branch.
+- **A `suggestion` block is a hint, not gospel.** Before committing a reviewer's suggested fix, verify it actually works and handles the *general* case — not just the flagged spot. A confident suggestion can overcorrect (e.g. a regex tweak that fixes one form but breaks all the others). If the correct fix differs, apply that and note the divergence in your reply, so the reviewer sees why.
 
 ## Integration with ardi
 
