@@ -270,3 +270,9 @@
   failure state. E.g. "in a session after a PR has just merged" is correct for a skill that
   stops on unmerged PRs; "with an open PR" is insufficient — it covers only the stop path,
   not the full flow. (Learned on ai-config#125.)
+- When a reviewer (human or bot) includes a suggested fix (`suggestion` block), verify the
+  fix before applying it. The suggestion can be wrong or overcorrect — e.g., making an
+  optional marker required. Apply the correct fix, and if you diverge from the suggestion,
+  note the divergence in the ARD reply so the reviewer sees why. (Learned on ai-config#94
+  round 2: the bot suggested `[>|][-+]?` — which required the block-scalar indicator —
+  when the correct fix was `[>|]?[-+]?`, keeping it optional.)

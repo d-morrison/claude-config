@@ -199,6 +199,7 @@ Tell the user what you did and give a **clickable URL** to the PR/MR (and to the
 - **Rebuttals must be falsifiable** — point to specific code, behavior, or documentation.
 - **Deferrals must be tracked.** A defer without a filed issue is just ignoring with extra words.
 - **Push before you post.** The reviewer should be able to verify Addressed fixes are on the branch.
+- **Suggestion blocks are hints, not gospel.** A reviewer's `suggestion` block can be wrong or overcorrect (e.g., making an optional token required, which breaks the general case). Verify the suggested fix — especially that it doesn't regress cases the original code handled — before committing it. If you diverge from the suggestion, say why in the Address reply. (Learned on ai-config#94: a bot-suggested regex `[>|][-+]?` made the block-scalar indicator required, breaking all inline descriptions; the correct fix was `[>|]?[-+]?`.)
 
 ## Integration with ardi
 
