@@ -82,6 +82,19 @@ Say so and route it there; don't store a note that will never fire.
    from a checkout on `main` (the normal case) — that's where shared memory
    belongs. In an ephemeral cloud session the push is mandatory: an unpushed
    commit dies with the container.
+
+   **Worktree session / occupied main checkout.** `~/.claude/memories` and
+   `~/.claude/CLAUDE.md` are symlinked to the **main** checkout, so
+   `git -C ~/.claude/memories rev-parse --show-toplevel` resolves to the main
+   checkout — *not* your worktree. If that checkout is on a non-`main` branch
+   (e.g. another session is working there, possibly with uncommitted edits),
+   committing through the symlink lands your memory on the wrong branch and can
+   tangle with that session's work. In that case don't commit through the
+   symlink: edit the memory file at its path inside **your** worktree, commit on
+   your worktree branch, and land it via branch + PR + merge. It only reaches the
+   live symlinked memory once it merges to `main` and the main checkout updates.
+   (See the worktree-isolation and no-`cd`-in-worktree bullets in
+   `memories/preferences.md`, and the `session-lock` skill.)
 6. **Confirm**: one sentence — what was stored, where, and that it was pushed.
 
 ## Don't
