@@ -19,8 +19,9 @@ standing yes (see `preferences.md`).
 
 ## When this fires
 
-- "merge it", "merge this", "merge the PR", "go ahead and merge", "ship it"
-  (as a merge directive).
+- "merge it", "merge this", "merge the PR", "go ahead and merge" (as an
+  explicit merge directive). Deliberately excludes vague approval like "ship
+  it" / "lgtm" — merging is irreversible, so require an explicit merge verb.
 - Distinct from `merge-main` / `sync-pr-branch` (those merge `main` *into* a
   branch to sync it — they do NOT merge the PR).
 - If the PR is **already merged**, skip steps 2–3 and go straight to step 4
@@ -33,7 +34,8 @@ standing yes (see `preferences.md`).
 - Resolve which PR is meant (the one from the current session; if ambiguous,
   ask which number).
 - Confirm it is **fully clean** before merging (the ARDI terminal state — see
-  `fully-clean.md`): all required CI checks green AND the latest review clean.
+  `shared/workflow/fully-clean.md`): all required CI checks green AND the latest
+  review clean.
   Verify with a fresh query, not a cached verdict:
   `mcp__github__pull_request_read` (`get` for `mergeable_state`, `get_check_runs`
   for CI) — or `gh pr view <N>` / `gh pr checks <N>` in a local session.
