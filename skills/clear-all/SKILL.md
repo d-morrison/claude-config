@@ -2,6 +2,11 @@
 name: clear-all
 description: "Alias for `gia` (Grab Issues + iterate-All). Clear the repo's entire work queue: open a PR for every open issue that lacks one, and drive every open PR to a clean review verdict with green CI. Use when asked to 'clear-all', 'clear all the work', 'clear everything', 'open PRs for all the issues and drive them clean', 'open a PR for every issue and make every PR green', or 'clear the whole queue'."
 user-invocable: true
+allowed-tools:
+  - Bash
+  - Read
+  - Edit
+  - Write
 ---
 
 # clear-all (alias for `gia`)
