@@ -6,9 +6,6 @@
   session or what "should" be the case. State drifts between turns. "It should be X" /
   "I left it as X" / "presumably X" are red flags; replace with a fresh check.
 - ALWAYS record what I learn in memory/AI-instruction notes as I work (standing request).
-- After a PR/MR merges, run the post-merge/UMS wrap-up automatically and persist any durable
-  learnings — INCLUDING opening the follow-up branch+PR that records them — without asking first.
-  That learnings PR is a standing yes; don't pause to ask permission to open it.
 - When creating a GitHub PR, request reviewer `d-morrison` (see request-pr-review skill).
 - When deferring work out of scope during a review iteration, always file a follow-up issue
   (via `gh issue create` or `glab issue create`) capturing the deferred item. Don't just
@@ -67,6 +64,8 @@
   local branch (checkout main, pull, `git branch -d`), confirm any deferred items are tracked,
   then run UMS to capture what the PR's review lifecycle taught — mistakes corrected and guidance
   given along the way. A merge is the natural checkpoint to bank lessons before context is lost.
+  Do all of this automatically — including opening the follow-up branch and PR that records the
+  lessons — without asking permission first; opening that follow-up PR is a standing yes.
 - Keep it simple. Don't over-explain or ask permission for straightforward fixes — just do them.
 - When finishing work on an MR/PR (clean review, ready to merge, etc.), always provide a
   clickable link to the MR/PR in the chat message.
@@ -161,9 +160,10 @@
   `update-memories-and-skills`) that points to the canonical file.
 - Some skills are platform/global — present in the Claude Code skill registry but with NO
   local `skills/<name>/` directory (e.g. `deep-research`). Cross-references to them are valid.
-  Automated reviewers (Copilot, the `@claude` bot) may false-flag such a reference as a
-  "non-existent skill"; verify against the available-skills registry before treating a skill
-  cross-ref as a broken link, then rebut the false positive. (ai-config#120 flagged it 4×.)
+  Automated reviewers (Copilot, the `@claude` bot) may wrongly flag such a reference as a
+  "non-existent skill"; check the available-skills list presented to the agent (the Claude Code
+  skill registry) before treating a skill cross-ref as a broken link, then rebut the false
+  positive. (ai-config#120 flagged it 4×.)
 - During ARDI loops: if a round has only Rebut/Defer dispositions (no code pushed),
   still explicitly re-request review — the push won't auto-trigger the reviewer bot.
   BUT the converse: when a round DID push code, the push already triggers the review
@@ -180,8 +180,8 @@
   review-trigger mention") or split the tokens (e.g. `@ claude`, with a space). (Learned the hard
   way on ai-config#41; ardi/iterate/ard
   carry the warning.)
-- While I'm iterating a PR, the `@claude` bot (triggered by an `@claude` review comment —
-  including one I or the user post mid-loop) runs its OWN ARD and pushes fix commits to the
+- While I'm iterating a PR, the `@claude` bot (triggered by an `@claude` comment — including
+  one I or the user posts mid-loop) runs its OWN ARD and pushes fix commits to the
   SAME PR branch. Before every edit/push during a PR loop, `git fetch` and reconcile
   `origin/<branch>`: sync to the bot's commit and don't redo fixes it already landed. Two
   Claude sessions on one branch is the parallel-session collision `claim-pr`/`session-lock`
