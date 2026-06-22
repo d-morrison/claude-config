@@ -116,8 +116,8 @@ and the default branch for each issue:
 >
 > 1. **Claim it** so no one else double-works it: post a brief "Working on this
 >    --- paws off until I'm done." comment on the issue
->    (`gh issue comment <N> --body "..."`, or the MCP `add_issue_comment`
->    equivalent in a remote session).
+>    (`gh issue comment <N> --body "..."`, or the MCP
+>    `mcp__github__add_issue_comment` equivalent in a remote session).
 > 2. **Check history** — before writing code, scan merged/closed PRs that
 >    touched the same area so you don't undo past work or reintroduce a fixed
 >    bug (`gh pr list --state all --search "<keywords>"`). If a past PR already
