@@ -243,3 +243,18 @@
   upstream's `main`. Applies across our orgs: d-morrison, UCD-SERG, ucdavis, UCLA-PHP,
   UCD-IDDRC. The REVDEPS list lets us warn consumers before a breaking tag move, so adding
   is pure upside.
+- When adding a new bare keyword directive that routes to a skill (e.g. "merge it"),
+  update THREE places to keep routing consistent: (1) `CLAUDE.md` routing documentation,
+  (2) the skill's `description:` frontmatter (what the LLM sees when scanning the skill
+  list), and (3) the skill's "When this fires" trigger list. If the skill has N synonym
+  trigger phrases, list all N in all three places. Missing any one causes inconsistent
+  behavior depending on which document is in context first. (Learned on ai-config#125.)
+- When documenting in `CLAUDE.md` what a bare directive does, read the skill's procedure
+  steps BEFORE writing the description. A mismatch between the prose summary and the actual
+  skill logic is a blocker finding — e.g. writing "auto-merges first" when the skill step 1
+  says "stop and report if not merged". (Learned on ai-config#125.)
+- When writing test plan items for a skill that verifies a precondition and stops if not
+  met, describe the test in terms of the SUCCESS state (precondition satisfied), not the
+  failure state. E.g. "in a session after a PR has just merged" is correct for a skill that
+  stops on unmerged PRs; "with an open PR" is insufficient — it covers only the stop path,
+  not the full flow. (Learned on ai-config#125.)
