@@ -66,7 +66,7 @@ recall it.)
 ## Post in-chat feedback to the PR
 
 When the user gives feedback, corrections, or guidance in the CLI or chat
-during a PR session, paraphrase it and post it as a PR comment:
+while working a PR, paraphrase it and post it as a PR comment:
 
 ```
 gh pr comment <N> --body "..."
@@ -76,7 +76,7 @@ One to three sentences is enough. Don't quote verbatim — paraphrase so it
 reads naturally in the PR thread. Skip trivial acknowledgments or
 conversational exchanges with no actionable content.
 
-This makes context visible to other reviewers, the @claude bot, and future
+This makes context visible to future @claude sessions, other reviewers, and
 contributors who only see the PR thread.
 
 ## Claim a GitHub PR/issue before working on it
