@@ -23,9 +23,9 @@ allowed-tools:
 # consolidate-memory — merge redundant memory entries into one canonical
 
 The memory corpus (`memories/debugging.md`, `memories/preferences.md`,
-`memories/tools.md`, and any `memories/repo/<name>.md`) accretes near-duplicates:
-two sessions each record the same lesson in different words, or a fact lands in
-both a general file and a repo-specific one. This skill collapses a
+`memories/tools.md`, and per-repo entries in `~/.claude/projects/<path>/memory/`)
+accretes near-duplicates: two sessions each record the same lesson in different
+words, or a fact lands in both a general file and a repo-specific one. This skill collapses a
 genuine-duplicate cluster into **one canonical entry** — unioning the facts and
 repointing any cross-links — so the corpus shrinks but no fact and no
 `[[link]]` breaks.
@@ -50,8 +50,8 @@ Most "overlap" is **not** a duplicate. Before merging anything, classify each
 cluster into exactly one of three buckets:
 
 1. **Intentional scope layering — LEAVE ALONE.** A general rule in
-   `preferences.md` *and* a concrete instance of it in
-   `memories/repo/<repo>.md` is deliberate — the general file states the
+   `preferences.md` *and* a concrete instance of it in a repo's project memory
+   (`~/.claude/projects/<path>/memory/`) is deliberate — the general file states the
    principle, the repo file pins the specifics. Collapsing them loses either the
    generality or the specifics. Tell: the entries live in different scope files
    and one is the named application of the other.
@@ -76,9 +76,9 @@ the surrounding text, and returns each cluster already sorted into the three
 buckets above (with a recommended disposition). Work from its report.
 
 If `find-overlap` is unavailable, fall back to its inline pass — list the
-headings/bullets across `memories/*.md` and `memories/repo/*.md`, cluster by
-subject, then **read the full surrounding context of every member** before
-classifying.
+headings/bullets across `memories/*.md` and per-repo project memories
+(`~/.claude/projects/*/memory/`), cluster by subject, then **read the full
+surrounding context of every member** before classifying.
 
 ### 2. Keep only the genuine-duplicate clusters
 
@@ -95,8 +95,8 @@ off. Present, per cluster:
   (not scope layering, not adjacent-but-distinct).
 - **The chosen canonical home** — which scope file the merged entry belongs in.
   A fact true everywhere belongs in the general file (`preferences.md` /
-  `tools.md` / `debugging.md`); a repo-specific fact belongs in
-  `memories/repo/<repo>.md`. State why.
+  `tools.md` / `debugging.md`); a repo-specific fact belongs in that repo's
+  Claude project memory (`~/.claude/projects/<path>/memory/`). State why.
 - **What gets folded in** — every non-obvious detail and *why*-clause unique to
   an absorbed entry that must survive into the canonical.
 - **Which entries get removed** (all non-canonical members).

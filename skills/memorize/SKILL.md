@@ -41,8 +41,13 @@ Say so and route it there; don't store a note that will never fire.
 
 1. **Parse** the fact/preference from the user's message.
 2. **Choose scope by relevance**:
-   - **Project-specific** — a fact, convention, or gotcha tied to THIS repo
-     ("renders with renv via `R_LIBS_USER`") → `/memories/repo/<repo-name>.md`
+   - **Project-specific** — a fact, convention, or gotcha tied to ONE specific repo
+     ("renders with renv via `R_LIBS_USER`") → write directly to that repo's
+     Claude project memory: `~/.claude/projects/<project-path>/memory/<file>.md`
+     (NOT `memories/repo/` inside ai-config; that directory is removed). The
+     project path is the repo's directory path with `/` replaced by `-` — e.g.
+     `/Users/you/Documents/GitHub/rme` → `-Users-you-Documents-GitHub-rme`.
+     No git commit is needed for project memory writes — they persist locally.
    - **General standing rule** — an always-apply working preference across ALL
      repos ("always link PRs in tables", "use Pacific time") →
      `~/.claude/CLAUDE.md` (it's loaded every session)
@@ -72,7 +77,7 @@ Say so and route it there; don't store a note that will never fire.
    ```bash
    [ -L ~/.claude/memories ] || { echo "~/.claude/memories isn't a symlink — run bootstrap.sh first"; exit 1; }
    repo="$(git -C ~/.claude/memories rev-parse --show-toplevel)"   # ai-config repo root
-   rel="CLAUDE.md"   # or memories/<file>.md, memories/repo/<repo-name>.md, …
+   rel="CLAUDE.md"   # or memories/<file>.md  (NOT memories/repo/ — that's gone)
    git -C "$repo" add "$rel" \
      && git -C "$repo" commit -m "memorize: <one-line summary>" \
      && git -C "$repo" push origin HEAD   # current branch; not HEAD:main — that would push a feature branch's commits onto main
