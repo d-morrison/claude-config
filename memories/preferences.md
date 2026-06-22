@@ -201,6 +201,12 @@
   numbers that came from the analysis (means, counts, p-values, sample sizes) so the
   text never goes stale on re-render. Hard-coded literals are fine for genuine constants
   (a chosen threshold, a year). Example: [ucdavis/bcs#191 review comment r3437005734](https://github.com/ucdavis/bcs/pull/191/changes#r3437005734).
+- When adding or changing math (LaTeX/Quarto equations — `$...$`, `$$...$$`,
+  `\begin{equation}`, `\(...\)`), always verify it actually RENDERS — open the rendered
+  HTML page and confirm the equation displays, not just that the build succeeded. A typo
+  in a macro can silently break MathJax while the build still passes. For rme, check the
+  PR preview, e.g. https://d-morrison.github.io/rme/pr-preview/pr-772/chapters/proportional-hazards-models.html#eq-anchor-45 .
+  (An instance of never-assume; always verify, applied to math.)
 - When a memory, skill, or doc entry points at a location in *another* file, don't cite
   a specific line number — it goes stale the moment that file changes, and a later reader
   who looks it up comes up empty. Quote the section heading or symbol name (e.g. the
