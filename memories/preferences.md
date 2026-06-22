@@ -256,5 +256,5 @@
 - When writing test plan items for a skill that verifies a precondition and stops if not
   met, describe the test in terms of the SUCCESS state (precondition satisfied), not the
   failure state. E.g. "in a session after a PR has just merged" is correct for a skill that
-  stops on unmerged PRs; "with an open PR" is wrong — it describes a case that triggers the
-  stop path, not the full flow. (Learned on ai-config#125.)
+  stops on unmerged PRs; "with an open PR" is insufficient — it covers only the stop path,
+  not the full flow. (Learned on ai-config#125.)
