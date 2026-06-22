@@ -60,10 +60,11 @@ On Lacaedemon/sparta#150 another driver (a second `@claude` task, or GitHub's
 "Update with rebase") force-pushed the PR branch three times, each time replacing
 my sync-merge commit with a rebase that dropped my conflict resolutions and
 reverted fixes. Defenses:
-- **Before pushing to a shared PR branch, `git fetch` and check origin's HEAD still
-  matches your local HEAD** — don't assume your last push is still HEAD.
-  `git rev-parse HEAD` vs `git rev-parse origin/<branch>`; if they differ, a
-  parallel session moved it.
+- **Before pushing to a shared PR branch, `git fetch` and check that `origin/<branch>`
+  hasn't moved since your last push** — don't assume your last push is still HEAD.
+  `git log --oneline HEAD..origin/<branch>`: non-empty means a parallel session pushed
+  past you. (This handles unpushed local commits, where a bare `rev-parse HEAD` vs
+  `origin` would always differ by design.)
 - **When it was force-pushed, reset to origin and re-verify the content** (refs,
   the specific fixes, demo/metadata) rather than force-pushing your divergent copy
   back. The rebase may already carry the same correct content — diff it.
