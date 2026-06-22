@@ -29,7 +29,9 @@ invocation name, slash command, or muscle-memory breaks.
 
 It is the corpus-level complement to the single-skill tools: `skill-builder`
 *creates* (extend-first), `heal-skill` *repairs* one misfiring skill, and this
-*merges* a redundant set into one.
+*merges* a redundant set into one. The detection half — finding and classifying
+the overlap — is delegated to `find-overlap`; this skill adds the merge action on
+top.
 
 ## When this fires
 
@@ -65,34 +67,28 @@ duplicate. If you can, it isn't.
 
 ## Procedure
 
-### 1. Locate the repo and gather every skill
+### 1. Detect overlap — delegate to `find-overlap`
 
-```bash
-cd "$(git -C ~/.claude/skills rev-parse --show-toplevel)"   # the ai-config repo
-ls skills/
-# name + description, one row per skill, to eyeball overlap:
-for d in skills/*/; do
-  n=$(basename "$d")
-  desc=$(awk '/^description:/{flag=1} flag{print} /^(user-invocable|allowed-tools):/{if(flag)exit}' "$d/SKILL.md" | head -4 | tr '\n' ' ')
-  printf '%-40s %s\n' "$n" "$desc"
-done
-```
+Don't re-implement the audit; run **`find-overlap`** over the skills corpus. It
+gathers every `skills/<name>/SKILL.md`, clusters by shared triggers / outcome,
+reads the bodies, and returns each cluster already sorted into the three buckets
+above (with a recommended disposition). Work from its report.
 
-> In a **worktree**, `rev-parse --show-toplevel` resolves to the *main* checkout
-> (see issue #76 / the `skill-builder` warning) — that's correct here: skills
-> live in the main checkout, edit them there.
+> In a **worktree**, `find-overlap`'s `rev-parse --show-toplevel` resolves to the
+> *main* checkout (see issue #76 / the `skill-builder` warning) — that's correct:
+> skills live in the main checkout, edit them there.
 
-### 2. Cluster and classify
+If `find-overlap` is somehow unavailable, fall back to its inline pass — list
+`skills/*/` with `name` + `description` + line count (a stub is ≈ <15 lines, a
+real body more), cluster, then **read the full SKILL.md of every member** of each
+candidate cluster before classifying.
 
-Group skills that share trigger keywords or describe the same outcome. For each
-candidate cluster, **read the full SKILL.md of every member** and assign the
-bucket above. A stub vs. a real body is the fastest signal:
+### 2. Keep only the genuine-duplicate clusters
 
-```bash
-wc -l skills/<a>/SKILL.md skills/<b>/SKILL.md   # stub ≈ <15 lines; real body more
-```
-
-Only clusters that land in **bucket 3 (genuine duplicate)** proceed.
+From `find-overlap`'s report, act **only** on bucket 3 (genuine duplicate).
+Leave intentional alias families (bucket 1) untouched, and hand
+adjacent-but-distinct clusters (bucket 2) to `link-skills` if they want a
+cross-link — never a merge.
 
 ### 3. Propose the consolidation plan — get approval first
 
@@ -179,6 +175,9 @@ git push -u origin HEAD && gh pr create --fill
 
 ## Relationship to other skills
 
+- **`find-overlap`** — the read-only detector this skill delegates its audit to;
+  it finds and classifies the overlapping clusters, consolidate-skills merges the
+  genuine duplicates. (find-overlap : consolidate-skills :: `pr-status` : `ardi`.)
 - **`skill-builder`** — the inverse-facing sibling: it *creates* (extend-first)
   and, when it finds it should have extended an existing skill, hands the
   cleanup here.

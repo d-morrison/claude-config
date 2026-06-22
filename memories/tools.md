@@ -51,6 +51,10 @@
   which can connect asynchronously after session start. Don't conclude a tool is
   absent from one check — `ToolSearch` for what you need before deciding it's
   missing (and don't assume the `github_ci` server is present either).
+- `mcp__github__pull_request_read` `method:` enum: `get` · `get_diff` (PR
+  unified diff — equivalent to `gh pr diff`) · `get_status` · `get_files` ·
+  `get_commits` · `get_review_comments` · `get_reviews` · `get_comments` ·
+  `get_check_runs`.
 - Webhook PR-activity events cover comments/reviews/CI *failures* but NOT CI
   *success*, new pushes, or merge-conflict transitions — don't rely on events
   alone to know a PR went green or merged; re-check explicitly.
@@ -70,6 +74,10 @@
   (catches committed-but-unpushed local branches), and the `git worktree list`
   working trees for *untracked* files that never reached any ref
   (`git -C <wt> ls-files --others --exclude-standard -- 'skills/'`).
+
+## Git branch create/reset (`git switch -C`)
+- `git switch -C "$BRANCH"` is already safe against flag-shaped branch names: `$BRANCH` is the argument *to* `-C`, so a value like `--weird` fails cleanly as `fatal: '--weird' is not a valid branch name` rather than being parsed as an option.
+- Do NOT "harden" it to `git switch -C -- "$BRANCH"` — that form is **broken**: the `--` is consumed as the branch name (the required argument to `-C`), so `$BRANCH` is parsed as the start-point instead and the command fails without creating the branch. (Verified on git 2.x; a review bot suggested the broken form on d-morrison/gha#58.)
 
 ## GitLab Discussions API (inline diff comments)
 - Endpoint: `POST /projects/:id/merge_requests/:iid/discussions`
@@ -171,10 +179,11 @@
   symlink into the repo and `git -C` there fails with "not a git repository".
   The `@claude` reviewer enforces the per-skill form on new skills (it flagged
   the bare-parent form on PR #71); `skill-builder` and `ums` already use it.
-- Open issue #36 proposes standardizing on `git -C ~/.claude/skills rev-parse
-  --show-toplevel` (the bare-parent) — its example is the unreliable one (it can
-  error with "not a git repository", not a security risk); prefer the per-skill
-  form until #36 is reconciled.
+- Issue #36 originally proposed the bare-parent `git -C ~/.claude/skills
+  rev-parse --show-toplevel` — but that example is the unreliable one (it can
+  error with "not a git repository", not a security risk). #36 was closed by
+  PR #110, which standardized on the **per-skill** form for `record-learnings`
+  and `memorize`; PR #109 swept the last straggler #110 missed (`find-overlap`).
 - **Worktree caveat:** the resolved toplevel is the **MAIN** checkout, often on
   another session's branch — don't author files there. Work in your own
   worktree's `skills/<name>/` dir (full rationale in `skill-builder`'s Ship-it

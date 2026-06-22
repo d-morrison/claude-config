@@ -1,0 +1,26 @@
+# Refresh the vendored lab-manual fragments under shared/vendored/ and open a PR
+# when they change. Calls d-morrison/gha's reusable sync-shared-fragments workflow.
+#
+# lab-manual is public, so no SOURCE_TOKEN is needed, and the PR is opened in this
+# repo with the integrated GITHUB_TOKEN -- which requires Settings -> Actions ->
+# General -> "Allow GitHub Actions to create and approve pull requests".
+name: Sync from lab-manual
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1' # Weekly on Monday at 06:00 UTC
+
+jobs:
+  sync:
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: d-morrison/gha/.github/workflows/sync-shared-fragments.yml@v1
+    with:
+      source-repo: UCD-SERG/lab-manual
+      source-paths: |
+        shared/prompt-formats.md
+        shared/copilot-review-before-human.md
+      dest-dir: shared/vendored
+      manifest-path: shared/vendored/MANIFEST.json

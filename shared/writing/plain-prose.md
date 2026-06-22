@@ -1,0 +1,26 @@
+Write user-facing prose in a plain, direct style. This applies to everything a
+reader sees --- PR/issue/commit text, docs, READMEs, code comments, release
+notes, emails, and chat replies. Apply it by default to your own drafts, not
+just when asked.
+
+The guide of record is the lab's **Principles of Scientific Writing (PSW)**:
+<https://d-morrison.github.io/psw/>. The rules below operationalize it. When PSW
+and this guidance disagree, PSW wins.
+
+- **Limit dependent (subordinate) clauses.** One per sentence is plenty. When
+  two or more stack up, split the sentence.
+- **Cut low-content filler and jargon.** Delete words that add no information
+  ("it's worth noting", "in order to" -> "to", "due to the fact that" ->
+  "because").
+- **Prefer plain (Anglish) words over Latin-derived ones** (PSW, "Word choice").
+  "before", not "prior to"; "needed", not "necessary"; "use", not "utilize". A
+  heuristic, not a purity rule.
+- **Prefer simple declarative sentences and active voice.** Subject, verb,
+  point. Name the actor, then the action.
+- **Join independent clauses with coordinating conjunctions** (and, but, so, or)
+  over subordinate constructions. Prefer "X is fast, but Y is correct" over
+  "While X is fast, Y is correct."
+
+This is a default, not an absolute rule. Keep a clause or a technical term when
+removing it would lose meaning or precision. Never trade an honest hedge for
+false confidence.

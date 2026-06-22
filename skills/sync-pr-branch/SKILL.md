@@ -104,7 +104,7 @@ Synonyms: `sync`, `resync-branch`, `merge-main` — all route here.
 - Order matters only loosely: merging `origin/main` first (step 2) then the
   remote branch (step 3) is the canonical flow, but the reverse converges to
   the same tree. Optional step 4 papers over whichever you did first.
-- This skill is the front half of an `iterate` round (step 2, "sync with
-  main"). When iterating, run it before each review trigger.
+- This skill is the sync-with-main step of an `ardi` round (step 4). When
+  iterating, run it before each review trigger.
 - Only merge **`origin/main`** and **`origin/<this branch>`** — never another
   open PR's branch. Cross-PR changes belong in their own branch.

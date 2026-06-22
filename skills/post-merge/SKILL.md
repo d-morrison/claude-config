@@ -106,7 +106,8 @@ the UMS diff is a new lesson worth a follow-up.)
 
 A linked summary: the merged PR, the auto-closed issue, any deferred follow-up
 issues, what UMS updated, and a Pacific-time timestamp
-(`date "+%Y-%m-%d %H:%M %Z"`).
+(`TZ=America/Los_Angeles date "+%Y-%m-%d %H:%M %Z"`; the explicit `TZ` enforces
+PT on a machine set to any other zone).
 
 ## Relationship to other skills
 

@@ -1,6 +1,6 @@
 ---
 name: ard
-description: "Address, Rebut, Defer, or Acknowledge: respond to every review comment on a PR/MR with exactly one disposition. For each item a reviewer (human or bot) raises, choose one — fix it (Address), explain why it's correct as-is (Rebut), file a follow-up issue (Defer), or acknowledge a no-change-requested observation (Acknowledge). Silently ignoring a comment is never acceptable. Works on GitHub (gh) and GitLab (glab). Use after receiving a review, when asked to 'address reviews' / 'respond to the review', or as the inner loop of the iterate skill."
+description: "Address, Rebut, Defer, or Acknowledge: respond to every review comment on a PR/MR with exactly one disposition. For each item a reviewer (human or bot) raises, choose one — fix it (Address), explain why it's correct as-is (Rebut), file a follow-up issue (Defer), or acknowledge a no-change-requested observation (Acknowledge). Silently ignoring a comment is never acceptable. Works on GitHub (gh) and GitLab (glab). Use after receiving a review, when asked to 'address reviews' / 'respond to the review', or as the inner loop of the `ardi` skill."
 user-invocable: true
 allowed-tools:
   - Bash
@@ -200,15 +200,15 @@ Tell the user what you did and give a **clickable URL** to the PR/MR (and to the
 - **Deferrals must be tracked.** A defer without a filed issue is just ignoring with extra words.
 - **Push before you post.** The reviewer should be able to verify Addressed fixes are on the branch.
 
-## Integration with iterate
+## Integration with ardi
 
-Inside the `iterate` loop:
+Inside the `ardi` loop (also reachable as `iterate`):
 
-1. Read the latest review (iterate step 4)
+1. Read the latest review (`ardi` step 2)
 2. Apply ARD to each finding (this skill: steps 1–2)
 3. Commit + push fixes (this skill: step 3)
 4. Post the ARD summary and per-thread replies (this skill: steps 4–4b)
-5. Re-request review (iterate step 3) — **even if this round was Rebut/Defer only**, so the reviewer re-evaluates.
+5. Re-request review (`ardi` step 6) — **even if this round was Rebut/Defer only**, so the reviewer re-evaluates.
 
 The loop continues until the PR/MR is **fully clean** — zero findings, all CI
 workflows green, and every inline review thread resolved (the only open

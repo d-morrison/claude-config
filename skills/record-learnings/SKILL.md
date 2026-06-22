@@ -71,12 +71,14 @@ For standing instructions that should always be in context:
 4. **Write concisely** — bullet points, not prose. Include the *why* not just
    the *what*
 5. **If it's a skill** — create it in `~/.claude/skills/` (symlink to the
-   cloned repo; discover the repo path with `readlink ~/.claude/skills`)
+   cloned repo; discover the repo path with
+   `git -C ~/.claude/skills/record-learnings rev-parse --show-toplevel`)
 
 ## Sharing with other agents
 
 The `~/.claude/skills/` directory is a symlink to wherever you cloned
-`ai-config` (discover the path with `readlink ~/.claude/skills`).
+`ai-config` (discover the path with
+`git -C ~/.claude/skills/record-learnings rev-parse --show-toplevel`).
 Any skill written there is:
 - Available to this agent via the skills system
 - Shareable with other agents by cloning/pulling the ai-config repo

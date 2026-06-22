@@ -60,7 +60,7 @@ only open conversation being the final all-clear and your reply to it — see
 *Check thread-resolution state* below). Do **not** report "ready to merge with
 one minor nit noted" / "harmless as-is" / "can address if you want" — that
 hedging just pushes triage back to the user. If there are open items, report
-them as open (and offer to run `iterate` to clear them).
+them as open (and offer to run `ardi` to clear them).
 
 ## Check thread-resolution state
 

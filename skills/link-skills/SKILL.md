@@ -40,7 +40,7 @@ Three kinds, roughly in priority order:
    `skills/B/` link), but B's `## Relationship to other skills` never names A.
    The return link is almost always warranted.
 2. **Thematic-cluster gap** — a set of skills clearly belong to one workflow
-   family (e.g. the review/iterate family `iterate` / `ardi` / `iterate-all`,
+   family (e.g. the review/iterate family `ard` / `ardi` / `ardia`,
    the branch/sync family `sync-pr-branch` / `merge-main` / `clean-branches`),
    but some members don't point to the others.
 3. **Missing section** — a *real* skill (one with `allowed-tools:`, not a thin
@@ -150,6 +150,10 @@ through the `.claude/skills` symlink (`git add` rejects the symlinked path).
 - **`heal-skill`** — repairs one skill that misfired (including fixing an
   ambiguous overlap by cross-linking the two); `link-skills` is the proactive,
   whole-corpus sweep rather than a reaction to one failure.
+- **`find-overlap`** — the complementary detector: `link-skills` finds skills
+  that should *reference* each other but don't; `find-overlap` finds skills that
+  *duplicate* each other. When `find-overlap` flags an adjacent-but-distinct
+  cluster (overlap that shouldn't merge), the fix is a cross-link — this skill.
 - **`request-pr-review`, `ardi`** — ship and clean the resulting PR.
 
 ## Anti-patterns

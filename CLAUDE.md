@@ -1,5 +1,14 @@
 # User-wide Claude Code instructions
 
+<!--
+Some sections below pull their body from a fragment in `shared/` via Claude
+Code's `@path` import (e.g. `@shared/writing/plain-prose.md`). Those fragments
+are the single source of truth for guidance shared with the UCD-SERG lab manual,
+which transcludes the same files. Edit the fragment, not the inlined copy, and
+keep fragments ASCII (write `---` for em-dashes) so the manual's character check
+passes. See README.md, "Shared content".
+-->
+
 ## Run UMS before /clear
 
 When the user says "clear", "/clear", or otherwise asks to reset the
@@ -11,18 +20,21 @@ with the clear.
 
 When printing a status recap or summary, include a timestamp in the user's
 local time zone (Pacific Time, `America/Los_Angeles` — get it from
-`date "+%Y-%m-%d %H:%M %Z"`). This makes "as of when" unambiguous when the
-user reads the recap later.
+`TZ=America/Los_Angeles date "+%Y-%m-%d %H:%M %Z"`; the explicit `TZ` enforces
+PT on a machine set to any other zone). This makes "as of when" unambiguous when
+the user reads the recap later.
 
 ## Bare queue-command keywords
 
 I maintain a family of slash skills for managing the task queue and amending
-requests: `/also`, `/first`, `/next`, `/before`, `/last`, `/and`, and
-`/remember`. When I write one of these keywords **without the leading slash** as
-a directive — e.g. "also fix the test", "remember that ...", "and bold it",
-"next, run the spellcheck", "first, revert that" — interpret it using the
-corresponding skill's semantics rather than as ordinary prose. When the word is
-genuinely just part of a sentence (ambiguous), fall back to the plain reading.
+requests: `/also`, `/first`, `/next`, `/before`, `/last`, `/and`, `/remember`,
+and `/always`. When I write one of these keywords **without the leading slash**
+as a directive — e.g. "also fix the test", "remember that ...", "always link
+PRs in tables", "and bold it", "next, run the spellcheck", "first, revert
+that" — interpret it using the corresponding skill's semantics rather than as
+ordinary prose. (`/remember` and `/always` both route to the `memorize` skill.)
+When the word is genuinely just part of a sentence (ambiguous), fall back to
+the plain reading.
 
 ## Link PRs in tables
 
@@ -53,48 +65,19 @@ recall it.)
 
 ## Claim a GitHub PR/issue before working on it
 
-Before starting a work session on a GitHub PR or issue — i.e. before fetching
-the branch, making edits, or invoking `@claude` review cycles — post a brief
-comment on the PR/issue so other humans and the `@claude` CI bot know not to
-start a conflicting parallel session.
+<!-- Shared with the lab manual; edit shared/workflow/claim-pr.md, not here. -->
+@shared/workflow/claim-pr.md
 
-Use:
-
-```
-gh pr comment <N> --body "Claude Code CLI (local session) is working on this — paws off until I'm done."
-gh issue comment <N> --body "Claude Code CLI (local session) is working on this — paws off until I'm done."
-```
-
-Then proceed with the work. After completing the session (PR merged, issue
-closed, or work otherwise paused), follow up with a closing comment so the
-PR/issue is unclaimed for the next person.
-
-Skip the claim step if the most recent comment from me (Claude) on that
-PR/issue already says I'm working on it.
-
-This applies to:
-
-- Direct fix/review/implement/debug/refactor prompts that reference a PR or
-  issue (`#N`, a PR URL, or an issue URL)
-- Iterative review loops (`@claude review again`, `iterate until clean`)
-- Any task that will push commits to a PR branch
-
-It does **not** apply to read-only inspection: `show me PR #X`, `what's the
-status of #Y`, `explain the diff on #Z`. Those don't risk a parallel session.
+The `claim-pr` skill operationalizes this (the exact claim wording, when it
+applies, and the closing/unclaim comment).
 
 ## File an issue before starting a new task
 
-When starting a **new** piece of work, go **issue-first**: before branching,
-editing, or opening a PR, make sure a tracking issue exists. Search the tracker
-first; if no open issue covers the task, **file one** (`gh issue create` /
-`glab issue create`), then proceed. Never jump straight into a PR without a
-tracking issue behind it.
+<!-- Shared with the lab manual; edit shared/workflow/issue-first.md, not here. -->
+@shared/workflow/issue-first.md
 
-The issue is the durable record of intent, scope, and "done" criteria — it
-gives reviewers context, lets the PR auto-close it via `Closes #N`, and keeps
-the work discoverable even if the PR stalls. The `st` (Start Task) skill
-operationalizes this; `gi` (Grab Issue) is the path when the issue already
-exists. Skip only when the task is already tracked by an open issue.
+The `st` (Start Task) skill operationalizes this; `gi` (Grab Issue) is the path
+when the issue already exists.
 
 ## Wrap up a merged PR with UMS
 
@@ -107,174 +90,80 @@ checkpoint to bank lessons before the context is lost.
 
 ## What "fully clean" means
 
-"Fully clean" is the terminal state every ARDI / iterate loop drives toward.
-A PR/MR is **fully clean** when **both** of these hold:
+<!-- Shared with the lab manual; edit shared/workflow/fully-clean.md, not here. -->
+@shared/workflow/fully-clean.md
 
-1. **All CI workflows are green.** Every required check passes — not just the
-   review job.
-2. **The latest review is totally clean:** no nits, and every item that wasn't
-   directly **Addressed** is either **Deferred** to a tracked follow-up issue,
-   or **Rebutted with a rebuttal that actually convinced the reviewer** — i.e.
-   the reviewer did *not* re-raise it on the next round. A rebuttal the
-   reviewer still disputes does **not** count as clean.
-
-**Threads:** at fully-clean, every **inline** review thread is resolved, and
-the only conversation left open is the final all-clear exchange — the
-reviewer's all-clear comment and your reply to it. (The all-clear is usually a
-top-level PR comment, not an inline thread.)
-
-**Deadlock → escalate to a human.** If you and the reviewer(s) can't reach
-consensus on an item (a rebuttal was exchanged and neither side is budging),
-don't loop forever and don't unilaterally override the reviewer — request a
-**human reviewer** (`d-morrison`) via the `request-pr-review` skill (or
-`gh pr edit <N> --add-reviewer d-morrison`), `@`-mention them in a comment
-summarizing the impasse, and surface the open item to me.
+Escalate a deadlock via the `request-pr-review` skill (human reviewer
+`d-morrison`, or `gh pr edit <N> --add-reviewer d-morrison`), and surface the
+open item to me.
 
 ## Always run ARDI on PRs you touch
 
-Whenever I'm working a PR/MR, run the full **ARDI** loop by default, without
-being asked: **A**ddress every flagged item, **R**ebut findings that are wrong,
-**D**efer out-of-scope items to tracked issues, then **I**terate with a fresh
-review — repeating until the latest review is **fully clean** (see *What
-"fully clean" means* above). Don't stop at "review-clean, just needs approval"
-and hand triage back; keep the cycle going until it's genuinely clean.
-(Mechanics for each step are in the sections below.)
+<!-- Shared with the lab manual; edit shared/workflow/ardi.md, not here. -->
+@shared/workflow/ardi.md
+
+The `ardi` / `iterate` skill family runs this loop. (See *What "fully clean"
+means* above; the mechanics for each step are in the sections around here.)
 
 ## Address every in-scope review comment, even non-blockers
 
-When iterating on a PR with `@claude review` (or any other reviewer), **address
-every in-scope flagged item**, regardless of severity label. The reviewer's
-"Not a blocker", "minor", "nit", "optional", "consider", or "if you want"
-labels are for the user's prioritization, not a free pass for the implementor.
+<!-- Shared with the lab manual; edit shared/workflow/address-every-comment.md, not here. -->
+@shared/workflow/address-every-comment.md
 
-For each flagged item, exactly one of:
-
-1. **Fix it in this PR.** Default path — most nits are 1–3 line changes.
-2. **Defer to a tracked issue.** Only when the fix expands the PR's scope
-   (new feature, broader refactor, separate concern) or the user has
-   explicitly said this PR shouldn't grow. File a follow-up issue and
-   reference it in a PR comment so the item isn't lost.
-
-Then trigger another `@claude review` (or the equivalent) and repeat until the
-PR is **fully clean** (see *What "fully clean" means* above) — zero flagged
-items under any heading, no "non-blocking", "harmless", "minor observation",
-"could improve", etc. sections. "Looks good" / "no findings" / "approved" with
-no follow-on bullets is the bar. Resolve every inline review thread along the
-way, leaving only the final all-clear exchange (the reviewer's comment and your
-reply).
-
-Do **not** report "ready to merge with one minor nit noted" / "harmless
-as-is" / "can address if you want" — that hedging just pushes triage back to
-the user.
-
-If you and the reviewer reach an impasse on an item (your rebuttal didn't
-convince them and you're not convinced by their re-raise), escalate to a
+If you and the reviewer reach an impasse on a single item (your rebuttal didn't
+convince them and their re-raise didn't convince you), escalate that item to a
 **human reviewer** — request `d-morrison` via the `request-pr-review` skill (or
 `gh pr edit <N> --add-reviewer d-morrison`) and `@`-mention them with the
 impasse — for the final call rather than looping.
-Likewise, if after 3–4 rounds the reviewer keeps generating new nits each cycle
-(asymptotic noise), surface that to the user and ask whether to keep going or
-accept the current state.
 
 ## Keep PR branches synced with main
 
-Whenever `main` has moved ahead of a PR branch you're working on, **merge
-`main` into the PR branch** before the next push or review trigger. Don't
-wait for a conflict to surface or for the user to ask.
+<!-- Shared with the lab manual; edit shared/workflow/sync-with-main.md, not here. -->
+@shared/workflow/sync-with-main.md
 
-Check before pushing:
-
-```bash
-git fetch origin main
-git log --oneline ..origin/main | head    # any commits? main is ahead — merge it in
-git merge origin/main
-```
-
-Always do this before triggering a fresh `@claude review`, so the reviewer
-evaluates the PR against current `main` rather than a stale snapshot. (Another
-instance of **never assume; always verify** — `git fetch` to check main's
-actual position instead of assuming the branch is current.)
-
-Don't rebase or squash-rewrite a published PR branch unless explicitly
-asked — a merge commit is the right move because it matches GitHub's "Update
-branch" button and preserves the PR history.
-
-If the merge has conflicts, resolve them, run the project's standard
-pre-commit checks (render / lint / spell / tests), commit, then push. Don't
-push a half-resolved merge.
+(Another instance of **never assume; always verify** — `git fetch` to check
+main's actual position instead of assuming the branch is current. The
+`sync-pr-branch` / `merge-main` skill runs this.)
 
 ## Coding style: avoid nesting; follow the lab manual
 
 Follow the SERG lab manual (https://ucd-serg.github.io/lab-manual/) for coding
 and collaboration conventions.
 
-When writing code, **avoid nested function calls and nested function
-definitions where feasible**:
-
-- Prefer named intermediate variables (or a pipe, e.g. `|>` / `%>%` in R) over
-  deeply nested calls like `f(g(h(x)))`. Naming each step makes the data flow
-  read top-to-bottom and leaves intermediate values inspectable in a debugger.
-- Prefer standalone, top-level function definitions over functions defined
-  inside other functions. Nested definitions hide reusable logic, complicate
-  unit testing, and obscure scope.
-
-This is a readability/maintainability default, not an absolute rule — keep the
-nesting when flattening it would be more convoluted (a trivial one-argument
-wrapper, or a closure that genuinely needs the enclosing scope).
+<!-- Shared with the lab manual; edit shared/coding/avoid-nesting.md, not here. -->
+@shared/coding/avoid-nesting.md
 
 ## Writing style: plain, direct prose
 
-Write user-facing prose in a plain, direct style. This applies to everything I
-read — PR/issue/commit text, docs, READMEs, code comments, release notes,
-emails, and chat replies. Apply it by default to your own drafts, not just when
-asked.
+<!-- Shared with the lab manual; edit shared/writing/plain-prose.md, not here. -->
+@shared/writing/plain-prose.md
 
-The guide of record is my **Principles of Scientific Writing (PSW)**:
-https://d-morrison.github.io/psw/. The rules below operationalize it. When PSW
-and this section disagree, PSW wins.
-
-- **Limit dependent (subordinate) clauses.** One per sentence is plenty. When
-  two or more stack up, split the sentence.
-- **Cut low-content filler and jargon.** Delete words that add no information
-  ("it's worth noting", "in order to" → "to", "due to the fact that" →
-  "because").
-- **Prefer plain (Anglish) words over Latin-derived ones** (PSW, "Word choice").
-  "before", not "prior to"; "needed", not "necessary"; "use", not "utilize". A
-  heuristic, not a purity rule.
-- **Prefer simple declarative sentences and active voice.** Subject, verb,
-  point. Name the actor, then the action.
-- **Join independent clauses with coordinating conjunctions** (and, but, so, or)
-  over subordinate constructions. Prefer "X is fast, but Y is correct" over
-  "While X is fast, Y is correct."
-
-This is a default, not an absolute rule. Keep a clause or a technical term when
-removing it would lose meaning or precision. Never trade an honest hedge for
-false confidence. The `use-preferred-style` skill (alias `style`) spells out the
-procedure, the PSW chapter links, and a filler/jargon swap table; the
-`find-ai-tells` skill (alias `ai-tells`) is the scan-after detector counterpart.
+The `use-preferred-style` skill (alias `style`) spells out the procedure, the
+PSW chapter links, and a filler/jargon swap table; the `find-ai-tells` skill
+(alias `ai-tells`) is the scan-after detector counterpart.
 
 ## Writing style: scan for AI tells
 
-The detector counterpart to the plain-prose guide above: write plainly up
-front, then **scan the draft for AI tells before sending**. Before presenting
-non-trivial prose I authored — PR/issue descriptions, commit bodies,
-README/doc/vignette text, or a long answer meant as deliverable prose —
-self-check it and cut the tells. Watch for:
+The detector counterpart to the plain-prose guide above.
 
-- **Overused vocabulary:** delve, leverage, utilize, tapestry, testament, realm,
-  robust, seamless, holistic, nuanced, multifaceted, pivotal, crucial, "in
-  today's fast-paced world", "stands as a testament to".
-- **Rhetorical reflexes:** the "it's not just X, it's Y" antithesis (the biggest
-  tell), mechanical rule-of-three lists, signposting filler ("it's worth noting
-  that", "importantly"), hedging stacks, hollow "in conclusion" restatements.
-- **Structural/typographic:** em-dash overuse as a default connector,
-  bold-leading `**Term:**` bullets applied mechanically, emoji section headers,
-  conspicuously uniform paragraph rhythm.
-- **Tonal:** promotional register, reflexive both-sidesing, vague universals
-  with no concrete names or numbers.
+<!-- Shared with the lab manual; edit shared/writing/ai-tells.md, not here. -->
+@shared/writing/ai-tells.md
 
-De-slop — cut the filler and the reflexes — **don't** ban words outright or sand
-the text into a flat, voiceless register. Any single tell is innocent;
-clustering and mechanical repetition are the signal. Code, terse status lines,
-and short conversational replies are exempt. The `find-ai-tells` skill (alias
-`ai-tells`) runs this same catalog on demand against any target text.
+The `find-ai-tells` skill (alias `ai-tells`) runs this same catalog on demand
+against any target text.
+
+## Useful prompt formats for coding agents
+
+<!-- Vendored from UCD-SERG/lab-manual; edit there, not here. See README, "Shared content". -->
+@shared/vendored/prompt-formats.md
+
+## Review with Copilot before requesting human review
+
+This is shared lab guidance on getting an automated review before asking a human
+reviewer. When *I* iterate a PR, the ARDI loop above is the mechanism — it
+already addresses whatever the `@claude` or Copilot reviewer flags — so read this
+as the lab-member-facing statement of the same principle, not a second loop to
+run.
+
+<!-- Vendored from UCD-SERG/lab-manual; edit there, not here. See README, "Shared content". -->
+@shared/vendored/copilot-review-before-human.md
