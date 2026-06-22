@@ -89,7 +89,7 @@ score_task_complexity() {
 
 get_current_model() {
     if [[ -f ~/.claude/settings.json ]]; then
-        grep -o '"model"[[:space:]]*:[[:space:]]*"[^"]*"' ~/.claude/settings.json | \
+        grep -o '"model"[[:space:]]*:[[:space:]]*"[^"]*"' ~/.claude/settings.json 2>/dev/null | \
             head -1 | cut -d'"' -f4 || echo "unknown"
     else
         # Fall back to env variable if set
@@ -100,7 +100,9 @@ get_current_model() {
 recommend_model() {
     local score="$1"
 
-    if [[ "$score" -lt 2 ]]; then
+    if [[ "$score" -lt 1 ]]; then
+        echo "fable"
+    elif [[ "$score" -lt 2 ]]; then
         echo "haiku"
     elif [[ "$score" -lt 4 ]]; then
         echo "sonnet"
@@ -117,6 +119,27 @@ model_tier() {
         sonnet|claude-sonnet*|claude-3-sonnet*) echo 2 ;;
         opus|claude-opus*|claude-3-opus*) echo 3 ;;
         *) echo -1 ;; # unknown
+    esac
+}
+
+get_model_display_name() {
+    local model_key="$1"
+    case "$model_key" in
+        fable|fable5|claude-fable-5)
+            echo "Fable 5 (claude-fable-5)"
+            ;;
+        haiku|claude-haiku*|claude-3-haiku*)
+            echo "Haiku 4.5 (claude-haiku-4-5-20251001)"
+            ;;
+        sonnet|claude-sonnet*|claude-3-sonnet*)
+            echo "Sonnet 4.6 (claude-sonnet-4-6)"
+            ;;
+        opus|claude-opus*|claude-3-opus*)
+            echo "Opus 4.8 (claude-opus-4-8)"
+            ;;
+        *)
+            echo "Unknown ($model_key)"
+            ;;
     esac
 }
 
@@ -140,9 +163,9 @@ show_executable_mode() {
     echo ""
     echo -e "${BLUE}## Model Fit Assessment${NC}"
     echo ""
-    echo "**Current model:** $current_model"
+    echo "**Current model:** $(get_model_display_name "$current_model_raw")"
     echo "**Task complexity score:** $complexity / 10"
-    echo "**Recommended model:** $recommended (estimated)"
+    echo "**Recommended model:** $(get_model_display_name "$recommended") (estimated)"
     echo ""
 
     if [[ "$complexity" -lt 2 ]]; then

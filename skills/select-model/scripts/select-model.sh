@@ -5,8 +5,6 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-
 # Colors
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
@@ -170,9 +168,9 @@ get_model_display_name() {
 get_current_model() {
     if [[ -f ~/.claude/settings.json ]]; then
         grep -o '"model"[[:space:]]*:[[:space:]]*"[^"]*"' ~/.claude/settings.json 2>/dev/null | \
-            head -1 | cut -d'"' -f4 || echo "${CLAUDE_MODEL:-}"
+            head -1 | cut -d'"' -f4 || echo "${CLAUDE_MODEL:-unknown}"
     else
-        echo "${CLAUDE_MODEL:-}"
+        echo "${CLAUDE_MODEL:-unknown}"
     fi
 }
 
