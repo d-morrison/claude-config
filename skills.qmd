@@ -1,0 +1,88 @@
+---
+title: "Skills"
+---
+
+Skills are markdown files that teach Claude Code a reusable workflow. Each `skills/<name>/SKILL.md` file describes when to invoke the skill, what steps to follow, and which tools it may use. Claude Code discovers skills in `~/.claude/skills/` automatically.
+
+## How to invoke a skill
+
+| Surface | Syntax |
+|---------|--------|
+| Local CLI | `/skill-name` or a bare keyword (e.g. `ardi`) |
+| Plugin (other repos) | `/ai-config:skill-name` |
+| `@claude` bot on PRs | `@claude skill-name` in a PR comment |
+
+Most skills also respond to plain-English triggers listed in their `description` field (e.g. "grab an issue", "drive to clean", "update memories and skills").
+
+## Skill categories
+
+### PR / review workflow
+
+| Skill | Aliases | What it does |
+|-------|---------|--------------|
+| `ardi` | `dc`, `drive`, `clean`, `iterate` | Read the latest review, address/rebut/defer every finding, push, re-request review — loop until clean |
+| `adr` | | Single ARD pass: address, rebut, defer — without the iterate loop |
+| `claim-pr` | | Post a "paws off" comment before a work session; unclaim when done |
+| `request-pr-review` | | Add a human reviewer and @-mention them with context |
+| `pr-status` | | Report the current PR's CI and review state |
+| `pr-status-all` | | Report status across all open PRs |
+
+### Issue management
+
+| Skill | Aliases | What it does |
+|-------|---------|--------------|
+| `start-task` | `st` | File a tracking issue (if none exists), branch, implement, open PR, ARDI to clean |
+| `grab-issue` | `gi` | Pick the highest-priority open issue and work it end-to-end |
+| `grab-issues-in-parallel` | `gip` | Grab multiple issues and work them in parallel worktrees |
+| `defer-issue` | | File a follow-up issue for something out of scope in the current PR |
+| `cancel-superseded` | `cb` | Close issues/PRs that a merged PR made redundant |
+
+### Branch / sync
+
+| Skill | Aliases | What it does |
+|-------|---------|--------------|
+| `sync-pr-branch` | `sync`, `merge-main`, `resync-branch` | Fetch origin, merge main into the branch, push |
+| `merge-it` | `merged` | Squash-merge a ready PR, then run post-merge cleanup |
+| `post-merge` | | After a merge: checkout main, pull, delete branch, run UMS |
+| `clean-branches` | `prune` | Delete local branches already merged or closed |
+
+### Memory and skills maintenance
+
+| Skill | Aliases | What it does |
+|-------|---------|--------------|
+| `ums` | `update-memories-and-skills` | Capture learnings from the session into memory files and skill definitions |
+| `memorize` | `remember`, `always` | Save a specific fact or preference to memory |
+| `record-learnings` | | Structured post-mortem: extract lessons from a completed task |
+| `consolidate-memory` | | Merge or deduplicate memory files that have drifted |
+
+### Writing and style
+
+| Skill | Aliases | What it does |
+|-------|---------|--------------|
+| `use-preferred-style` | `style` | Apply the plain-prose writing guide to a draft |
+| `find-ai-tells` | `ai-tells` | Scan text for AI-sounding patterns and flag them |
+| `tidy` | | Clean up code or prose without changing behavior |
+| `simplify` | | Reduce a file or function to its essential parts |
+
+### Repo / CI utilities
+
+| Skill | Aliases | What it does |
+|-------|---------|--------------|
+| `scout-peers` | | Survey comparable repos for ideas and conventions |
+| `check-dependency-updates` | `cdu` | Check for outdated dependencies and propose updates |
+| `dependabot` | | Add or update Dependabot config for a repo |
+| `send-upstream` | `sup` | Open a PR or issue in an upstream repo for a bug found here |
+| `reprexes` | | Build minimal reproducible examples for a bug |
+| `r-pkg-spellcheck` | | Spell-check an R package's documentation |
+
+### Session management
+
+| Skill | Aliases | What it does |
+|-------|---------|--------------|
+| `session-lock` | `deconflict-sessions` | Register/deregister this session to prevent parallel clobbering |
+| `handoff` | `wrap-up` | Summarize context and open items so another session can pick up |
+| `select-model` | `model-fit`, `assess-model-fit` | Choose the right Claude model for the task at hand |
+
+## Full skill list
+
+All 112+ skills are in [`skills/`](https://github.com/d-morrison/ai-config/tree/main/skills) on GitHub. Each `SKILL.md` has a `description` field that lists the trigger phrases and a full procedure.

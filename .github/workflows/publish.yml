@@ -1,0 +1,29 @@
+name: Quarto Publish
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@8a96df13519ee81fd526f2dfca5962811136661b # v2.2.0
+
+      - name: Render
+        uses: quarto-dev/quarto-actions/render@8a96df13519ee81fd526f2dfca5962811136661b # v2.2.0
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@d92aa235d04922e8f08b40ce78cc5442fcfbfa2f # v4.8.0
+        with:
+          folder: _site
+          clean-exclude: pr-preview/
+          force: false

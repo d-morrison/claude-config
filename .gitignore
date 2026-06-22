@@ -10,3 +10,10 @@ skill-zips/
 # Python (validators in scripts/)
 __pycache__/
 *.pyc
+
+# Quarto website build
+_site/
+.quarto/
+
+/.quarto/
+**/*.quarto_ipynb
