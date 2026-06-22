@@ -54,7 +54,8 @@ sends everything else back to the serial path.
 Detect the forge (GitHub `gh` / GitLab `glab`) from `git remote get-url origin`
 and note the default branch. Resolve `<owner>/<repo>` once so you can pass it to
 every subagent. In a remote/web session, `gh` may be absent — use the GitHub MCP
-tools instead (see the repo's `CLAUDE.md` mapping table).
+tools instead (e.g. `add_issue_comment`, `create_pull_request`,
+`search_pull_requests`).
 
 ### 1. Enumerate and triage (orchestrator)
 
@@ -132,7 +133,7 @@ and the default branch for each issue:
 >    (`Closes #<N>` so the PR auto-closes it).
 > 6. **Push** `git push -u origin HEAD` (retry with backoff on a network error)
 >    and **open a PR** into `<default-branch>` as ready-for-review (not draft),
->    body referencing `Closes #<N>`. Request `d-morrison` as reviewer.
+>    body referencing `Closes #<N>`.
 > 7. **ARDI to clean** — drive the PR to a clean review verdict: read the
 >    LATEST review, Address every finding / Rebut what's wrong / Defer
 >    out-of-scope items to a tracked issue, push, re-request review, repeat
@@ -149,9 +150,9 @@ in the orchestrator — never have each subagent re-do it.
 
 ### 5. Work the dependent remainder serially (orchestrator)
 
-After (or alongside) the parallel wave, run the **dependent remainder** through
-the normal serial [`gii`](../gii/SKILL.md) loop — it stacks branches and handles
-same-file ordering correctly. Don't try to parallelize it.
+After the parallel wave, run the **dependent remainder** through the normal
+serial [`gii`](../gii/SKILL.md) loop — it stacks branches and handles same-file
+ordering correctly. Don't try to parallelize it.
 
 ### 6. Combined report (orchestrator)
 
