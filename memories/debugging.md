@@ -40,7 +40,7 @@ touched lines** before pushing:
   and scan for `see issue\.`, `, #[0-9]+,`, double spaces, broken section-header dashes.
 - The blanket strip patterns that work cleanly (with `sed -E` / `sed -r` — they need
   ERE for the `+` quantifier; in ERE, `\(` and `\)` match literal parens, not groups):
-  `s/ \(#[0-9]+\)//g` (inline), `s/# #[0-9]+: /# /g` (prefix), `s/, #[0-9]+,/,/g` — but
+  `s/ \(#[0-9]+\)//g` (inline), `s/^# #[0-9]+: /# /` (prefix — `^`-anchored, so no `g`), `s/, #[0-9]+,/,/g` — but
   the line-leading and sentence-internal cases need hand edits, not sed.
 
 ## Merging main into a sibling PR can silently clobber an un-customized file
