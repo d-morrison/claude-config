@@ -72,7 +72,7 @@ score_task_complexity() {
         score=$(( score + 3 ))
     fi
 
-    if [[ "$task_desc" =~ [Rr]eview|[Bb]ug|[Pp]erformance ]]; then
+    if [[ "$task_desc" =~ [Rr]eview|[Cc]ode.review|[Qq]uality|[Pp]erformance ]]; then
         score=$(( score + 2 ))
     fi
 
