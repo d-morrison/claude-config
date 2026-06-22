@@ -34,7 +34,8 @@ history to understand what decisions were made previously and why.
 
    **GitLab:**
    ```bash
-   glab mr list --state opened --per-page=50 2>&1 | grep -iE "closes #<N>|fixes #<N>|resolves #<N>" || true
+   glab mr list --state opened --per-page=50 --output json 2>/dev/null \
+     | jq -r '.[] | select((.description // "") | test("(Closes|Fixes|Resolves) #<N>"; "i")) | "!\(.iid) \(.title)"'
    ```
 
    If an open PR already covers the issue, **review or extend it** instead of
