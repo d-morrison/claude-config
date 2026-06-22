@@ -28,7 +28,7 @@ history to understand what decisions were made previously and why.
 
    **GitHub:**
    ```bash
-   gh pr list --state open --json number,title,body \
+   gh pr list --state open --limit 100 --json number,title,body \
      --jq '.[] | select((.body // "") | test("(Closes|Fixes|Resolves) #<N>"; "i")) | "#\(.number) \(.title)"'
    ```
 
