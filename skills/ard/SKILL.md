@@ -103,7 +103,7 @@ sentence saying you're *not* re-requesting a review. Refer to it obliquely
 `@ claude`, with a space, so the raw body never contains the contiguous handle);
 paste the literal `@`-mention only when you actually intend to dispatch a review. A
 stray mention spawns a run that cancels the push-triggered review on
-`cancel-in-progress` setups. On the d-morrison/gha mention bot it also starts a
+`cancel-in-progress` setups. On some mention-bot setups it also starts a
 session whose residual-commit sweep can churn the branch.
 
 Summary format:

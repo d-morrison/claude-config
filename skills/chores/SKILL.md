@@ -49,7 +49,7 @@ any repo without checking it out:
 
 ```bash
 REPO="${REPO:-$(gh repo view --json nameWithOwner --jq .nameWithOwner)}"
-# e.g. to target another repo:  REPO=d-morrison/qwt
+# e.g. to target another repo:  REPO=owner/other-repo
 ```
 
 This skill is GitHub-first (`gh`). For a GitLab repo, the same shape applies via

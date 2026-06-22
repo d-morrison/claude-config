@@ -49,7 +49,7 @@ finding → push → post summary → re-request review → repeat until clean.
 
    **If the latest review is a cancellation, the live verdict is stale —
    don't re-do already-applied fixes.** A `cancel-in-progress` cancellation
-   (the d-morrison/gha setup cancels superseded review runs) means the last
+   (on setups that cancel superseded review runs) means the last
    *complete* review's findings may already have been fixed by a commit that
    landed after it, with the confirming re-review killed before it could post.
    Before treating those findings as outstanding work, **diff the current code
@@ -86,7 +86,7 @@ finding → push → post summary → re-request review → repeat until clean.
    - **Code was pushed:** the push **already** triggers the review (e.g.
      `claude-code-review` on `pull_request` sync). Do **NOT** also post
      "@claude review again". On workflows with `concurrency:
-     cancel-in-progress` (the d-morrison/gha setup), the push-triggered and
+     cancel-in-progress`, the push-triggered and
      mention-triggered runs **cancel each other**, leaving the latest commit
      with a canceled, never-posted verdict. Just wait for the push-triggered
      review.
@@ -95,7 +95,7 @@ finding → push → post summary → re-request review → repeat until clean.
      or the forge's equivalent). This is the only case where you post the
      mention.
    - **Heads-up — some repos' review workflow is *not* comment-triggered.**
-     The d-morrison Quarto / R-pkg repos (e.g. `d-morrison/psw`) run
+     Some Quarto / R-package repos run
      `claude-code-review.yml` on `pull_request` (`opened, synchronize,
      ready_for_review, reopened`) and `workflow_dispatch` (input `pr_number`),
      not on an `@claude` comment. A new push auto-fires it; to force a fresh
@@ -120,7 +120,7 @@ finding → push → post summary → re-request review → repeat until clean.
    space, so the raw body never contains the contiguous handle); paste the
    literal `@`-mention only when you actually intend to dispatch. A stray mention
    spawns a run that cancels the push-triggered review on `cancel-in-progress`
-   setups. On the d-morrison/gha mention bot it also starts a session whose
+   setups. On some mention-bot setups it also starts a session whose
    residual-commit sweep can churn the branch.
 
    Then wait for the new verdict.

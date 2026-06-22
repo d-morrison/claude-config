@@ -45,7 +45,7 @@ git log --oneline -5 origin/main           # what actually landed on main
 - For every PR/issue you touched, confirm its real state with
   `gh pr view <N> --json state,mergedAt` (or `gh issue view`). A PR you think
   you left open may have been merged by the user, and vice-versa.
-- If the session touched **other repos** (e.g. an upstream like `d-morrison/gha`),
+- If the session touched **other repos** (e.g. an upstream dependency),
   check those too — `gh pr list --repo <owner>/<repo> --state open`.
 
 ### 2. Surface anything still open or dangling

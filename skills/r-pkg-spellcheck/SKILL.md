@@ -16,9 +16,9 @@ Verifies spelling locally before pushing R-package changes that touch text the
 in CI and treats unknown words as a failure — the only allow-list is
 `inst/WORDLIST`.
 
-**Why this exists:** On d-morrison/serodynamics PR #210 (2026-05-18) a push
-added `assignees`, `PR's`, and `SHA` to NEWS.md without updating
-`inst/WORDLIST`, failing Spellcheck CI and forcing a follow-up push.
+**Why this exists:** a push that adds new words (e.g. `assignees`, `PR's`,
+`SHA`) to NEWS.md without updating `inst/WORDLIST` fails Spellcheck CI and
+forces a follow-up push.
 
 ## When to run
 
@@ -78,6 +78,5 @@ Compare against `inst/WORDLIST`. Acronyms and possessives are the usual misses.
 
 ## Related
 
-This pattern came from serodynamics PR #210 but applies to any R package using
-the `spelling` package's GitHub Actions workflow (rme, serocalculator,
-serodynamics, snapr, qwt, mic-sim, shigella, rmb all use this setup).
+This pattern applies to any R package using the `spelling` package's GitHub
+Actions workflow.

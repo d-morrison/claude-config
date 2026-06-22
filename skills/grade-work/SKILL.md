@@ -15,9 +15,9 @@ Grade a folder of submissions against a solution key and distill the results
 into a **ranked catalog of common error types** — the raw material for a review
 session, regrade, or answer-key improvement.
 
-**Origin:** built from grading Epi 204 Midterm 2 (survival analysis + Cox PH),
-where 12 PDF submissions were compared against the course solution and the
-errors became a new `rme` review chapter (d-morrison/rme PR #881).
+**Origin:** built from grading an exam where PDF submissions were compared
+against the course solution and the errors became a new review chapter in the
+course book.
 
 ## When to use
 

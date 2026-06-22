@@ -79,7 +79,7 @@ Synonyms: `sync`, `resync-branch`, `merge-main` — all route here.
    `render` / `lint` / `spell` / `test` skills, use them. A clean,
    conflict-free merge auto-commits and needs no extra commit.
 
-   <details><summary>Example: an R + Quarto package (e.g. <code>rme</code>)</summary>
+   <details><summary>Example: an R + Quarto package</summary>
 
    ```bash
    quarto render <chapter.qmd> --to html      # each parent chapter touched by the merge
