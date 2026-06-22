@@ -126,6 +126,12 @@ allowed-tools:               # real skill: list its tools. alias: mirror the can
 - **No registry to update.** Skills are auto-discovered from `skills/` (the
   bootstrap symlink and the plugin root both read the directory) — adding the
   directory is enough.
+- **Use `<angle-bracket>` placeholders in command blocks — never bare ALLCAPS.**
+  Identifiers like `PATH`, `URL`, `TARGET` look like shell env vars; bare `PATH`
+  looks like the `$PATH` env var, and `path` is a zsh special that mirrors
+  `$PATH`. A reader who copies the command without substituting the placeholder
+  runs something wrong. Use `<path>`, `<url>`, `<target>` instead. (See
+  `memories/tools.md` → "Skill command blocks".)
 
 ## If the skill fans out to subagents
 

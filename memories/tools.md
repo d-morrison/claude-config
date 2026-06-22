@@ -188,3 +188,21 @@
   another session's branch — don't author files there. Work in your own
   worktree's `skills/<name>/` dir (full rationale in `skill-builder`'s Ship-it
   caveat).
+- **Use `<angle-bracket>` placeholders in command blocks — never bare ALLCAPS.**
+  `PATH`, `URL`, `TARGET`, etc. look like shell env vars: bare `PATH` looks like
+  the `$PATH` env var, and `path` is a zsh special that mirrors `$PATH`. A reader
+  who copies the command without substituting the placeholder runs something wrong.
+  Use `<path>`, `<url>`, `<target>` instead. (PR #99 fixed `test -e PATH` →
+  `test -e <path>` and `curl … URL` → `curl … <url>` in purge-hallucinations.)
+
+## ai-config memory file structure
+- Memory files (`memories/*.md`) have **no YAML frontmatter** — the file starts
+  directly with a `#` heading. `grep -r "^name:" memories/` always returns empty;
+  don't use frontmatter fields to locate or identify a memory file.
+- `[[link]]` cross-links in skills and memories resolve to **skill directories**
+  (`skills/<target>/`), not to named entries in memory files. To verify a
+  `[[target]]` link: `ls skills/<target>/`. If no skill dir exists, fall back to
+  searching memory headings: `grep -rn "^# .*<target>" memories/`.
+- System skills (e.g. `claude-api`) may be globally available but have no local
+  `skills/<name>/` directory. An absent local dir means ❓ Unverifiable, not
+  ❌ Fabricated — check the session's available-skills list before classifying.
