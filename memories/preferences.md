@@ -6,6 +6,11 @@
   session or what "should" be the case. State drifts between turns. "It should be X" /
   "I left it as X" / "presumably X" are red flags; replace with a fresh check.
 - ALWAYS record what I learn in memory/AI-instruction notes as I work (standing request).
+- When recording a factual claim about tool/workflow behavior (an implementation detail
+  or why-it-happens explanation derived from a specific source), cite the source inline —
+  e.g., "(source: gha#70 PR body)" — so future sessions can calibrate trust and verify
+  if needed. Directly observed facts need no citation; explanations inferred from a PR
+  body, commit message, or doc do. (Learned on ai-config#118.)
 - When creating a GitHub PR, request reviewer `d-morrison` (see request-pr-review skill).
 - When deferring work out of scope during a review iteration, always file a follow-up issue
   (via `gh issue create` or `glab issue create`) capturing the deferred item. Don't just
