@@ -84,6 +84,10 @@ score_task_complexity() {
         score=$(( score + 1 ))
     fi
 
+    if [[ "$task_desc" =~ [Dd]ocument|[Ww]rite.doc|[Cc]omment|[Rr]eadme ]]; then
+        score=$(( score + 2 ))
+    fi
+
     echo "$score"
 }
 
