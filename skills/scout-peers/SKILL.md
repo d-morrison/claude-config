@@ -179,11 +179,3 @@ items to implement (mirror `tidy`'s close-out). For each item the user greenligh
   matters — fetch the actual source file before relying on the mechanic.
 - Don't over-weight raw size/star count; a bigger catalog is not "superior" to
   a focused tool that does its job well.
-
-## Relationship to other skills
-
-- **`opposition-research`** — mines a competitor's **user community** (issue
-  trackers, forums, subreddits, reviews) for demanded features, as opposed to
-  this skill which mines their **source code and structure**. The two are
-  complementary: this skill tells you what they built; `opposition-research`
-  tells you what their users want next.
