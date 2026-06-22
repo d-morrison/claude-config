@@ -84,7 +84,7 @@ when the issue already exists.
 <!-- Shared with the lab manual; edit shared/workflow/upstream-issues.md, not here. -->
 @shared/workflow/upstream-issues.md
 
-The `sup` / `send-upstream` skill operationalizes these steps (issue path, PR path, and the local link-back).
+The `sup` / `send-upstream` skill operationalizes steps 1--2 (the PR path, including fork-if-needed, and the issue path) and the link-back. Step 3 (own-repo fallback) is not covered by `sup`; use `gh issue create` in the current repo and ask the user to transfer it.
 
 ## Wrap up a merged PR with UMS
 
