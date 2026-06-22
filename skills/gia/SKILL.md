@@ -112,6 +112,9 @@ stacks on it.
   `check-history`, `sync-pr-branch`, `defer-issue`).
 - Use **`ardia`** alone to only clear the PR queue, or **`gii`** alone to only
   work the issue backlog. `gia` is the both-in-one sweep.
+- **`gip`** — when Phase 2's issues are provably independent (no stacking
+  dependency, no file overlap), run that phase with `gip` to work them
+  concurrently instead of serially.
 
 ## Anti-patterns
 

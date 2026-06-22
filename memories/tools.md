@@ -67,6 +67,15 @@
 - Webhook PR-activity events cover comments/reviews/CI *failures* but NOT CI
   *success*, new pushes, or merge-conflict transitions — don't rely on events
   alone to know a PR went green or merged; re-check explicitly.
+- The `gh`->MCP substitution **mapping table** lives in `d-morrison/gha`'s
+  `CLAUDE.md` specifically (the "GitHub access in remote / web sessions" table);
+  other repos' `CLAUDE.md` (e.g. `ai-config`) do NOT carry it. When a skill or
+  doc tells a reader to "use the GitHub MCP tools," name the tools by example
+  (`mcp__github__add_issue_comment`, `mcp__github__create_pull_request`,
+  `mcp__github__search_pull_requests`) rather than pointing at "the repo's
+  `CLAUDE.md` mapping table" — that cross-reference
+  resolves only in gha and reads as a fabricated reference elsewhere. (Caught in
+  ai-config#137 review: the gip skill referenced a table ai-config doesn't have.)
 
 ## Git tags (force-move / slide)
 - To move a tag to a new commit: `git tag -d <tag> && git tag <tag> <target> && git push origin :refs/tags/<tag> && git push origin <tag>`

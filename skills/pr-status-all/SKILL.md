@@ -183,6 +183,9 @@ whole-queue *write* loops are different, and deliberately stay (mostly) series:
   worktree isolation + bounded concurrency — not by default.
 - **`gii` / `gia`** — intentionally sequential: a later issue's base branch
   depends on whether the prior MR merged, and same-file issues conflict.
+  **`gip`** is the opt-in exception — it fans out only the *provably
+  independent* subset (no stacking dependency, no file overlap), each subagent
+  in its own worktree, and sends everything else back through `gii`.
 
 Rule of thumb: fan out a whole-queue loop only when its units are provably
 independent and don't mutate shared state — like this one.
