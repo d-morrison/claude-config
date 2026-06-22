@@ -20,7 +20,7 @@ review lifecycle is still fresh in context.
 
 - A PR/MR you were working on just merged.
 - "post-merge", "wrap up the merged PR", "clean up after the merge", "the PR
-  merged — now what?"
+  merged — now what?", "merge it", "merge this"
 - Distinct from **`wrap-up`** (session-level, may span several PRs/issues) —
   `post-merge` is the single-PR version, run each time a PR lands.
 
