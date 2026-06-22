@@ -74,7 +74,7 @@ gh pr comment <N> --body "..."
 
 One to three sentences is enough. Don't quote verbatim — paraphrase so it
 reads naturally in the PR thread. Skip trivial acknowledgments or
-conversational exchanges with no actionable content.
+conversational exchanges with nothing to act on.
 
 This makes context visible to future @claude sessions, other reviewers, and
 contributors who only see the PR thread.
