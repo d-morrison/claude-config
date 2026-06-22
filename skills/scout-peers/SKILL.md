@@ -153,6 +153,19 @@ items to implement (mirror `tidy`'s close-out). For each item the user greenligh
 4. **What this repo uniquely owns** — the capabilities no peer replicated
    (reassurance + positioning).
 
+## Relationship to other skills
+
+- **`opposition-research`** (alias `oppo`) — the mirror image. `scout-peers`
+  reads a competitor's **code / repo** to borrow license-checked
+  *implementations*; `oppo` reads its **users' discourse** (issue trackers,
+  feature-request boards, subreddits, reviews) for *demanded features*,
+  regardless of whether anyone built them. Use `oppo` to learn *what* to build,
+  `scout-peers` to learn *how* others built it.
+- **`deep-research`** — the general multi-source web-research harness;
+  `scout-peers` is the repo-survey-and-adapt specialization.
+- **`prefer-upstream`** — before hand-rolling something, both skills push toward
+  reusing what the ecosystem already maintains.
+
 ## What NOT to do
 
 - Don't copy from a repo whose license you haven't fetched and verified this
