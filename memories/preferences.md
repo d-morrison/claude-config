@@ -191,10 +191,10 @@
   `origin/<branch>`: sync to the bot's commit and don't redo fixes it already landed. Two
   Claude sessions on one branch is the parallel-session collision `claim-pr`/`session-lock`
   warn about. (ai-config#120: the bot fixed 3 of 4 findings while I worked the same branch.)
-- A reviewer's *suggested fix* (a `suggestion` block or proposed code) can itself be wrong —
+- A reviewer's *suggested fix* (a `suggestion` block or proposed code) — human or bot — can itself be wrong —
   verify it before applying; don't paste it in blind. Check it handles the general case, not
   just the one flagged spot. If the correct fix differs, apply that and say so in the ARD reply
-  so the reviewer sees why you diverged. (ai-config#94: a suggested regex `[>|][-+]?` would have
+  so the reviewer sees why you diverged. (ai-config#94 round 2: a suggested regex `[>|][-+]?` would have
   blanked every inline `description:` — the very round-1 bug under review; the right fix kept the
   block indicator optional, `[>|]?[-+]?`.)
 - In R/Quarto/Rmd prose, prefer inline R expressions (`` `r ...` ``) over hard-coded
@@ -276,9 +276,4 @@
   failure state. E.g. "in a session after a PR has just merged" is correct for a skill that
   stops on unmerged PRs; "with an open PR" is insufficient — it covers only the stop path,
   not the full flow. (Learned on ai-config#125.)
-- When a reviewer (human or bot) includes a suggested fix (`suggestion` block), verify the
-  fix before applying it. The suggestion can be wrong or overcorrect — e.g., making an
-  optional marker required. Apply the correct fix, and if you diverge from the suggestion,
-  note the divergence in the ARD reply so the reviewer sees why. (Learned on ai-config#94
-  round 2: the bot suggested `[>|][-+]?` — which required the block-scalar indicator —
-  when the correct fix was `[>|]?[-+]?`, keeping it optional.)
+
