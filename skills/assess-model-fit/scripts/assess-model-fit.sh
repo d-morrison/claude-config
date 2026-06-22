@@ -179,13 +179,13 @@ show_executable_mode() {
     elif [[ "$recommended_tier" -le "$current_tier" ]]; then
         echo -e "${GREEN}✓ Current model is adequate for this task.${NC}"
         echo ""
-        echo "The recommended model ($recommended) is not higher than your current model."
+        echo "The recommended model ($(get_model_display_name "$recommended")) is not higher than your current model."
         echo "No escalation needed."
         return 0
     elif [[ "$complexity" -lt 4 ]]; then
         echo -e "${YELLOW}⚠ Current model may be borderline for this task.${NC}"
         echo ""
-        echo "The task has moderate complexity. A higher model ($recommended) is recommended."
+        echo "The task has moderate complexity. $(get_model_display_name "$recommended") is recommended."
         echo ""
         echo "**Escalating to model selection...**"
         echo ""
@@ -193,7 +193,7 @@ show_executable_mode() {
     else
         echo -e "${RED}✗ Current model is likely insufficient for this task.${NC}"
         echo ""
-        echo "The task requires significant reasoning. Escalation to $recommended recommended."
+        echo "The task requires significant reasoning. Escalation to $(get_model_display_name "$recommended") recommended."
         echo ""
         echo "**Escalating to model selection...**"
         echo ""

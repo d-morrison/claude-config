@@ -248,6 +248,7 @@ show_executable_mode() {
         if [[ "$current_key" == "$recommended_key" ]]; then
             echo -e "${GREEN}✓ Current model matches recommendation.${NC}"
             echo ""
+            return 0
         else
             echo -e "${YELLOW}Current model differs from recommendation.${NC}"
             echo ""
