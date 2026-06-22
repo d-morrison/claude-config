@@ -198,8 +198,8 @@
 - When a memory, skill, or doc entry points at a location in *another* file, don't cite
   a specific line number — it goes stale the moment that file changes, and a later reader
   who looks it up comes up empty. Quote the section heading or symbol name (e.g. the
-  `## Foo` heading) or use a vaguer reference instead. Same root as the inline-R-expressions
-  rule above: don't bake a volatile value into prose. (ai-config#135 review: a
+  `## Foo` heading) or use a vaguer reference instead. This shares the same root principle
+  as the inline-R-expressions rule above: don't bake a volatile value into prose. (ai-config#135 review: a
   `debugging.md` note cited `scout-peers/SKILL.md` lines 156/183, which #132's `bfc17ee`
   had already removed.)
 - Always leave yourself handoff notes proactively when pausing — don't wait to be asked —
