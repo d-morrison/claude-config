@@ -1,3 +1,10 @@
+---
+name: rme-epi204
+description: "Project map, operational gotchas, and reviewer conventions for d-morrison/rme (Regression Models for Epidemiology / Epi 204 course)"
+metadata:
+  type: project
+---
+
 # rme / Epi 204 (UC Davis) — working notes
 
 ## Project map
@@ -13,9 +20,9 @@
 - Work in an **isolated `git worktree` off `origin/main`** (`git worktree add -b <branch> /tmp/<dir> origin/main`); `git submodule update --init`; `renv::restore()` is fast from the shared cache; render a single chapter with `quarto render chapters/<x>.qmd --to html`.
 - Before pushing a PR branch, **fetch + reconcile `origin/<branch>`** — another session may have already pushed the same change (saw both local & remote independently merge `main` into the same PR branch).
 
-## CI: preview-deploy "green but nothing happens" gotcha (fixed in PR #913)
+## CI: preview-deploy "green but nothing happens" gotcha (fixed in d-morrison/rme#913)
 - Symptom: preview **build** green + `pr-preview-site` artifact uploaded, yet `pr-preview/pr-N/` never publishes and **all checks stay green**.
-- Cause: a step that created files **before `actions/checkout`** had them wiped by checkout's default `clean: true` (`git clean -ffdx`), so the metadata never reached the artifact; the deploy's `if: …outputs.action == 'deploy'` was silently false. `pr_number=$(cat missing)` inside `echo` → empty output + exit 0, so the step "passed."
+- Cause: PR metadata files (`pr-number.txt`, `action.txt`) were written **before `actions/checkout`**, which runs `git clean -ffdx` and deletes them; the artifact shipped `site/` only, no `meta/`. The deploy job then got `cat: _preview_download/meta/pr-number.txt: No such file or directory` → empty `action` output → `if: …action == 'deploy'` guard was false → deploy silently skipped, job reported success.
 - **General lesson:** when CI is green but an expected side-effect (deploy/comment/output) didn't happen, **read the run logs**, not just the check status; suspect a guard that evaluated false on empty/missing inputs. (Download the artifact to see what actually shipped.)
 - Preview URL: `https://d-morrison.github.io/rme/pr-preview/pr-<N>/`, deployed by `rossjrw/pr-preview-action` to the `gh-pages` branch. A PR's preview build uses the `preview.yml` from the **PR head branch**, so an open PR needs `main` merged in to pick up a workflow fix.
 
