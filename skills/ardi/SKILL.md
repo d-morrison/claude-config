@@ -1,6 +1,6 @@
 ---
 name: ardi
-description: "ARD + Iterate: apply the ARD framework within an iterate loop on a single PR/MR. Read the latest review, Address/Rebut/Defer every finding, push fixes, post the ARD summary, then re-request review — repeating until the verdict is clean. Use when asked to 'ardi', 'dc', 'drive to clean', 'iterate', 'iterate until clean', 'iterate this MR', 'drive this PR to clean', 'address the review comments', '@claude review again and fix what it finds', or after receiving a review you want to resolve completely / carry a PR all the way to mergeable."
+description: "ARD + Iterate: apply the ARD framework within an iterate loop on a single PR/MR. Read the latest review, Address/Rebut/Defer every finding, push fixes, post the ARD summary, then re-request review — repeating until the verdict is clean. Use when asked to 'ardi', 'dc', 'drive', 'clean', 'drive to clean', 'iterate', 'iterate until clean', 'iterate this MR', 'drive this PR to clean', 'address the review comments', '@claude review again and fix what it finds', or after receiving a review you want to resolve completely / carry a PR all the way to mergeable."
 user-invocable: true
 allowed-tools:
   - Bash

@@ -127,6 +127,19 @@ allowed-tools:               # real skill: list its tools. alias: mirror the can
   bootstrap symlink and the plugin root both read the directory) — adding the
   directory is enough.
 
+## If the skill fans out to subagents
+
+When a skill's procedure spawns subagents (to parallelize per-item work, e.g.
+`pr-status-all` runs one subagent per PR), write the **subagent prompt as if the
+skill file doesn't exist** — because for the subagent it doesn't. A spawned
+subagent starts fresh: it sees only the prompt the orchestrator hands it, not
+this skill's text. Any discipline the work depends on (the exact query, the
+bot-login wording, how to resolve owner/repo, "read the LATEST review") has to be
+restated inside the subagent prompt, not assumed inherited. Keep the cheap,
+once-per-run setup in the orchestrator — enumerate the work items there, and pass
+down the per-item data the orchestrator already holds so each subagent doesn't
+re-fetch it. `pr-status-all` is the worked example.
+
 ## If the skill encodes a standing rule
 
 When the skill codifies general guidance or a preference (not just a one-off
@@ -199,6 +212,8 @@ Then, as their own explicit steps (don't leave them buried in a comment):
 - ❌ Not scanning other branches → colliding parallel work / duplicate skills.
 - ❌ Duplicating canonical content across alias files (aliases must only redirect).
 - ❌ A thin description with no trigger phrases — the skill never gets discovered.
+- ❌ In a subagent-fanning skill, writing the subagent prompt as if it inherits
+  this skill's text — it doesn't; restate every needed discipline in the prompt.
 - ❌ `name:` not matching the directory name.
 - ❌ Encoding a standing rule in the skill but not in `preferences.md`.
 - ❌ Leaving the new skill as a local-only uncommitted file (or pushing direct to main).

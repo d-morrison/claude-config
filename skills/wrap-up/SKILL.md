@@ -15,7 +15,8 @@ Close out a work session cleanly: confirm where everything *actually* landed,
 report it with clickable links (surfacing anything still open), and capture
 what was learned before the context is gone.
 
-Synonyms: `merged` — routes here, and can name the just-merged PR to anchor the
+Synonyms: `done` — a plain "are we done?" entry point that routes here; and
+`merged` — routes here too, and can name the just-merged PR to anchor the
 summary (e.g. `/merged #74`). (Distinct from `post-merge`, which wraps up a
 single just-merged PR rather than the whole session.)
 
