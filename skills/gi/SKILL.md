@@ -148,7 +148,7 @@ before merging (and treat an unexpected merge conflict as a signal):
 
 - Search open *and merged* PRs for one that already references `Closes #<N>`
   for your issue (`gh pr list --state all --search "closes #<N>"` / the GitHub
-  `search_pull_requests` tool) — the default `gh pr list` lists only open PRs
+  `mcp__github__search_pull_requests` tool) — the default `gh pr list` lists only open PRs
   and would miss a sibling that already merged and closed the issue, the case
   that matters most. If the issue is already closed, don't merge a now-redundant
   PR blindly.
