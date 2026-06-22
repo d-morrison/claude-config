@@ -76,12 +76,8 @@ score_task_complexity() {
         score=$(( score + 2 ))
     fi
 
-    if [[ "$task_desc" =~ [Mm]any|[Ll]arge|[Ww]ide ]]; then
-        score=$(( score + 1 ))
-    fi
-
-    if [[ "$task_desc" =~ [Mm]ulti-step|[Ss]tep-by-step|[Cc]ompose ]]; then
-        score=$(( score + 1 ))
+    if [[ "$task_desc" =~ [Mm]ulti-step|[Mm]ulti-file|[Cc]oordinate|[Ll]arge.scope ]]; then
+        score=$(( score + 2 ))
     fi
 
     if [[ "$task_desc" =~ [Dd]ocument|[Ww]rite.doc|[Cc]omment|[Rr]eadme ]]; then
