@@ -64,7 +64,7 @@ score_task_complexity() {
     local task_desc="$1"
     local score=0
 
-    if [[ "$task_desc" =~ [Cc]omplex|[Aa]rchitecture|[Dd]eep|[Rr]efactor|[Dd]esign|[Pp]lan|[Rr]esearch ]]; then
+    if [[ "$task_desc" =~ [Cc]omplex|[Aa]rchitecture|[Rr]efactor|[Dd]esign ]]; then
         score=$(( score + 3 ))
     fi
 
