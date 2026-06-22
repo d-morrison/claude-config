@@ -54,8 +54,8 @@ sends everything else back to the serial path.
 Detect the forge (GitHub `gh` / GitLab `glab`) from `git remote get-url origin`
 and note the default branch. Resolve `<owner>/<repo>` once so you can pass it to
 every subagent. In a remote/web session, `gh` may be absent — use the GitHub MCP
-tools instead (e.g. `add_issue_comment`, `create_pull_request`,
-`search_pull_requests`).
+tools instead (e.g. `mcp__github__add_issue_comment`,
+`mcp__github__create_pull_request`, `mcp__github__search_pull_requests`).
 
 ### 1. Enumerate and triage (orchestrator)
 
