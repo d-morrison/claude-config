@@ -93,7 +93,8 @@ Say so and route it there; don't store a note that will never fire.
    symlink: edit the memory file at its path inside **your** worktree, commit on
    your worktree branch, and land it via branch + PR + merge. It only reaches the
    live symlinked memory once it merges to `main` and the main checkout updates.
-   (See `use-isolated-worktree-for-ai-config` / `worktree-git-no-cd-to-main`.)
+   (See the worktree-isolation and no-`cd`-in-worktree bullets in
+   `memories/preferences.md`, and the `session-lock` skill.)
 6. **Confirm**: one sentence — what was stored, where, and that it was pushed.
 
 ## Don't
