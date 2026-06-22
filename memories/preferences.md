@@ -137,9 +137,10 @@
   to confirm only intended files are staged. (Learned the hard way: a
   `git add -A` swept the user's `scout-peers` skill into an unrelated `/prune` PR, adding
   several extra review rounds.)
-- ALWAYS run a local session in an isolated `git worktree`, never directly in the shared
-  working copy — this is the default for EVERY local session, not just substantial multi-file
-  work or when the user flags the wd as "in use" / "do this in a separate repo". The ai-config
+- Run a local session in an isolated `git worktree` by DEFAULT, not directly in the shared
+  working copy — unless there's a specific reason to use the working copy. This default holds
+  for EVERY local session, not just substantial multi-file work or when the user flags the wd
+  as "in use" / "do this in a separate repo". The ai-config
   working copy is often in use by CONCURRENT Claude sessions; untracked or uncommitted files
   there can be silently wiped by another session (branch switch / `git clean`). Create it off
   `origin/main` (`git worktree add -b <branch> ../ai-config-worktrees/<branch> origin/main`),
