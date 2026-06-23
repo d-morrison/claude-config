@@ -54,6 +54,29 @@ From the current conversation, identify:
 If any of these are unclear from context, ask the user briefly before
 filing. A vague follow-up issue is worse than no issue.
 
+### 2b. Search for an existing issue first — including CLOSED ones
+
+Before filing, check the tracker so you don't create a duplicate. Search
+**both open and closed** issues by keyword — deferred review findings are
+often pre-filed by an earlier session or the review bot and may already be
+**closed** (e.g. as a duplicate, or decided), which an open-only search
+misses:
+
+```sh
+gh issue list --state all --search "<keywords>" --json number,title,state
+# GitLab: glab issue list --all --search "<keywords>"   # --all (-A) = open + closed
+```
+
+- If an **open** issue already covers it, link that one instead of filing —
+  report its URL and stop.
+- If a **closed** issue covers it, surface it to the user (it may have been
+  closed as a duplicate pointing elsewhere, or closed as decided) and confirm
+  whether to reopen it, file fresh, or treat the matter as settled — don't
+  blindly file a second one.
+
+This is the **never assume; always verify** rule applied to issue filing: a
+quick search beats leaving two issues tracking the same work.
+
 ### 3. Compose the issue
 
 **Title:** short, imperative, specific. Good: `Refactor session_env merge

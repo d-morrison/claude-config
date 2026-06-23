@@ -1,6 +1,6 @@
 ---
 name: ard
-description: "Address, Rebut, Defer, or Acknowledge: respond to every review comment on a PR/MR with exactly one disposition. For each item a reviewer (human or bot) raises, choose one — fix it (Address), explain why it's correct as-is (Rebut), file a follow-up issue (Defer), or acknowledge a no-change-requested observation (Acknowledge). Silently ignoring a comment is never acceptable. Works on GitHub (gh) and GitLab (glab). Use after receiving a review, when asked to 'address reviews' / 'respond to the review', or as the inner loop of the iterate skill."
+description: "Address, Rebut, Defer, or Acknowledge: respond to every review comment on a PR/MR with exactly one disposition. For each item a reviewer (human or bot) raises, choose one — fix it (Address), explain why it's correct as-is (Rebut), file a follow-up issue (Defer), or acknowledge a no-change-requested observation (Acknowledge). Silently ignoring a comment is never acceptable. Works on GitHub (gh) and GitLab (glab). Use after receiving a review, when asked to 'address reviews' / 'respond to the review', or as the inner loop of the `ardi` skill."
 user-invocable: true
 allowed-tools:
   - Bash
@@ -36,6 +36,15 @@ For anything that requests a change, choose among the first three (Acknowledge i
 2. **Rebut** — only when you're confident the reviewer is mistaken. A rebuttal that isn't falsifiable ("I think it's fine") is not a rebuttal. **Before applying *or* rebutting any factual claim about an API, deprecation, signature, or behavior, TEST it** — run the code both ways. Reviewers (including the `@claude` bot) state such claims confidently but are sometimes exactly backwards, and blindly "Addressing" a wrong one breaks the build. (Seen on rme #873: the bot insisted igraph `bfs(mode=)` was deprecated in favor of `neimode=`; the reverse is true — `neimode` is a hard `deprecate_stop` error, `mode` is current. Re-running the script revealed it instantly.)
 3. **Defer** — only when the fix genuinely expands scope. Never defer just because a fix is "minor" — minor fixes get Addressed.
 
+> **"You deleted/removed X" findings — check for branch-behind-main first.** When
+> a reviewer says the PR removed something you don't recall touching, run
+> `git log HEAD..origin/main` and `git show HEAD:<file>` before Addressing. Main
+> may have *added* X after you branched, so X is absent only because the branch is
+> stale — not because your diff deleted it. The fix is **merge `origin/main` in**
+> (the standing keep-synced rule), not "restore" a line you never removed. Verify
+> the actual committed diff (`git show <commit> -- <file>`) rather than trusting
+> the finding's framing. (Seen on ai-config PR #52.)
+
 ## Procedure
 
 ### 1. Gather every finding
@@ -57,6 +66,8 @@ glab api "projects/:id/merge_requests/<N>/discussions"   # inline threads
 ```
 
 Bots often post the same finding twice — once inline and once in the summary comment. Collect the **union and dedupe** before numbering, so one issue doesn't get two rows (or two conflicting dispositions). Then number 1..n; every number must end up with a row in the summary.
+
+A PR can also carry **more than one review surface from different reviewers**: an inline code-review bot, a separate *agent* post-step that posts its own top-level summary, and Copilot are each distinct. `gh pr view <N> --comments` returns every top-level comment, so disposition each reviewer's findings — not just the inline review or the most recent comment. A whole review summary left un-dispositioned reads as ignored even when every inline thread was handled.
 
 ### 2. Disposition each one
 
@@ -84,6 +95,16 @@ Write the summary to a file and post it *from* the file — **never inline on Gi
 gh pr comment <N> --body-file ard-summary.md         # GitHub
 glab mr note <N> -F ard-summary.md                   # GitLab
 ```
+
+**Keep the bot's trigger phrase out of the summary body.** The `issue_comment`
+trigger fires on the bare bot `@`-mention **anywhere** in a comment — even in a
+sentence saying you're *not* re-requesting a review. Refer to it obliquely
+("re-request review", "the review-trigger mention") or split the tokens (e.g.
+`@ claude`, with a space, so the raw body never contains the contiguous handle);
+paste the literal `@`-mention only when you actually intend to dispatch a review. A
+stray mention spawns a run that cancels the push-triggered review on
+`cancel-in-progress` setups. On some mention-bot setups it also starts a
+session whose residual-commit sweep can churn the branch.
 
 Summary format:
 
@@ -141,13 +162,30 @@ glab api -X PUT "projects/:id/merge_requests/<N>/discussions/<discussion_id>?res
 - **Defer** — reply with the tracked issue link, then resolve (work lives
   elsewhere now).
 - **Acknowledge** — reply briefly, then resolve.
-- **Rebut** — reply with the falsifiable evidence. Resolve if the reviewer is a
-  bot or you're confident; **leave a human's thread open** if they may want to
-  respond to the rebuttal.
+- **Rebut** — reply with the falsifiable evidence. A rebuttal only counts as
+  settled once it **convinces the reviewer** — i.e. they don't re-raise it on
+  the next round. While that's still in question, **leave the thread open**:
+  resolve a bot's thread once it drops the item, and leave a human's thread
+  open if they may want to respond. Resolving on acceptance happens a round
+  *later* than the rebuttal, so it's easy to forget — **at the start of each
+  new round, first sweep your still-open rebuttal threads and resolve any the
+  latest review didn't re-raise**, before dispositioning the new findings. If
+  you and the reviewer reach an impasse (your rebuttal didn't convince them,
+  their re-raise didn't convince you), **escalate to a human reviewer** —
+  request `d-morrison` via the `request-pr-review` skill (or
+  `gh pr edit <N> --add-reviewer d-morrison`) and `@`-mention them with the
+  impasse — rather than resolving unilaterally or looping forever.
 
 Don't resolve a thread you haven't replied to. Every inline comment ends with
 both a reply and (where appropriate) a resolution — silence on a thread reads as
 ignored, exactly the failure ARD exists to prevent.
+
+**End-state (fully clean):** when the PR/MR is fully clean, **every inline
+review thread is resolved**, and the only conversation left open is the final
+all-clear exchange — the reviewer's all-clear comment (usually a top-level PR
+comment, not an inline thread) and your reply to it. A leftover open inline
+thread (an unaccepted rebuttal, an un-resolved Address) means you're not clean
+yet.
 
 ### 5. Report back with a link
 
@@ -161,18 +199,23 @@ Tell the user what you did and give a **clickable URL** to the PR/MR (and to the
 - **Rebuttals must be falsifiable** — point to specific code, behavior, or documentation.
 - **Deferrals must be tracked.** A defer without a filed issue is just ignoring with extra words.
 - **Push before you post.** The reviewer should be able to verify Addressed fixes are on the branch.
+- **A `suggestion` block is a hint, not gospel.** Before committing a reviewer's suggested fix, verify it actually works and handles the *general* case — not just the flagged spot. A confident suggestion can overcorrect (e.g. a regex tweak that fixes one form but breaks all the others). If the correct fix differs, apply that and note the divergence in your reply, so the reviewer sees why.
 
-## Integration with iterate
+## Integration with ardi
 
-Inside the `iterate` loop:
+Inside the `ardi` loop (also reachable as `iterate`):
 
-1. Read the latest review (iterate step 4)
+1. Read the latest review (`ardi` step 2)
 2. Apply ARD to each finding (this skill: steps 1–2)
 3. Commit + push fixes (this skill: step 3)
 4. Post the ARD summary and per-thread replies (this skill: steps 4–4b)
-5. Re-request review (iterate step 3) — **even if this round was Rebut/Defer only**, so the reviewer re-evaluates.
+5. Re-request review (`ardi` step 6) — **even if this round was Rebut/Defer only**, so the reviewer re-evaluates.
 
-The loop continues until the reviewer returns zero findings (and CI is green).
+The loop continues until the PR/MR is **fully clean** — zero findings, all CI
+workflows green, and every inline review thread resolved (the only open
+conversation being the final all-clear exchange — the reviewer's all-clear and
+your reply to it). A rebuttal counts only once it convinces the reviewer; on an
+impasse, escalate to a human reviewer (`d-morrison`; see step 4b for how).
 
 ## Edge cases
 

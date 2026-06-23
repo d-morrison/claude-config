@@ -50,12 +50,48 @@ GitHub tools like `mcp__github_ci__get_ci_status` are an alternative where the
 Read the full latest review body and scan for any "Findings", "Issues",
 "Remaining", "Non-blocking", "Minor", "Could improve", "Consider", etc.
 section. The bar for reporting **clean**: "Looks good" / "no findings" /
-"approved" with **zero** follow-on bullets under any heading.
+"approved" with **zero** follow-on bullets under any heading. A posted rebuttal
+the reviewer is still disputing is **open**, not clean — a rebuttal counts only
+once it convinced the reviewer (they dropped the item).
 
-Do **not** report "ready to merge with one minor nit noted" / "harmless
-as-is" / "can address if you want" — that hedging just pushes triage back to
-the user. If there are open items, report them as open (and offer to run
-`iterate` to clear them).
+A PR is only **fully clean / ready to merge** when its review is clean *and*
+all CI workflows are green *and* every inline review thread is resolved (the
+only open conversation being the final all-clear and your reply to it — see
+*Check thread-resolution state* below). Do **not** report "ready to merge with
+one minor nit noted" / "harmless as-is" / "can address if you want" — that
+hedging just pushes triage back to the user. If there are open items, report
+them as open (and offer to run `ardi` to clear them).
+
+## Check thread-resolution state
+
+A clean review *body* isn't the whole bar — unresolved inline threads count as
+open too. Count the unresolved ones via GraphQL:
+
+```bash
+gh api graphql -f query='query {
+  repository(owner:"<owner>", name:"<repo>") {
+    pullRequest(number:<N>) {
+      reviewThreads(first:100) {
+        totalCount
+        nodes { isResolved }
+      }
+    }
+  }
+}' --jq '.data.repository.pullRequest.reviewThreads as $rt |
+  ($rt.nodes | map(select(.isResolved | not)) | length) as $open |
+  if $rt.totalCount > ($rt.nodes | length)
+  then "\($open)+ open (totalCount \($rt.totalCount); cap reached — may undercount)"
+  else "\($open)"
+  end'
+```
+
+Interpret the output as:
+
+- `0` — all threads resolved; clean on this dimension.
+- A plain non-zero number (e.g. `3`) — that many threads are unresolved.
+- A `+`-suffixed string (e.g. `0+ open (totalCount 150; cap reached — may undercount)`) — the 100-thread cap was hit. **Cannot confirm clean**, even if the visible count is 0; treat as unresolved until the cap is lifted or the PR is confirmed clean another way.
+
+(The resolve mutation lives in the `ard` skill, step 4b.)
 
 ## Output
 

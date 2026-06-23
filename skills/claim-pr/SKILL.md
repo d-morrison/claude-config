@@ -83,6 +83,14 @@ gh issue comment <N> --body "Done with my local session — unclaiming."
 
 ## Notes
 
+- **Claim an issue you just filed and will implement now, too.** Filing an
+  issue then starting work on it yourself is still a write session. Post the
+  claim (or open and link the PR with `Closes #N`) *promptly* — a parallel
+  issues-sweep session can grab the freshly-filed issue and build a duplicate
+  before your PR shows up. (This exact collision produced a duplicate PR in one
+  session; the claim, or a fast linked PR, makes the sweep skip it. The
+  reciprocal check is `check-history` step 0 — look for an already-open PR
+  before implementing.)
 - If `@claude` agent runs are in flight on the branch, wait for them before
   pushing or polling — don't edit while the bot is mid-session.
 - **Detecting an already-active parallel session** (so you don't collide):
@@ -95,8 +103,8 @@ gh issue comment <N> --body "Done with my local session — unclaiming."
   take over" before resuming pushes. (Seen repeatedly on rme #772 and #706,
   where another session was substantially reworking the branch — even adding
   new content — while a watch session held a one-line diff.)
-- This is the claim ritual referenced by `iterate` (step 1) and `iterate-all`;
-  when those run, they cover the claim for you.
+- This is the claim ritual referenced by `ardi` (step 1; aka `iterate`) and
+  `ardia` (aka `iterate-all`); when those run, they cover the claim for you.
 - On GitLab, **always prefer resolving** the discussion over posting a second
   "unclaim" comment — it keeps the MR thread clean and signals completion
   without adding noise.

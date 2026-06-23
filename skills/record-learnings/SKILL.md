@@ -32,12 +32,13 @@ For facts that apply across all projects:
 - General preferences
 - Cross-project conventions
 
-### Repository memory (`/memories/repo/`)
-For facts specific to the current workspace:
-- Build commands and their quirks
-- Project structure conventions
-- CI/CD pipeline behavior
-- Test commands and expected outputs
+### Repository memory (`~/.claude/projects/<project-path>/memory/`)
+For facts specific to ONE repo (build quirks, project conventions, CI behavior):
+write directly to that repo's Claude project memory directory. The project path
+is the repo's directory path with `/` replaced by `-` — e.g.
+`/Users/you/Documents/GitHub/rme` → `~/.claude/projects/-Users-you-Documents-GitHub-rme/memory/`.
+No git commit needed — project memory files persist locally. Update `MEMORY.md`
+in that directory as an index.
 
 ### Shared ai-config skills (`~/.claude/skills/`)
 For reusable workflows that other agents should also follow:
@@ -56,10 +57,10 @@ For standing instructions that should always be in context:
 |----------|---------|-------|
 | Bug diagnosis | "bash EOF error = CRLF line endings" | `/memories/debugging.md` |
 | Tool quirk | "glab has no GITLAB_TOKEN env var" | `/memories/tools.md` |
-| Codebase fact | "CI only runs on branch pushes, not PR events" | `/memories/repo/` |
+| Codebase fact | "CI only runs on branch pushes, not PR events" | `~/.claude/projects/<path>/memory/` |
 | Workflow | "Always run r-pkg-spellcheck before push" | Skill file |
 | Preference | "Always request d-morrison as reviewer" | `/memories/preferences.md` |
-| Failed approach | "Don't use merge_request_event with $CI_OPEN_MERGE_REQUESTS" | `/memories/repo/` |
+| Failed approach | "Don't use merge_request_event with $CI_OPEN_MERGE_REQUESTS" | `~/.claude/projects/<path>/memory/` |
 
 ## Process
 
@@ -71,12 +72,14 @@ For standing instructions that should always be in context:
 4. **Write concisely** — bullet points, not prose. Include the *why* not just
    the *what*
 5. **If it's a skill** — create it in `~/.claude/skills/` (symlink to the
-   cloned repo; discover the repo path with `readlink ~/.claude/skills`)
+   cloned repo; discover the repo path with
+   `git -C ~/.claude/skills/record-learnings rev-parse --show-toplevel`)
 
 ## Sharing with other agents
 
 The `~/.claude/skills/` directory is a symlink to wherever you cloned
-`ai-config` (discover the path with `readlink ~/.claude/skills`).
+`ai-config` (discover the path with
+`git -C ~/.claude/skills/record-learnings rev-parse --show-toplevel`).
 Any skill written there is:
 - Available to this agent via the skills system
 - Shareable with other agents by cloning/pulling the ai-config repo

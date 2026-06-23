@@ -15,9 +15,9 @@ Grade a folder of submissions against a solution key and distill the results
 into a **ranked catalog of common error types** — the raw material for a review
 session, regrade, or answer-key improvement.
 
-**Origin:** built from grading Epi 204 Midterm 2 (survival analysis + Cox PH),
-where 12 PDF submissions were compared against the course solution and the
-errors became a new `rme` review chapter (d-morrison/rme PR #881).
+**Origin:** built from grading an exam where PDF submissions were compared
+against the course solution and the errors became a new review chapter in the
+course book.
 
 ## When to use
 
@@ -31,10 +31,10 @@ errors became a new `rme` review chapter (d-morrison/rme PR #881).
    solution on disk may be an *older variant* than the one students actually
    sat. Before trusting it, open one blank/clean submission (or the question
    sheet) and confirm the data, tables, covariate names, and number of subparts
-   match the solution. On the originating task the repo solution was a
-   hemodialysis model but students sat a WCGS/CHD version with different numbers
-   and an extra subpart — grading against the wrong key would have been wrong on
-   every Part-2 item.
+   match the solution. A mismatch happens when the solution on disk is for one
+   version of the dataset but students sat a different version, with different
+   numbers or an extra subpart — grading against the wrong key would be wrong on
+   every affected item.
 
 2. **Verify the key's numbers yourself.** Recompute the solution's numeric
    answers independently (a quick `python3`/`Rscript` block). Don't assume the
@@ -85,9 +85,10 @@ errors became a new `rme` review chapter (d-morrison/rme PR #881).
 
 ## Tips
 
-- Round-trip the data scale: many Part-2 errors in the origin task were
-  scale-confusions (HR vs log-HR, log-scale CI vs HR-scale CI). When you see a
-  numeric answer, check *what scale* it's on before calling it right or wrong.
+- Round-trip the data scale: a common error class is scale-confusion (e.g. a
+  raw vs log-transformed value, or a CI computed on one scale and reported on
+  another). When you see a numeric answer, check *what scale* it's on before
+  calling it right or wrong.
 - A "right answer, wrong method" still belongs in the catalog — it predicts
   failures on the next problem.
 - Note submission-logistics problems (missing pages, wrong file, unrelated

@@ -1,0 +1,52 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - "index.qmd"
+    - "setup.qmd"
+    - "skills.qmd"
+    - "workflow.qmd"
+
+website:
+  title: "ai-config"
+  site-url: https://d-morrison.github.io/ai-config/
+  description: "Portable AI agent config — skills, memories, and commands synced across machines via git"
+  llms-txt: true
+  page-footer:
+    center: "Built with [Quarto](https://quarto.org/)"
+  back-to-top-navigation: true
+  page-navigation: true
+  reader-mode: true
+  repo-url: https://github.com/d-morrison/ai-config
+  repo-actions: [edit, issue, source]
+  navbar:
+    left:
+      - text: "Home"
+        href: index.qmd
+      - text: "Setup"
+        href: setup.qmd
+      - text: "Skills"
+        href: skills.qmd
+      - text: "Workflow"
+        href: workflow.qmd
+    right:
+      - icon: github
+        href: https://github.com/d-morrison/ai-config
+        aria-label: GitHub
+
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: darkly
+    css: styles.css
+    toc: true
+    anchor-sections: true
+    toc-location: right
+    toc-depth: 3
+    link-external-icon: true
+    embed-resources: false
+
+execute:
+  warning: false
+  message: false

@@ -19,7 +19,53 @@ history to understand what decisions were made previously and why.
   configuration files
 - When the change touches code that has been refactored in prior MRs
 
+## First: is the issue already done or in progress?
+
+Before reviewing past history, confirm the issue still needs a *new* PR. Two
+checks (skipping them wastes a whole issue-pick):
+
+- **Already resolved on `main`?** An issue can go stale — fixed incidentally by
+  a later change (e.g. a dependency bump). Re-read the issue body against current
+  `main` before implementing.
+
+  ```bash
+  gh issue view <N> --json state,title,body | cat   # also: is it already closed?
+  ```
+
+- **Existing open PR for it?** Search open PRs for one that already addresses the
+  issue, so you don't open a second, parallel PR for the same work.
+
+  ```bash
+  gh pr list --state open --json number,title,headRefName,body \
+    --jq '.[] | select(((.body // "") | test("#<N>\\b")) or (.title | test("#<N>\\b"))) | "#\(.number) \(.title) [\(.headRefName)]"'
+  ```
+
+If an open PR already covers it, **drive that PR to clean** instead of
+re-implementing (ask before pushing to a branch you didn't create). If `main`
+already satisfies the issue, stand it down and report — don't open a no-op PR.
+
 ## Procedure
+
+0. **Check the issue for an already-open PR.** Before writing any code, look at
+   the issue itself for an open PR that already addresses it (one whose body
+   says `Closes #<N>`). A parallel session — or an issues-sweep run on another
+   machine — may already be on it; building anyway produces a duplicate PR.
+
+   **GitHub:**
+   ```bash
+   gh pr list --state open --limit 100 --json number,title,body \
+     --jq '.[] | select((.body // "") | test("(Closes|Fixes|Resolves) #<N>\\b"; "i")) | "#\(.number) \(.title)"'
+   ```
+
+   **GitLab:**
+   ```bash
+   glab mr list --state opened --per-page=50 --output json 2>/dev/null \
+     | jq -r '.[] | select((.description // "") | test("(Closes|Fixes|Resolves) #<N>\\b"; "i")) | "!\(.iid) \(.title)"'
+   ```
+
+   If an open PR already covers the issue, **review or extend it** instead of
+   opening a competing one. This catches *in-flight* work; the merged/closed
+   history below catches *settled* decisions.
 
 1. **List recent merged MRs** touching the same area:
 

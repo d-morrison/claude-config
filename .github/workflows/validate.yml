@@ -19,3 +19,5 @@ jobs:
         run: python3 scripts/validate-skills.py
       - name: Check markdown links
         run: python3 scripts/check-links.py
+      - name: Check vendored drift
+        run: python3 scripts/check-vendored-drift.py

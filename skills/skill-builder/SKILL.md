@@ -30,24 +30,37 @@ Rule out extending an existing skill *before* scaffolding anything:
 1. **Search the live skills** for something that already owns (or is adjacent
    to) this concern:
    ```bash
-   cd "$(git -C ~/.claude/skills rev-parse --show-toplevel)"   # the ai-config repo
+   cd "$(git -C ~/.claude/skills/skill-builder rev-parse --show-toplevel)"   # the ai-config repo
    ls skills/
    grep -ril "<keywords>" skills/*/SKILL.md
    ```
    If a skill already covers it, **extend that skill** (a new alias, a new
    section, an extra trigger phrase) rather than adding a near-duplicate.
 
-2. **Scan EVERY branch for in-flight work** — you, another CLI session, or the
-   `@claude` bot may already be adding it:
+2. **Scan EVERY branch AND every local worktree for in-flight work** — you,
+   another CLI session, or the `@claude` bot may already be adding it. A
+   parallel CLI session usually builds its skill in an **unpushed local
+   worktree**, so a remote-only `git branch -r` scan misses it entirely (this
+   hit PR #67 — a sibling skill was caught only by a stray system-reminder, not
+   the scan). Scan local refs *and* the worktree working trees too:
    ```bash
    git fetch origin --prune
-   for b in $(git branch -r --format='%(refname:short)' | grep -v HEAD); do
+   # local + remote branches — NOT just -r; unpushed local branches count:
+   for b in $(git branch -a --format='%(refname:short)' | grep -v HEAD); do
      git ls-tree -r --name-only "$b" | grep -iE "skills/[^/]*<keyword>" \
        | sed "s|^|$b: |"
    done
+   # uncommitted, ref-less work in sibling worktrees — list only UNTRACKED
+   # files, so shipped skills (committed in the main worktree) don't false-match.
+   # Read paths via sed + `while read` (not $(...)/awk $2) so paths with spaces
+   # survive:
+   git worktree list --porcelain | sed -n 's/^worktree //p' | while IFS= read -r wt; do
+     git -C "$wt" ls-files --others --exclude-standard -- 'skills/' 2>/dev/null \
+       | grep -iE "skills/[^/]*<keyword>" | sed "s|^|$wt: |"
+   done
    ```
-   If a branch is already building it, **continue that work** (check it out /
-   extend its PR) instead of opening a colliding parallel branch.
+   If a branch or worktree is already building it, **continue that work** (check
+   it out / extend its PR) instead of opening a colliding parallel branch.
 
 3. **Decide explicitly: extend (preferred) or new.** State which and why before
    writing a line. A new alias or section almost always beats a whole new skill.
@@ -65,7 +78,7 @@ skills/<name>/SKILL.md
 name: <name>                 # MUST equal the directory name
 description: "<what it does>. Use when asked to '<trigger>', '<trigger>', …"
 user-invocable: true
-allowed-tools:               # include for real skills; omit on thin alias files
+allowed-tools:               # real skill: list its tools. alias: mirror the canonical's list
   - Bash
   - Read
   - Edit
@@ -92,6 +105,11 @@ allowed-tools:               # include for real skills; omit on thin alias files
   name: <alias>
   description: "Alias for `<canonical>`. <one-line>. Use when asked to '<trigger>'."
   user-invocable: true
+  allowed-tools:        # mirror the canonical's allowed-tools exactly
+    - Bash
+    - Read
+    - Edit
+    - Write
   ---
 
   # <alias> (alias for `<canonical>`)
@@ -101,10 +119,32 @@ allowed-tools:               # include for real skills; omit on thin alias files
   → **`~/.claude/skills/<canonical>/SKILL.md`**
   ```
   Keep the real content in **one** canonical file; aliases never duplicate it.
+  The alias's `allowed-tools` is the one exception: copy the canonical's list
+  verbatim so invoking the alias permits exactly what the canonical needs (an
+  alias redirects, so it must not be more restrictive than its target).
 - **Cross-link** related skills under `## Relationship to other skills`.
 - **No registry to update.** Skills are auto-discovered from `skills/` (the
   bootstrap symlink and the plugin root both read the directory) — adding the
   directory is enough.
+- **Use `<angle-bracket>` placeholders in command blocks — never bare ALLCAPS.**
+  Identifiers like `PATH`, `URL`, `TARGET` look like shell env vars; bare `PATH`
+  looks like the `$PATH` env var, and `path` is a zsh special that mirrors
+  `$PATH`. A reader who copies the command without substituting the placeholder
+  runs something wrong. Use `<path>`, `<url>`, `<target>` instead. (See
+  `memories/tools.md` → "Skill command blocks".)
+
+## If the skill fans out to subagents
+
+When a skill's procedure spawns subagents (to parallelize per-item work, e.g.
+`pr-status-all` runs one subagent per PR), write the **subagent prompt as if the
+skill file doesn't exist** — because for the subagent it doesn't. A spawned
+subagent starts fresh: it sees only the prompt the orchestrator hands it, not
+this skill's text. Any discipline the work depends on (the exact query, the
+bot-login wording, how to resolve owner/repo, "read the LATEST review") has to be
+restated inside the subagent prompt, not assumed inherited. Keep the cheap,
+once-per-run setup in the orchestrator — enumerate the work items there, and pass
+down the per-item data the orchestrator already holds so each subagent doesn't
+re-fetch it. `pr-status-all` is the worked example.
 
 ## If the skill encodes a standing rule
 
@@ -120,8 +160,18 @@ Skills and memories all live in the ai-config repo — never leave changes
 local-only. Commit via a **branch + PR** (not direct to main), request
 `d-morrison` as reviewer, then **ARDI to clean**.
 
+> **In a worktree session, the repo toplevel below is the MAIN checkout, not
+> your worktree.** `~/.claude/skills` symlinks into the main `ai-config`
+> checkout, so `git -C ~/.claude/skills … rev-parse --show-toplevel` returns the
+> main repo root — often on another session's branch. Don't `cd` there and don't
+> pass that path to Write/Edit: the skill files (and git commits) would land in
+> the main checkout, clobbering another session's working tree. Instead author
+> the files in your **worktree's own** `skills/<name>/` dir and run git from the
+> worktree (it's a full checkout of the same repo). Confirm with
+> `git branch --show-current` before committing.
+
 ```bash
-cd "$(git -C ~/.claude/skills rev-parse --show-toplevel)"   # the ai-config repo
+cd "$(git -C ~/.claude/skills/skill-builder rev-parse --show-toplevel)"   # ai-config root — NOTE: the MAIN checkout, NOT your worktree (see caveat above)
 git fetch origin main && git checkout -b add-<name>-skill origin/main
 # write skills/<name>/SKILL.md (+ alias dir, + preferences/CLAUDE.md if it's a rule)
 git add skills/<name>/SKILL.md memories/preferences.md      # stage the files you
@@ -153,6 +203,14 @@ Then, as their own explicit steps (don't leave them buried in a comment):
 - **`request-pr-review`, `ardi`** — used to ship and clean the new skill's PR.
 - **`simplify` / `tidy`** — when extending, prefer collapsing into an existing
   skill over proliferating near-duplicates.
+- **`consolidate-skills`** — when you discover a near-duplicate that already
+  shipped (two real skills for one workflow), hand the cleanup there: it merges
+  them into one canonical skill plus alias stubs.
+- **`heal-skill`** — the repair counterpart: this skill authors a skill,
+  `heal-skill` fixes one that misfired after it shipped.
+- **`link-skills`** — this skill cross-links the one skill it authors;
+  `link-skills` is the corpus-wide audit that catches cross-reference gaps a
+  single authoring pass missed.
 
 ## Anti-patterns
 
@@ -160,6 +218,12 @@ Then, as their own explicit steps (don't leave them buried in a comment):
 - ❌ Not scanning other branches → colliding parallel work / duplicate skills.
 - ❌ Duplicating canonical content across alias files (aliases must only redirect).
 - ❌ A thin description with no trigger phrases — the skill never gets discovered.
+- ❌ In a subagent-fanning skill, writing the subagent prompt as if it inherits
+  this skill's text — it doesn't; restate every needed discipline in the prompt.
 - ❌ `name:` not matching the directory name.
 - ❌ Encoding a standing rule in the skill but not in `preferences.md`.
 - ❌ Leaving the new skill as a local-only uncommitted file (or pushing direct to main).
+- ❌ In a worktree session, writing the skill files to the `rev-parse --show-toplevel`
+  path — it resolves to the main checkout (via the `~/.claude/skills` symlink), not
+  your worktree, so the files land on another session's branch. Author in the
+  worktree's own `skills/` dir.

@@ -79,10 +79,24 @@ If the misfire reflects a pattern worth remembering (a recurring over-trigger,
 a phrasing the user favors), hand off to `ums` to persist it, so the next skill
 is authored without the same flaw.
 
+## Relationship to other skills
+
+- **`skill-builder`** — the authoring counterpart; it writes a skill, this skill
+  repairs one after it ships and misfires.
+- **`link-skills`** — the proactive, whole-corpus cross-link audit; `heal-skill`
+  is the single-skill reactive repair, and fixing an ambiguous overlap here
+  means cross-linking the two skills (exactly what `link-skills` sweeps for).
+- **`consolidate-skills`** — when two skills have real bodies for the same
+  workflow, that's a merge, not a heal; hand it there.
+- **`ums` / `record-learnings`** — hand off to persist a recurring misfire as a
+  remembered lesson, so the next skill is authored without the same flaw.
+
 ## What NOT to do
 
 - Don't delete or disable a skill to "fix" a single misfire — repair the
-  trigger or body instead, unless the skill is genuinely redundant.
+  trigger or body instead. If a skill is genuinely redundant with another (two
+  real bodies for one workflow), that's a merge, not a heal — hand it to
+  `consolidate-skills`.
 - Don't broaden a description so far that it starts stealing other skills'
   triggers; healing a missed-trigger shouldn't create a false-trigger.
 - Don't make unrelated edits in the same pass — keep the heal minimal and

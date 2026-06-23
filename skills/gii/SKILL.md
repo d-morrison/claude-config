@@ -128,6 +128,10 @@ When the loop ends, print a summary:
 
 ## Relationship to other skills
 
+- **`gip`** — the **parallel** counterpart: when a batch of issues is provably
+  independent (no stacking dependency, no file overlap), `gip` lifts that subset
+  out and works it concurrently in worktree-isolated subagents instead of
+  serially. This loop stays serial for everything `gip` can't prove independent.
 - **`gi`** — the inner loop; each iteration is a full GI invocation
 - **`ardi`** — drives each MR/PR to clean review within GI
 - **`check-history`** — invoked per-issue to avoid undoing past work

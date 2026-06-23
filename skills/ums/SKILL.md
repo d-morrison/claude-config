@@ -51,10 +51,15 @@ reflect, and persist.
 
 4. **Commit and push ALL ai-config changes — via a branch + PR, not direct to
    `main`.** Skills AND memory files both live in the ai-config repo. Discover
-   its path with `git -C ~/.claude/skills rev-parse --show-toplevel` (portable
-   across macOS/Linux; the older `dirname "$(readlink …)"` resolves only one
-   symlink hop). Never leave ANY changes (skills, memories, etc.) as local-only
-   uncommitted edits. Run **one** of the two paths below — not both:
+   its path with `git -C ~/.claude/skills/ums rev-parse --show-toplevel` — point
+   `-C` at a **skill subdir** (any one), not the `~/.claude/skills` parent.
+   `bootstrap.sh` may symlink skills *per-child* into a real `~/.claude/skills`
+   directory (cloud/web sessions pre-populate it), so the parent itself isn't a
+   symlink into the repo and `git -C` there fails with "not a git repository";
+   a child like `…/skills/ums` follows the symlink into the repo. (Both beat the
+   older `dirname "$(readlink …)"`, which resolves only one symlink hop.) Never
+   leave ANY changes (skills, memories, etc.) as local-only uncommitted edits.
+   Run **one** of the two paths below — not both:
 
    **Stage only the files you actually edited — NEVER `git add -A`.** The
    working tree often holds unrelated in-flight edits (the user's own UMS
@@ -67,7 +72,7 @@ reflect, and persist.
 
    *Already on the open PR's branch* (e.g. mid-ARDI): commit + push to it.
    ```bash
-   cd "$(git -C ~/.claude/skills rev-parse --show-toplevel)"
+   cd "$(git -C ~/.claude/skills/ums rev-parse --show-toplevel)"
    git add skills/<name>/SKILL.md memories/<file>.md   # the files you touched
    git commit -m "ums: <brief summary>"
    git push origin HEAD
@@ -76,7 +81,7 @@ reflect, and persist.
    *No PR yet:* branch off main first — a direct-to-main push is denied by
    auto-mode and bypasses review.
    ```bash
-   cd "$(git -C ~/.claude/skills rev-parse --show-toplevel)"
+   cd "$(git -C ~/.claude/skills/ums rev-parse --show-toplevel)"
    git fetch origin main && git checkout -b ums-<topic> origin/main
    git add skills/<name>/SKILL.md memories/<file>.md   # the files you touched
    git commit -m "ums: <brief summary>"
@@ -99,10 +104,15 @@ reflect, and persist.
 - [ ] Did the user correct my behavior? → Encode as preference + skill update
 - [ ] Did I discover a tool quirk? → `/memories/tools.md`
 - [ ] Did I learn a debugging pattern? → `/memories/debugging.md`
-- [ ] Did I discover a repo convention? → `/memories/repo/`
+- [ ] Did I discover a repo convention? → that repo's Claude project memory:
+  `~/.claude/projects/<project-path>/memory/` (write directly; no git commit needed)
 - [ ] Did the user express a new preference? → `/memories/preferences.md`
 - [ ] Did a workflow emerge that could be a new skill? → Create it
 - [ ] Are there existing skills that reference outdated info? → Fix them
+- [ ] Did I edit one step's scope without updating sibling steps in the same file? →
+  Search the file for all enumerations of the changed category and make them consistent.
+- [ ] Did I add a shared-procedure step to one skill but not to sibling skills? →
+  Grep sibling skills for the same action and add the step there too.
 
 ## Relationship to record-learnings
 

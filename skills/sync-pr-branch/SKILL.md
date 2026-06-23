@@ -68,8 +68,10 @@ Synonyms: `sync`, `resync-branch`, `merge-main` — all route here.
    ```
    Skip this when step 3 was a no-op — it would just be an empty merge.
 
-5. **Resolve any conflicts fully** in the working tree (from any of steps 2–4).
-   Don't push a half-resolved merge.
+5. **Resolve any conflicts fully** in the working tree (from any of steps 2–4)
+   — consolidate the best of both sides, don't blind-pick `--ours`/`--theirs`.
+   See the `resolve-conflicts` skill (alias `rc`) for the how-to. Don't push a
+   half-resolved merge.
 
 6. **Run the repo's pre-commit checks before committing a conflict
    resolution.** Run whatever the current repo's checks are — build, lint,
@@ -77,7 +79,7 @@ Synonyms: `sync`, `resync-branch`, `merge-main` — all route here.
    `render` / `lint` / `spell` / `test` skills, use them. A clean,
    conflict-free merge auto-commits and needs no extra commit.
 
-   <details><summary>Example: an R + Quarto package (e.g. <code>rme</code>)</summary>
+   <details><summary>Example: an R + Quarto package</summary>
 
    ```bash
    quarto render <chapter.qmd> --to html      # each parent chapter touched by the merge
@@ -102,7 +104,7 @@ Synonyms: `sync`, `resync-branch`, `merge-main` — all route here.
 - Order matters only loosely: merging `origin/main` first (step 2) then the
   remote branch (step 3) is the canonical flow, but the reverse converges to
   the same tree. Optional step 4 papers over whichever you did first.
-- This skill is the front half of an `iterate` round (step 2, "sync with
-  main"). When iterating, run it before each review trigger.
+- This skill is the sync-with-main step of an `ardi` round (step 4). When
+  iterating, run it before each review trigger.
 - Only merge **`origin/main`** and **`origin/<this branch>`** — never another
   open PR's branch. Cross-PR changes belong in their own branch.

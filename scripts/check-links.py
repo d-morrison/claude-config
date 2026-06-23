@@ -24,6 +24,7 @@ SCAN_GLOBS = [
     "commands/**/*.md",
     "docs/**/*.md",
     "references/**/*.md",
+    "shared/**/*.md",
     "*.md",
 ]
 SKIP_PREFIXES = ("http://", "https://", "mailto:", "tel:", "#")

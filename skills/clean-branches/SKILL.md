@@ -152,7 +152,8 @@ git rebase origin/main
 ```
 
 If rebase has conflicts:
-- Attempt to resolve automatically
+- Attempt to resolve automatically (see the `resolve-conflicts` skill —
+  consolidate both sides, don't blind-pick)
 - If conflicts are non-trivial, skip this branch and report it
 - Don't force-push a broken rebase
 
@@ -299,6 +300,9 @@ Print a summary covering **both** local and remote:
 - **`sync-pr-branch`** — used internally when rebasing stale branches
 - **`claim-pr`** — checked to avoid touching claimed branches
 - **`ardi`** — user may want to ARDI the newly opened MRs afterward
+- **`clean-worktrees` / `cw`** — the worktree counterpart. This skill sweeps
+  *branches*; that one sweeps the *worktrees* a branch is checked out into. Run
+  both so neither a dead worktree nor an orphaned branch lingers.
 
 ## Anti-patterns
 
