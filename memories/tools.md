@@ -219,6 +219,13 @@
   jq -r '[.[] | select(.type == "assistant") | .message.content[]? | select(.type == "text") | .text] | last // ""' \
     "${RUNNER_TEMP}/claude-execution-output.json"
   ```
+- **Dispatched review quoting bug (gha#90, not yet fixed).** When the review body
+  contains backtick-quoted text (e.g. `` `@v1` ``), the "Post review comment for
+  dispatched run" step fails with `unexpected EOF while looking for matching '"'` — the
+  backticks are interpreted as shell command substitution. The review itself still
+  completes: look for `Claude review completed cleanly (subtype=success)` in the step
+  logs to confirm. The PR comment simply isn't posted. Workaround: push a trivial
+  commit to trigger the push-based review instead of dispatching again.
 - **Self-mod skip in `claude-code-review.yml` (added in gha#70, now in `v1`).** The
   workflow skips when the PR modifies `.claude/**` paths or the
   review workflow file itself (derived from `github.workflow_ref`). CI completes in
@@ -311,3 +318,22 @@ any Quarto website (rme, psw, qwt, …).
   custom element hide-on-scroll-down / reappear-on-scroll-up in step with the
   navbar, place it inside `#quarto-header` (it inherits the header's transform) or
   give it `.headroom-target`. (Used to put a "Contents" TOC button in the navbar.)
+- **`quarto render` auto-modifies `.gitignore`.** On first render, Quarto appends
+  `/.quarto/` and `**/*.quarto_ipynb` to `.gitignore`. If `.quarto/` is already
+  present, `/.quarto/` is redundant (the unanchored form already covers the root).
+  Remove `/.quarto/` when it appears; keep `**/*.quarto_ipynb`.
+
+## d-morrison/gha reusable workflows
+Check `d-morrison/gha` before writing bespoke CI — it has reusable workflows for
+common patterns.
+
+- **`quarto-publish.yml@v1`** — sets up Quarto, renders, and deploys via the GitHub
+  Pages artifact approach (`actions/deploy-pages`). No `gh-pages` branch needed.
+  Caller stub is ~12 lines. See `examples/quarto-publish.yml` in the gha repo.
+  **One-time repo setup:** set GitHub Pages source to "GitHub Actions" before the
+  first deploy, or the deploy step fails with `HttpError: Not Found`. Do it via the
+  API: `gh api repos/<owner>/<repo>/pages --method POST -f build_type=workflow`
+  (use `PUT` if Pages already exists but is on branch mode).
+- **Convention:** ai-config (and d-morrison repos generally) call `d-morrison/gha`
+  reusable workflows with `@v1` (not a SHA-pinned ref). SHA-pinning is the pattern
+  for third-party actions only.
