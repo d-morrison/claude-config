@@ -292,6 +292,13 @@
   ~48 s without posting a verdict comment. This prevents 401 errors from the
   App-token exchange during workflow validation of a not-yet-merged workflow file
   (source: gha#70 PR body). Not a CI failure — check the job logs for the skip message.
+- **`grep -qxF` for literal fixed-string line matching in workflow files.** Flags: `-q`
+  = quiet, `-x` = full-line match, `-F` = treat pattern as a fixed string (not a
+  regex). Omitting `-F` makes `.` in file paths (e.g.
+  `.github/workflows/claude-code-review.yml`) act as a regex wildcard, so the selfmod
+  check would match any file with a similar path structure. Use `-qxF` whenever
+  comparing file paths literally. The `selfmod` step in `claude-code-review.yml` uses
+  `grep -qxF` for this reason.
 - **Spurious `is_error=true, subtype=success` review failure (intermittent upstream
   bug).** The `claude-code-action` occasionally completes a review in a single turn and
   exits with `is_error=true` + `subtype=success`. The "Fail the check" step in
@@ -310,13 +317,6 @@
   comment to say "workflow_dispatch is a manual re-review from the Actions UI" rather
   than citing `claude.yml`. The `PR_NUMBER` env comment (was "when claude.yml triggered
   us") should become "when a manual re-review is triggered." Fixed in rpt#153 and qbt#43.
-- **`grep -qxF` for literal fixed-string line matching in workflow files.** Flags: `-q`
-  = quiet, `-x` = full-line match, `-F` = treat pattern as a fixed string (not a
-  regex). Omitting `-F` makes `.` in file paths (e.g.
-  `.github/workflows/claude-code-review.yml`) act as a regex wildcard, so the selfmod
-  check would match any file with a similar path structure. Use `-qxF` whenever
-  comparing file paths literally. The `selfmod` step in `claude-code-review.yml` uses
-  `grep -qxF` for this reason.
 
 ## AskUserQuestion (Claude Code harness tool)
 - Each entry in `questions[]` **requires a `question` field** (the full question
