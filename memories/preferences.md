@@ -39,6 +39,10 @@
   if none covers it, FILE one before branching or opening a PR. Never jump straight into a PR
   without a tracking issue behind it. (see the `st` / `start-task` skill — the issue is the
   durable record of intent/scope/"done" and lets the PR auto-close it via `Closes #N`.)
+- When implementing a user instruction that edits a tracked file in the repo (e.g. CLAUDE.md,
+  README, a config file), the task is not done at "made the local edit." Go all the way:
+  file an issue, commit on a branch, and open a PR — without waiting to be asked. Stopping at
+  a local edit leaves the change uncommitted and invisible to reviewers.
 - Always include `Closes #N` in MR/PR descriptions to auto-close the linked issue on merge.
 - On GitLab, assign MRs to `demorrison`.
 - Run local validation before pushing R-pkg work: lintr::lint_package(), devtools::document(),
@@ -102,6 +106,12 @@
   an extra round. (Learned on d-morrison/ai-config#45: the `git -C ~/.claude/skills`
   path fix was applied to `ums/SKILL.md` but the identical line in `skill-builder/SKILL.md`
   was missed until review caught it.)
+- When writing documentation in a stacked PR (or any branch), only document features whose
+  code is actually present on the CURRENT branch's ancestry — `grep` for the symbol/constant
+  first. A feature that lives in a sibling branch also targeting `main` is NOT in scope, even
+  if conceptually related; documenting it reads as a hallucinated feature and a reviewer will
+  flag it. Move those docs to the branch where the code lives. (A specific case of "NEVER
+  assume; ALWAYS verify" above.)
 - Avoid nested function calls and nested function definitions where feasible — prefer
   named intermediate variables (or a pipe, e.g. `|>` / `%>%` in R) over `f(g(h(x)))`, and
   prefer top-level function definitions over functions defined inside other functions.
@@ -302,4 +312,14 @@
   failure state. E.g. "in a session after a PR has just merged" is correct for a skill that
   stops on unmerged PRs; "with an open PR" is insufficient — it covers only the stop path,
   not the full flow. (Learned on ai-config#125.)
+- When editing a skill to introduce a new routing category or exception (e.g. "writes of
+  type X don't need a commit"), search the SAME file for ALL other steps that enumerate the
+  same category (e.g. "skip list" bullets, "when not to commit" sections) and update them
+  consistently. An exception declared in one step but absent from the other step's enumeration
+  is a contradiction the reviewer will catch. (Learned on ai-config#172: step 2 said "no
+  commit for project memory" but step 5's skip list still said "skip only for /memories/session/".)
+- When adding a shared-procedure step to one skill (e.g. "update MEMORY.md as an index"),
+  grep sibling skills that perform the same action and add the step there too. Sibling skills
+  that diverge on a shared sub-procedure each cost a review round to surface and fix. (Learned
+  on ai-config#172: memorize omitted the MEMORY.md index step that record-learnings already had.)
 
