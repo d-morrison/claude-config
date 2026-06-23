@@ -39,6 +39,10 @@
   if none covers it, FILE one before branching or opening a PR. Never jump straight into a PR
   without a tracking issue behind it. (see the `st` / `start-task` skill — the issue is the
   durable record of intent/scope/"done" and lets the PR auto-close it via `Closes #N`.)
+- When implementing a user instruction that edits a tracked file in the repo (e.g. CLAUDE.md,
+  README, a config file), the task is not done at "made the local edit." Go all the way:
+  file an issue, commit on a branch, and open a PR — without waiting to be asked. Stopping at
+  a local edit leaves the change uncommitted and invisible to reviewers.
 - Always include `Closes #N` in MR/PR descriptions to auto-close the linked issue on merge.
 - On GitLab, assign MRs to `demorrison`.
 - Run local validation before pushing R-pkg work: lintr::lint_package(), devtools::document(),
