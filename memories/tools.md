@@ -122,6 +122,13 @@
   working trees for *untracked* files that never reached any ref
   (`git -C <wt> ls-files --others --exclude-standard -- 'skills/'`).
 
+## Git — looking up a PR's branch name
+- `git branch -r` lists **all** remote branches — useless for finding a specific PR's branch: it has no way to filter by PR number. Don't suggest it as a fallback.
+- Targeted lookup: `gh pr view <N> --json headRefName -q .headRefName` in CLI sessions;
+  `mcp__github__pull_request_read` with `method: get` in remote/web sessions.
+- Flagged on ai-config#186: the first draft of the harness-override instruction included
+  `git branch -r` as the fallback; reviewer (claude-review bot) caught it.
+
 ## Git branch create/reset (`git switch -C`)
 - `git switch -C "$BRANCH"` is already safe against flag-shaped branch names: `$BRANCH` is the argument *to* `-C`, so a value like `--weird` fails cleanly as `fatal: '--weird' is not a valid branch name` rather than being parsed as an option.
 - Do NOT "harden" it to `git switch -C -- "$BRANCH"` — that form is **broken**: the `--` is consumed as the branch name (the required argument to `-C`), so `$BRANCH` is parsed as the start-point instead and the command fails without creating the branch. (Verified on git 2.x; a review bot suggested the broken form on d-morrison/gha#58.)

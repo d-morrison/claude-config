@@ -322,4 +322,8 @@
   grep sibling skills that perform the same action and add the step there too. Sibling skills
   that diverge on a shared sub-procedure each cost a review round to surface and fix. (Learned
   on ai-config#172: memorize omitted the MEMORY.md index step that record-learnings already had.)
+- When writing multi-step workflow instructions, order the steps to match the actual execution
+  sequence. A reviewer flagged on ai-config#186 that "Use the existing PR branch" was placed
+  before "Claim a GitHub PR/issue" in CLAUDE.md, even though you must claim the PR before you
+  look up and switch to its branch. Wrong ordering misleads the reader about the correct flow.
 
