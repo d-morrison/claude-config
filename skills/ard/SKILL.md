@@ -180,7 +180,7 @@ glab api -X PUT "projects/:id/merge_requests/<N>/discussions/<discussion_id>?res
   stated a sweeping rule), the converging move is to **narrow the claim to what
   you actually observed** — that's an Address, not a continued Rebut. Reserve
   escalation for genuine factual disputes; right-size an over-broad rebuttal
-  rather than defending its breadth. (Seen on ai-config #183: a tested
+  rather than defending its breadth. (Seen on ai-config PR #183: a tested
   project-root `{{< include >}}` behavior was correct but asserted as a
   universal Quarto-projects rule; the reviewer granted the test and asked only
   that it be scoped to the observed case, so the fix was to soften the wording,
