@@ -33,21 +33,28 @@ For a single repo that also merges main and the remote branch and pushes, use
 
 ## Procedure
 
-### 1. Find the repos
+### 1. Preview the repos (optional)
+
+To see what the sweep will cover before running it:
 
 ```bash
 ROOT="${ROOT:-$PWD}"     # or the directory the user named
 find "$ROOT" -maxdepth 2 -name .git -type d | sort
 ```
 
-`-maxdepth 2` finds `<root>/<repo>/.git` — the immediate children. Don't recurse
-deeper by default: nested repos and submodules balloon the sweep and submodule
-fetches are handled by their superproject.
+`-maxdepth 2` finds `<root>/<repo>/.git` — the immediate children. (If `ROOT`
+is *itself* a repo it also lists `<root>/.git`; the Step 2 loop ignores that
+case, fetching only the subdirectories.) Don't recurse deeper by default:
+nested repos and submodules balloon the sweep, and submodule fetches are
+handled by their superproject. This step is just a preview — the Step 2 loop
+discovers the repos on its own, so you can skip straight to it.
 
 ### 2. Fetch each, capture status
 
-Loop over the repos, fetch from origin, and classify each outcome. Run it as a
-single block so the user gets one consolidated report:
+Loop over the immediate subdirectories, fetch each from origin, and classify
+the outcome. This loop is self-contained — it does its own discovery (no need
+to pipe Step 1 into it). Run it as a single block so the user gets one
+consolidated report:
 
 ```bash
 cd "$ROOT"
@@ -57,8 +64,7 @@ for d in */; do
   if ! git -C "$repo" remote | grep -qx origin; then
     echo "SKIP $repo (no origin remote)"; continue
   fi
-  out=$(git -C "$repo" fetch origin 2>&1)
-  if [ $? -ne 0 ]; then
+  if ! out=$(git -C "$repo" fetch origin 2>&1); then
     echo "FAIL $repo: $(echo "$out" | tr '\n' ' ')"
   elif [ -z "$out" ]; then
     echo "OK   $repo"
