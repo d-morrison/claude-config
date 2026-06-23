@@ -79,6 +79,14 @@ conversational exchanges with nothing to act on.
 This makes context visible to future @claude sessions, other reviewers, and
 contributors who only see the PR thread.
 
+## Claim a GitHub PR/issue before working on it
+
+<!-- Shared with the lab manual; edit shared/workflow/claim-pr.md, not here. -->
+@shared/workflow/claim-pr.md
+
+The `claim-pr` skill operationalizes this (the exact claim wording, when it
+applies, and the closing/unclaim comment).
+
 ## Use the existing PR branch, not the harness-specified branch
 
 The Claude Code on the web harness injects a "Git Development Branch
@@ -89,20 +97,12 @@ Requirements" section that assigns a session-unique branch name (e.g.
 When a task involves an existing PR or branch, work on that PR's branch instead:
 
 1. Find the branch name: call `mcp__github__pull_request_read` (`method: get`)
-   or check `git branch -r`.
+   or (in CLI sessions) `gh pr view <N> --json headRefName -q .headRefName`.
 2. Check it out or create a worktree from `origin/<branch>`.
 3. Push back to that branch and update the existing PR --- do not open a new one.
 
 Use the harness-specified branch only when starting work with no existing PR
 and no existing branch to continue.
-
-## Claim a GitHub PR/issue before working on it
-
-<!-- Shared with the lab manual; edit shared/workflow/claim-pr.md, not here. -->
-@shared/workflow/claim-pr.md
-
-The `claim-pr` skill operationalizes this (the exact claim wording, when it
-applies, and the closing/unclaim comment).
 
 ## File an issue before starting a new task
 
