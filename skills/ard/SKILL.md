@@ -175,6 +175,16 @@ glab api -X PUT "projects/:id/merge_requests/<N>/discussions/<discussion_id>?res
   request `d-morrison` via the `request-pr-review` skill (or
   `gh pr edit <N> --add-reviewer d-morrison`) and `@`-mention them with the
   impasse — rather than resolving unilaterally or looping forever.
+  Not every re-raise is an impasse, though: if the reviewer **accepts your fact
+  but objects that the claim is over-generalized** (you verified one case and
+  stated a sweeping rule), the converging move is to **narrow the claim to what
+  you actually observed** — that's an Address, not a continued Rebut. Reserve
+  escalation for genuine factual disputes; right-size an over-broad rebuttal
+  rather than defending its breadth. (Seen on ai-config #183: a tested
+  project-root `{{< include >}}` behavior was correct but asserted as a
+  universal Quarto-projects rule; the reviewer granted the test and asked only
+  that it be scoped to the observed case, so the fix was to soften the wording,
+  not re-argue.)
 
 Don't resolve a thread you haven't replied to. Every inline comment ends with
 both a reply and (where appropriate) a resolution — silence on a thread reads as
