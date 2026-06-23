@@ -273,9 +273,11 @@
   `test -e <path>` and `curl … URL` → `curl … <url>` in purge-hallucinations.)
 
 ## ai-config memory file structure
-- Memory files (`memories/*.md`) have **no YAML frontmatter** — the file starts
-  directly with a `#` heading. `grep -r "^name:" memories/` always returns empty;
-  don't use frontmatter fields to locate or identify a memory file.
+- Memory files (`memories/*.md`) **may** carry YAML frontmatter (`name`,
+  `description`, `metadata`) — e.g. `memories/repo/sparta.md` — while older ones
+  start directly with a `#` heading. Don't assume either form: `grep -rn "^name:"
+  memories/` finds the frontmatter'd files, and a file without it is still valid.
+  Preserve whatever frontmatter a file already has rather than stripping it.
 - `[[link]]` cross-links in skills and memories resolve to **skill directories**
   (`skills/<target>/`), not to named entries in memory files. To verify a
   `[[target]]` link: `ls skills/<target>/`. If no skill dir exists, fall back to

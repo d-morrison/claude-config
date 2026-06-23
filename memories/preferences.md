@@ -102,6 +102,12 @@
   an extra round. (Learned on d-morrison/ai-config#45: the `git -C ~/.claude/skills`
   path fix was applied to `ums/SKILL.md` but the identical line in `skill-builder/SKILL.md`
   was missed until review caught it.)
+- When writing documentation in a stacked PR (or any branch), only document features whose
+  code is actually present on the CURRENT branch's ancestry — `grep` for the symbol/constant
+  first. A feature that lives in a sibling branch also targeting `main` is NOT in scope, even
+  if conceptually related; documenting it reads as a hallucinated feature and a reviewer will
+  flag it. Move those docs to the branch where the code lives. (A specific case of "NEVER
+  assume; ALWAYS verify" above.)
 - Avoid nested function calls and nested function definitions where feasible — prefer
   named intermediate variables (or a pipe, e.g. `|>` / `%>%` in R) over `f(g(h(x)))`, and
   prefer top-level function definitions over functions defined inside other functions.
