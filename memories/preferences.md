@@ -260,13 +260,13 @@
   `skill-builder` skill.)
 - "slide <tag>" means force-move a floating Git tag to current main HEAD (delete + recreate + push).
   Common for repos with floating major-version tags that consumers reference.
-- When starting a *write* session on a repo that another LOCAL session might also have open
-  (multiple Claude Code tabs / CLI + IDE / two terminals on the same checkout), use the
-  `session-lock` skill (alias `deconflict-sessions`): register at start, `check` before
-  editing, and on a SAME-WORKING-TREE conflict isolate into a `git worktree` before touching
-  files. This is the LOCAL counterpart to `claim-pr` (remote) and `sync-pr-branch` (reconcile
-  with origin) — use all three together on shared PR work. Registry lives under `.git/ai-sessions/`
-  (never committed). Script: `~/.claude/skills/session-lock/scripts/ai-session.sh`.
+- Use the `session-lock` skill (alias `deconflict-sessions`) as the detection/recovery layer
+  on top of the worktree-by-default policy (see above): register at start, `check` before
+  editing, so parallel sessions can see each other. Worktrees are already the default, so most
+  sessions start isolated; session-lock surfaces the rare SAME-WORKING-TREE collision before
+  files get clobbered. This is the LOCAL counterpart to `claim-pr` (remote) and `sync-pr-branch`
+  (reconcile with origin) — use all three together on shared PR work. Registry lives under
+  `.git/ai-sessions/` (never committed). Script: `~/.claude/skills/session-lock/scripts/ai-session.sh`.
 
 - "dew it" means "do it".
 - After implementing a feature or fix, ALWAYS commit and push immediately — don't wait
