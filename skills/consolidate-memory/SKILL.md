@@ -128,7 +128,8 @@ A merged-away entry may be referenced by a `[[name]]` cross-link. List every
 pointed at an absorbed entry at the surviving canonical:
 
 ```bash
-grep -rn "\[\[" memories/ skills/*/SKILL.md CLAUDE.md 2>/dev/null
+grep -rn "\[\[" memories/ skills/*/SKILL.md CLAUDE.md \
+  ~/.claude/projects/*/memory/ 2>/dev/null
 ```
 
 If you also named the absorbed entry in prose, grep that distinctive text and

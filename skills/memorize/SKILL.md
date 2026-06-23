@@ -48,6 +48,7 @@ Say so and route it there; don't store a note that will never fire.
      project path is the repo's directory path with `/` replaced by `-` — e.g.
      `/Users/you/Documents/GitHub/rme` → `-Users-you-Documents-GitHub-rme`.
      No git commit is needed for project memory writes — they persist locally.
+     Update `MEMORY.md` in that directory as an index entry.
    - **General standing rule** — an always-apply working preference across ALL
      repos ("always link PRs in tables", "use Pacific time") →
      `~/.claude/CLAUDE.md` (it's loaded every session)
