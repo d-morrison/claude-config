@@ -302,4 +302,14 @@
   failure state. E.g. "in a session after a PR has just merged" is correct for a skill that
   stops on unmerged PRs; "with an open PR" is insufficient — it covers only the stop path,
   not the full flow. (Learned on ai-config#125.)
+- When editing a skill to introduce a new routing category or exception (e.g. "writes of
+  type X don't need a commit"), search the SAME file for ALL other steps that enumerate the
+  same category (e.g. "skip list" bullets, "when not to commit" sections) and update them
+  consistently. An exception declared in one step but absent from the other step's enumeration
+  is a contradiction the reviewer will catch. (Learned on ai-config#172: step 2 said "no
+  commit for project memory" but step 5's skip list still said "skip only for /memories/session/".)
+- When adding a shared-procedure step to one skill (e.g. "update MEMORY.md as an index"),
+  grep sibling skills that perform the same action and add the step there too. Sibling skills
+  that diverge on a shared sub-procedure each cost a review round to surface and fix. (Learned
+  on ai-config#172: memorize omitted the MEMORY.md index step that record-learnings already had.)
 

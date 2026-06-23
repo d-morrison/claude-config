@@ -109,6 +109,10 @@ reflect, and persist.
 - [ ] Did the user express a new preference? → `/memories/preferences.md`
 - [ ] Did a workflow emerge that could be a new skill? → Create it
 - [ ] Are there existing skills that reference outdated info? → Fix them
+- [ ] Did I edit one step's scope without updating sibling steps in the same file? →
+  Search the file for all enumerations of the changed category and make them consistent.
+- [ ] Did I add a shared-procedure step to one skill but not to sibling skills? →
+  Grep sibling skills for the same action and add the step there too.
 
 ## Relationship to record-learnings
 
