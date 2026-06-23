@@ -187,6 +187,13 @@ The `use-preferred-style` skill (alias `style`) spells out the procedure, the
 PSW chapter links, and a filler/jargon swap table; the `find-ai-tells` skill
 (alias `ai-tells`) is the scan-after detector counterpart.
 
+## Line breaks in .qmd prose
+
+When editing existing `.qmd` prose, preserve the original line breaks exactly —
+don't reflow to single long lines or a different wrap width. When writing new
+`.qmd` prose, add line breaks at major phrase and sentence boundaries (one
+sentence or clause per line is fine).
+
 ## Writing style: scan for AI tells
 
 The detector counterpart to the plain-prose guide above.
