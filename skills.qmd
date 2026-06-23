@@ -21,7 +21,7 @@ Most skills also respond to plain-English triggers listed in their `description`
 | Skill | Aliases | What it does |
 |-------|---------|--------------|
 | `ardi` | `dc`, `drive`, `clean`, `iterate` | Read the latest review, address/rebut/defer every finding, push, re-request review — loop until clean |
-| `adr` | | Single ARD pass: address, rebut, defer — without the iterate loop |
+| `ard` | `adr` | Single ARD pass: address, rebut, defer, or acknowledge — without the iterate loop |
 | `claim-pr` | | Post a "paws off" comment before a work session; unclaim when done |
 | `request-pr-review` | | Add a human reviewer and @-mention them with context |
 | `pr-status` | | Report the current PR's CI and review state |
