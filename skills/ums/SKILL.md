@@ -104,7 +104,8 @@ reflect, and persist.
 - [ ] Did the user correct my behavior? → Encode as preference + skill update
 - [ ] Did I discover a tool quirk? → `/memories/tools.md`
 - [ ] Did I learn a debugging pattern? → `/memories/debugging.md`
-- [ ] Did I discover a repo convention? → `/memories/repo/`
+- [ ] Did I discover a repo convention? → that repo's Claude project memory:
+  `~/.claude/projects/<project-path>/memory/` (write directly; no git commit needed)
 - [ ] Did the user express a new preference? → `/memories/preferences.md`
 - [ ] Did a workflow emerge that could be a new skill? → Create it
 - [ ] Are there existing skills that reference outdated info? → Fix them
