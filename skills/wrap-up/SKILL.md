@@ -34,8 +34,8 @@ Don't report from memory or assume a merge did/didn't happen — query each thin
 fresh (this is the **never assume; always verify** rule applied to closing out):
 
 ```bash
-gh pr list --state open --json number,title,headRefName,author \
-  --jq '.[] | "#\(.number) [\(.author.login)] \(.title)"'
+gh pr list --state open --json number,title,headRefName,author,mergeable,mergeStateStatus,comments \
+  --jq '.[] | "#\(.number) [\(.author.login)] \(.title) [\(.mergeable)]"'
 gh issue list --state open --json number,title --jq '.[] | "#\(.number) \(.title)"'
 git status --short                         # uncommitted work?
 git worktree list                          # leftover worktrees (agent isolation / session-lock)?
@@ -46,7 +46,14 @@ git log --oneline -5 origin/main           # what actually landed on main
   `gh pr view <N> --json state,mergedAt` (or `gh issue view`). A PR you think
   you left open may have been merged by the user, and vice-versa.
 - If the session touched **other repos** (e.g. an upstream dependency),
-  check those too — `gh pr list --repo <owner>/<repo> --state open`.
+  check those too — `gh pr list --repo <owner>/<repo> --state open
+  --json number,title,headRefName,author,mergeable,mergeStateStatus,comments`.
+- **Merge conflict sweep.** Before closing out, check every open PR's
+  `mergeable` field. For each PR with `mergeable == "CONFLICTING"`, check its
+  claim status (most recent comment) and fix unclaimed ones using the cascade
+  procedure in `post-merge` step 1.5 (claim → isolated worktree → merge main →
+  `resolve-conflicts` skill → push → unclaim). Don't leave conflicting PRs
+  behind when wrapping up — they block whoever works the queue next.
 
 ### 2. Surface anything still open or dangling
 
@@ -80,8 +87,8 @@ rather than manufacturing edits.
 
 ## Notes
 
-- Wrap-up is read-only on PR/issue **state** (it reports) except for the UMS
-  writes (it persists). It does **not** merge PRs — merging stays the user's
-  call unless they ask.
+- Wrap-up reports PR/issue state and, where needed, resolves merge conflicts
+  in unclaimed conflicting PRs (step 1). It does **not** merge PRs — merging
+  stays the user's call unless they ask.
 - This is the session-level bookend to `record-learnings` (continuous) and
   `ums` (the learnings checkpoint, which this embeds as step 4).

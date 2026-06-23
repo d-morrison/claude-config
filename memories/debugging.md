@@ -39,6 +39,12 @@
 - When `replace_string_in_file` fails with "could not find matching text",
   the disk file likely differs from what `read_file` showed (stale buffer).
 
+## macOS sed vs GNU sed syntax differences
+- `sed '1{/pattern/d}'` works on GNU sed (Linux CI) but FAILS on macOS BSD sed
+- Portable form: `sed -e '1{' -e '/pattern/d' -e '}'` (separate -e expressions)
+- Always test sed commands locally before committing if they use address+command blocks
+- The CI runs on Linux (GNU sed) but local dev is macOS (BSD sed) — use portable form
+
 ## bash "syntax error: unexpected end of file" at last line
 - Almost always an unclosed construct (`if`/`fi`, quote, `$(`).
 - BUT a sneaky cause is **CRLF line endings**: `\r` makes bash read `then\r`/`fi\r`

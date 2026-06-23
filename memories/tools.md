@@ -121,6 +121,22 @@
 - `git switch -C "$BRANCH"` is already safe against flag-shaped branch names: `$BRANCH` is the argument *to* `-C`, so a value like `--weird` fails cleanly as `fatal: '--weird' is not a valid branch name` rather than being parsed as an option.
 - Do NOT "harden" it to `git switch -C -- "$BRANCH"` — that form is **broken**: the `--` is consumed as the branch name (the required argument to `-C`), so `$BRANCH` is parsed as the start-point instead and the command fails without creating the branch. (Verified on git 2.x; a review bot suggested the broken form on d-morrison/gha#58.)
 
+## Git — `worktree add` does not cd into the new worktree
+- `git worktree add <path> <ref>` creates the worktree at `<path>` but leaves the
+  shell in the **original** checkout. Subsequent bare git commands (`git checkout`,
+  `git merge`, etc.) run against the original checkout, not the new worktree.
+- Always follow `git worktree add <path> …` with `cd <path>` before any further
+  git work inside that worktree.
+- When creating a worktree to fix a **conflict caused by a squash-merge on main**,
+  `git fetch origin main <branch>` (both refs) **before** `git worktree add` so
+  the squash commit is present when you merge. Fetching only the PR branch leaves
+  origin/main stale and the merge won't pick up the commit that caused the conflict.
+
+## Git — `merge --continue` takes no arguments
+- `git merge --continue --no-edit` fails with `fatal: --continue expects no arguments`.
+- After resolving conflicts and staging (`git add <files>`), use `git merge --continue` alone.
+- In a non-interactive (headless) session git uses the auto-generated merge commit message without prompting — no editor opens.
+
 ## GitLab Discussions API (inline diff comments)
 - Endpoint: `POST /projects/:id/merge_requests/:iid/discussions`
 - For inline comments, include `position` object: `position_type: "text"`, `base_sha`, `head_sha`, `start_sha`, `new_path`, `old_path`, `new_line`
@@ -190,13 +206,19 @@
   (`git checkout <my-commit> -- CLAUDE.md`, commit), then before merging verify with
   `git diff origin/main -- CLAUDE.md` being **non-empty** (an empty diff means the
   payload was silently reverted to main), and merge promptly.
-- **Zero-findings dispatch review = no comment (expected).** `claude-code-review.yml`
-  in dispatch/agent mode only posts via the inline-comment tool. When the review finds
-  nothing to flag, it posts nothing — no top-level verdict comment appears on the PR.
-  This does NOT mean the review failed or didn't run; distinguish by checking the
-  job's turn count in the run logs (a live review run has many turns; a skipped or
-  errored run has very few). The old-comment collapse step still runs and minimizes
-  prior review comments even on a zero-findings run.
+- **Dispatched reviews now post a PR comment (gha#89, now in `v1`).** Before this fix,
+  `workflow_dispatch` runs wrote output to the step summary only —
+  `github.event.pull_request.number` is null for dispatch events, so the action's
+  internal post-step failed silently, and the old-comment collapse step then minimized
+  all prior review comments, leaving the PR thread silent. Fixed by a "Post review
+  comment for dispatched run" step that reads the last assistant text from the execution
+  file and posts it via `gh issue comment`. When the review finds no new issues, Claude
+  is prompted to link the most recent prior `claude[bot]` review comment and state it
+  still stands. Execution file extraction (for debugging):
+  ```
+  jq -r '[.[] | select(.type == "assistant") | .message.content[]? | select(.type == "text") | .text] | last // ""' \
+    "${RUNNER_TEMP}/claude-execution-output.json"
+  ```
 - **Self-mod skip in `claude-code-review.yml` (added in gha#70, now in `v1`).** The
   workflow skips when the PR modifies `.claude/**` paths or the
   review workflow file itself (derived from `github.workflow_ref`). CI completes in

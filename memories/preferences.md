@@ -137,11 +137,13 @@
   to confirm only intended files are staged. (Learned the hard way: a
   `git add -A` swept the user's `scout-peers` skill into an unrelated `/prune` PR, adding
   several extra review rounds.)
-- The ai-config working copy is often in use by CONCURRENT Claude sessions; untracked or
-  uncommitted files there can be silently wiped by another session (branch switch /
-  `git clean`). For substantial multi-file work in ai-config — and ALWAYS when the user
-  says the wd is "in use" / "do this in a separate repo" — work in an isolated `git worktree`
-  off `origin/main` (`git worktree add -b <branch> ../ai-config-worktrees/<branch> origin/main`),
+- Run a local session in an isolated `git worktree` by DEFAULT, not directly in the shared
+  working copy — unless there's a specific reason to use the working copy. This default holds
+  for EVERY local session, not just substantial multi-file work or when the user flags the wd
+  as "in use" / "do this in a separate repo". The ai-config
+  working copy is often in use by CONCURRENT Claude sessions; untracked or uncommitted files
+  there can be silently wiped by another session (branch switch / `git clean`). Create it off
+  `origin/main` (`git worktree add -b <branch> ../ai-config-worktrees/<branch> origin/main`),
   not the shared wd. Clean it up after merge with `git worktree remove`. (Learned when a
   concurrent session deleted a freshly-written, still-untracked skill file from the wd.)
   The `session-lock` skill (alias `deconflict-sessions`) tooling automates this:
@@ -176,6 +178,17 @@
   `concurrency: cancel-in-progress` (d-morrison/gha) the two runs cancel each other,
   leaving the latest commit with a canceled, never-posted verdict. If a review ends up
   canceled with no comment, dispatch one cleanly: `gh workflow run claude-review.yml -f pr_number=<N>`.
+- During ARDI loops: always ANTICIPATE what the reviewer will flag next and fix those
+  issues preemptively in the same commit. Don't wait for each round to surface issues
+  one at a time — read the code holistically, think about what patterns the reviewer
+  has flagged in prior rounds (documentation gaps, coupling without cross-references,
+  missing edge-case guards, inconsistent accounting), and fix analogous issues elsewhere
+  in the same file before pushing. The goal is to minimize back-and-forth rounds.
+- During ARDI loops: only stop iterating (without consensus) if you're at a literal
+  impasse — going in circles, redoing and undoing the same changes. Asymptotic new nits
+  each round is NOT an impasse; keep addressing them. After 3–4 rounds of asymptotic
+  noise (new nits appearing each round with no sign of convergence), surface that to
+  the user and ask whether to keep going or accept the current state.
 - Keep the bot's `@`-mention trigger phrase OUT of PR/issue comment prose unless you actually
   intend to dispatch. The `issue_comment` trigger fires on the bare mention ANYWHERE in a
   comment — even in a sentence saying you're NOT triggering a review (e.g. an ARD summary noting
@@ -191,10 +204,10 @@
   `origin/<branch>`: sync to the bot's commit and don't redo fixes it already landed. Two
   Claude sessions on one branch is the parallel-session collision `claim-pr`/`session-lock`
   warn about. (ai-config#120: the bot fixed 3 of 4 findings while I worked the same branch.)
-- A reviewer's *suggested fix* (a `suggestion` block or proposed code) can itself be wrong —
+- A *suggested fix* (a `suggestion` block or proposed code) from any reviewer — human or bot — can itself be wrong —
   verify it before applying; don't paste it in blind. Check it handles the general case, not
   just the one flagged spot. If the correct fix differs, apply that and say so in the ARD reply
-  so the reviewer sees why you diverged. (ai-config#94: a suggested regex `[>|][-+]?` would have
+  so the reviewer sees why you diverged. (ai-config#94 round 2: a suggested regex `[>|][-+]?` would have
   blanked every inline `description:` — the very round-1 bug under review; the right fix kept the
   block indicator optional, `[>|]?[-+]?`.)
 - In R/Quarto/Rmd prose, prefer inline R expressions (`` `r ...` ``) over hard-coded
@@ -289,3 +302,4 @@
   failure state. E.g. "in a session after a PR has just merged" is correct for a skill that
   stops on unmerged PRs; "with an open PR" is insufficient — it covers only the stop path,
   not the full flow. (Learned on ai-config#125.)
+

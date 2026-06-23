@@ -3,9 +3,9 @@ Before presenting non-trivial prose --- PR/issue descriptions, commit bodies,
 README/doc/vignette text, or a long answer meant as deliverable prose ---
 self-check it and cut the tells. Watch for:
 
-- **Overused vocabulary:** delve, leverage, utilize, tapestry, testament, realm,
-  robust, seamless, holistic, nuanced, multifaceted, pivotal, crucial, "in
-  today's fast-paced world", "stands as a testament to".
+- **Overused vocabulary:** actionable (→ "to act on"), delve, leverage, utilize,
+  tapestry, testament, realm, robust, seamless, holistic, nuanced, multifaceted,
+  pivotal, crucial, "in today's fast-paced world", "stands as a testament to".
 - **Rhetorical reflexes:** the "it's not just X, it's Y" antithesis (the biggest
   tell), mechanical rule-of-three lists, signposting filler ("it's worth noting
   that", "importantly"), hedging stacks, hollow "in conclusion" restatements.

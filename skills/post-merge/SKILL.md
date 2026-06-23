@@ -41,6 +41,52 @@ Confirm `state == MERGED` and `mergedAt` is set. If it isn't actually merged,
 **stop and report** — don't tidy a branch whose work hasn't landed. (The
 standing **never assume; always verify** rule applied to closing out a PR.)
 
+### 1.5. Cascade conflict scan
+
+A squash-merge on `main` can knock previously-mergeable open PRs into conflict.
+Scan right after the merge is confirmed:
+
+```bash
+gh pr list --state open \
+  --json number,title,headRefName,mergeable,mergeStateStatus,comments
+```
+
+For each PR where `mergeable == "CONFLICTING"`:
+
+1. **Check claim status.** Read the most recent comment. If it says "Working on
+   this — paws off" (or equivalent), skip it — another session owns it.
+2. **Claim it.**
+   ```bash
+   gh pr comment <N> --body "Working on this — paws off until I'm done."
+   ```
+3. **Create an isolated worktree**, fetch the latest `main` (the squash-merge
+   commit that caused the conflict), and merge:
+   ```bash
+   git fetch origin main <branch>   # fetch both: we need the new main tip
+   git worktree add .claude/worktrees/pr-<N> origin/<branch>
+   cd .claude/worktrees/pr-<N>
+   git checkout -b <branch>         # or --track origin/<branch> if the name is free
+   git merge origin/main            # picks up the new squash-merge commit
+   ```
+4. **Resolve conflicts** using the `resolve-conflicts` skill (consolidate both
+   sides' intent; do not blindly pick one side wholesale).
+5. **Run the repo's pre-commit checks**, then push and remove the worktree:
+   ```bash
+   git push origin <branch>
+   cd -
+   git worktree remove .claude/worktrees/pr-<N>
+   ```
+6. **Unclaim** with a brief resolution summary:
+   ```bash
+   gh pr comment <N> --body "Conflict resolved — branch is now mergeable. <one-line summary of what conflicted and how it was resolved>"
+   ```
+
+Resolve PRs one at a time — not because worktrees race each other (each
+worktree is an independent checkout), but because the same human or bot may be
+actively working a PR between your claim and your push. One-at-a-time keeps
+the blast radius small. Skip any PR whose conflict is in a file you can't
+understand without more context — comment asking for clarification instead.
+
 ### 2. Tidy the local branch
 
 ```bash
