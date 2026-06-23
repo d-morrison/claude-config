@@ -192,7 +192,7 @@ PSW chapter links, and a filler/jargon swap table; the `find-ai-tells` skill
 When editing existing `.qmd` prose, preserve the original line breaks exactly —
 don't reflow to single long lines or a different wrap width. When writing new
 `.qmd` prose, add line breaks at major phrase and sentence boundaries (one
-sentence or clause per line is fine).
+`.qmd` prose, break at sentence boundaries; one clause per line works well.
 
 ## Writing style: scan for AI tells
 
