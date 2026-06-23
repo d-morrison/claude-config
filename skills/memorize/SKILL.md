@@ -66,10 +66,11 @@ Say so and route it there; don't store a note that will never fire.
 4. **Write** a concise bullet (one line preferred), matching the file's voice;
    include the *why* if it isn't obvious. Don't record what the repo already
    documents (code structure, git history) — capture only the non-obvious.
-5. **Commit & push** the change so it persists. Skip *only* for
-   `/memories/session/` (conversation-only notes shouldn't enter the shared
-   repo); **everything else — including `~/.claude/CLAUDE.md` writes — gets
-   committed**. This assumes `bootstrap.sh` has symlinked `memories/` and
+5. **Commit & push** the change so it persists. Skip for `/memories/session/`
+   (conversation-only notes shouldn't enter the shared repo) and for project
+   memory writes to `~/.claude/projects/*/memory/` (they persist locally,
+   outside the ai-config repo — no git commit needed). **Everything else —
+   including `~/.claude/CLAUDE.md` writes — gets committed**. This assumes `bootstrap.sh` has symlinked `memories/` and
    `CLAUDE.md` into the ai-config repo (the expected setup). Resolve the repo
    from the `memories/` symlink and stage the file by its path *within* the
    repo (`git rev-parse --show-toplevel` follows the symlink to the repo root,
