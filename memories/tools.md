@@ -43,6 +43,11 @@
     review. Works reliably, but clutters the timeline with close/reopen events;
     prefer workflow_dispatch unless dispatch isn't available.
 
+## gh — stale remote URL causes cryptic `gh pr create` failure
+- `gh pr create` fails with `Head sha can't be blank, Base sha can't be blank, No commits between <owner>:main and <other-owner>:<branch>` when `origin` points to an **old repo URL** (e.g. after a GitHub repo transfer/rename).
+- Fix: `git remote set-url origin https://github.com/<new-owner>/<repo>.git` and re-push the branch before creating the PR.
+- Diagnosis: `git remote -v` shows the stale URL; `gh repo view --json nameWithOwner` shows where `gh` thinks the canonical repo is.
+
 ## GitHub MCP tools (Claude Code remote/web sessions)
 - In remote/web sessions the authenticated GitHub identity is the repo owner
   (`d-morrison`), so requesting `d-morrison` as a PR reviewer fails with
