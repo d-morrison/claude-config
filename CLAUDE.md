@@ -173,6 +173,12 @@ d-morrison's modular/idiomatic priorities), then keep iterating to fully-clean
 on your own findings. A quota-skipped review leaves the PR unreviewed; it is
 not an approval.
 
+The skip surfaces as a bot comment — either `Claude review skipped — API quota
+exhausted` (the review workflow) or `You've hit your org's monthly spend limit`
+(the `@claude` agent workflow). Both mean no bot will respond on this run, so
+don't wait on it; do the review yourself and keep driving. Re-running the
+workflow only helps once the quota actually resets.
+
 ## Watch and ARDI every PR you touch — don't ask first
 
 When you open (or are handed) a PR/MR in **any** repo, subscribe to its activity

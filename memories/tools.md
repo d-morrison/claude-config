@@ -390,6 +390,13 @@
   text) — `header` + `options` alone fail with `InputValidationError: required
   parameter questions[0].question is missing`. Easy to omit when you build the
   call from options first; include the `question` string every time.
+- **`Tool permission request failed: Error: Tool permission stream closed before
+  response received`** is a **transient** harness glitch, not a user denial —
+  **retry the same call.** Hit AskUserQuestion twice and `ExitPlanMode` twice in
+  one web session; every retry went through. Applies to any permission-gated
+  harness tool (AskUserQuestion, ExitPlanMode, …), so don't abandon the
+  interactive flow or fall back to a workaround on the first failure. (A genuine
+  denial reads differently — the user declining the specific action.)
 
 ## Bash tool runs under zsh — avoid bash-isms & reserved variable names
 - The Bash tool's shell is zsh-initialized, where some names are **read-only
