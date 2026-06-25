@@ -370,3 +370,7 @@
   before "Claim a GitHub PR/issue" in CLAUDE.md, even though you must claim the PR before you
   look up and switch to its branch. Wrong ordering misleads the reader about the correct flow.
 
+
+## Git author mapping
+- Commits by `dem-extra1` to repos owned by `d-morrison`, `ucd-serg`, or `ucdavis` → the true author is `d-morrison` (demorrison@ucdavis.edu); set `--author="Douglas Morrison <demorrison@ucdavis.edu>"` (or amend) when the committing identity is `dem-extra1`.
+- Commits to `sparta` by `d-morrison` → the true author is `dem-extra1` (dougmor@gmail.com); set `--author="dem-extra1 <dougmor@gmail.com>"` when the committing identity is `d-morrison`.
