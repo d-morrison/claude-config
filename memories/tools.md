@@ -254,6 +254,12 @@
   not in `inst/WORDLIST`. For one-off non-dictionary words in NEWS/prose, prefer
   rewording (e.g. "uncaptioned" → "without captions") over polluting WORDLIST;
   add to WORDLIST only for real domain terms you'll reuse.
+  - **When the offending token is a code identifier or a literal log/warning
+    message** (e.g. quoting `non-integer #successes in a binomial glm!` in a
+    NEWS entry, which tripped on `glm`), wrap it in backticks as inline code
+    instead — the spellcheck parses markdown and skips code spans, and
+    backticking a `pkg::fn()`/identifier/message is the correct markdown style
+    anyway. Cleaner than both rewording and a WORDLIST add. (ucdavis/ettbc#30.)
 - A `docs-check` / `R-check-docs` job runs `roxygenize()` then `git diff --exit-code
   man/`, so a roxygen edit with a stale `man/*.Rd` fails. **When you can't run
   `devtools::document()` (no R toolchain, e.g. a cloud/web session), you can still
