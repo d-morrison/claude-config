@@ -541,3 +541,15 @@ common patterns.
   CI-only / workflow-only PR (no user-visible R-package change), apply **both** labels
   rather than bumping `DESCRIPTION` and editing `NEWS.md`. (Verified on ucdavis/bcs#236 —
   corrects an earlier note that claimed `version-check` had no bypass.)
+
+## Office Open XML (.docx / .xlsx) — editing committed content
+- `.docx`/`.xlsx` are zip archives. To strip or edit content (e.g. remove a sensitive
+  link from a committed Word doc): `unzip` the file, edit `word/document.xml` for body
+  text, and edit `word/_rels/document.xml.rels` for hyperlink **targets** — a clickable
+  URL's address lives in the `.rels` `Target`, not just the visible `<w:t>` text, so
+  delete both the `<w:hyperlink r:id="rIdN">...</w:hyperlink>` element and its matching
+  `<Relationship Id="rIdN" ... Target="...">` to remove link and address.
+- Re-zip from the extracted dir: `zip -r -X out.docx '[Content_Types].xml' _rels docProps word`
+  (plus `customXml` if present). Verify with `unzip -t out.docx` and re-extract + grep to
+  confirm the removed strings are gone before committing. (Done on ucdavis/bcs#237 to strip
+  an internal SharePoint URL and a server reference from a to-do doc.)

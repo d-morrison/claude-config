@@ -104,6 +104,16 @@ When a task involves an existing PR or branch, work on that PR's branch instead:
 Use the harness-specified branch only when starting work with no existing PR
 and no existing branch to continue.
 
+**Exception --- the session can only push to its own branch.** Some web/remote
+sessions are scoped so the agent proxy allows pushing *only* to the
+harness-assigned branch; a push to any other branch (the existing PR's branch
+included) is rejected with `HTTP 403`. When that happens you cannot follow step
+3. Fall back to: push the fix to the assigned branch, open a **new** PR off
+`main` that supersedes the original (say "Supersedes #N" in the body and rebuild
+as a single clean commit so no sensitive history leaks through), comment on the
+original PR pointing to the replacement, and close the original once the new PR
+merges. Don't retry the 403 --- it's a policy denial, not a transient error.
+
 ## File an issue before starting a new task
 
 <!-- Shared with the lab manual; edit shared/workflow/issue-first.md, not here. -->
