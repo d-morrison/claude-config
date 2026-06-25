@@ -242,6 +242,32 @@ don't reflow to single long lines or a different wrap width. When writing new
 `.qmd` prose, add line breaks at major phrase and sentence boundaries (one
 `.qmd` prose, break at sentence boundaries; one clause per line works well.
 
+## Quarto: div syntax for figure/table labels and captions
+
+In Quarto `.qmd` files, label and caption figures and tables with **div
+syntax**, not chunk-option syntax. Wrap the code chunk in a
+`::: {#fig-...}` / `::: {#tbl-...}` fenced div and put the caption as the last
+line before the closing `:::`:
+
+```
+::: {#fig-stage-at-dx}
+
+```{r}
+#| label: stage-at-dx-fig
+#| code-fold: true
+
+plot_stage_at_dx(pt_data)
+```
+
+Stage at diagnosis by screening frequency
+:::
+```
+
+Don't use the chunk options `#| label: fig-...` / `#| fig-cap: "..."` for the
+cross-reference id and caption. The div id (`#fig-`/`#tbl-`) carries the
+cross-reference; the chunk `label` stays a plain code label. This keeps figures
+consistent with tables, which already use div syntax.
+
 ## Writing style: scan for AI tells
 
 The detector counterpart to the plain-prose guide above.
