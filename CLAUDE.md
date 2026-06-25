@@ -215,6 +215,11 @@ and collaboration conventions.
 <!-- Shared with the lab manual; edit shared/coding/avoid-nesting.md, not here. -->
 @shared/coding/avoid-nesting.md
 
+## Coding: prefer existing packaged functions over rolling your own
+
+<!-- Shared with the lab manual; edit shared/coding/prefer-packaged-functions.md, not here. -->
+@shared/coding/prefer-packaged-functions.md
+
 ## Writing style: plain, direct prose
 
 <!-- Shared with the lab manual; edit shared/writing/plain-prose.md, not here. -->
