@@ -133,3 +133,45 @@ pre-empt these when authoring shell, especially under `set -euo pipefail`:
 - **bash 3.2 (macOS default) compatibility:** indexed arrays, C-style
   `for ((…))`, and `${2+set}` all work; **associative arrays do NOT** (4.0+).
   Parse key=value records with `while IFS='=' read -r k v; do case "$k" in …`.
+
+## Verifying R-package tests: install + testthat, never `source()` the R files
+Hit on ucdavis/ettbc#14. The env had no `devtools`/`renv`, so I "verified" the new
+tests by `sys.source()`-ing every `R/*.R` file and re-running the assertions by
+hand. They passed — but CI's `R CMD check` failed with
+`could not find function "run_augment_one"`. Two lessons:
+- **testthat runs each test file top-to-bottom, and `test_that()` executes
+  immediately.** Helper functions (and file-scope fixtures) must be defined
+  **above** the `test_that()` blocks that call them. A helper defined at the
+  bottom of the file is undefined when the earlier tests run. Manual sourcing
+  hides this because you naturally define helpers before use in the REPL.
+- **Don't emulate the test run by sourcing `R/`.** It reproduces neither
+  testthat's execution model nor the package namespace (internal, unexported
+  functions resolve under `source()` but the suite's `test_check` exposes them
+  differently). Install the toolchain from the Posit package manager and run it
+  the way CI does:
+  `install.packages(c("testthat","cli", <Suggests used>), repos="https://packagemanager.posit.co/cran/__linux__/noble/latest")`,
+  then `R CMD INSTALL .`, then `testthat::test_dir("tests/testthat", load_package="installed")`.
+  roxygen2, lintr, and spelling install the same way — so `roxygenise()` (diff
+  check), `lint_package()`, and `spell_check_package()` are all runnable locally
+  even when `renv::restore()` can't reach the full dependency set.
+
+## R test/lint gotchas that only surface in CI
+Also from ettbc#13/#14:
+- **`lintr::object_usage_linter` flags package datasets used inside a *named*
+  helper function in a test file** (`no visible binding for global variable
+  'cohort'`). The same dataset used directly inside a `test_that()` block is
+  fine. So reference lazy-loaded data at file scope or inside the test blocks,
+  not inside a top-level helper. The repo's `lint-changed-files` job runs
+  `R CMD INSTALL .` before `lint_package`, so cross-file *internal* functions
+  (e.g. a helper defined in another `R/` file) resolve — a single-file
+  `lintr::lint()` can't see them and will false-flag them.
+- **`spelling::spell_check_package()` locally over-reports vs CI** on accented
+  hyphenated names: line-wrapped `García-Albéniz`/`Hernán` in `.Rd` files
+  tokenize as `Garc`/`niz`/`Hern`, which the CI spellcheck action does not flag
+  (main passes with them). Trust CI's misspelled count; add only the genuinely
+  new words to `inst/WORDLIST`.
+- **The ettbc `review / claude-review` check fails/skips org-wide when the
+  Anthropic org spend limit is hit** (`github-actions[bot]` posts "monthly spend
+  limit"). It's environmental, non-blocking, and unfixable from a content PR
+  (the bot can't edit `.github/workflows`). Stand in with a manual self-review
+  rather than chasing it.
