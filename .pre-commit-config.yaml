@@ -19,7 +19,7 @@ repos:
   - repo: local
     hooks:
       - id: validate-skills
-        name: validate skills & manifests
+        name: validate skills, Codex wrappers & manifests
         entry: python scripts/validate-skills.py
         language: python
         additional_dependencies: [pyyaml==6.0.2]

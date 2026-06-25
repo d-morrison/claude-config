@@ -43,6 +43,11 @@
     review. Works reliably, but clutters the timeline with close/reopen events;
     prefer workflow_dispatch unless dispatch isn't available.
 
+## gh — stale remote URL causes cryptic `gh pr create` failure
+- `gh pr create` fails with `Head sha can't be blank, Base sha can't be blank, No commits between <owner>:main and <other-owner>:<branch>` when `origin` points to an **old repo URL** (e.g. after a GitHub repo transfer/rename).
+- Fix: `git remote set-url origin https://github.com/<new-owner>/<repo>.git` and re-push the branch before creating the PR.
+- Diagnosis: `git remote -v` shows the stale URL; `gh repo view --json nameWithOwner` shows where `gh` thinks the canonical repo is.
+
 ## GitHub MCP tools (Claude Code remote/web sessions)
 - In remote/web sessions the authenticated GitHub identity is the repo owner
   (`d-morrison`), so requesting `d-morrison` as a PR reviewer fails with
@@ -333,15 +338,17 @@
   check would match any file with a similar path structure. Use `-qxF` whenever
   comparing file paths literally. The `selfmod` step in `claude-code-review.yml` uses
   `grep -qxF` for this reason.
-- **Spurious `is_error=true, subtype=success` review failure (intermittent upstream
-  bug).** The `claude-code-action` occasionally completes a review in a single turn and
-  exits with `is_error=true` + `subtype=success`. The "Fail the check" step in
-  `claude-code-review.yml` catches this and marks the `review / claude-review` job ❌.
-  The review comment may be missing or show only a placeholder ("I'll analyze this and
-  get back to you"). The session ran ~192 s; the prior clean review on the same diff
-  is still valid. Fix: push a trivial commit to trigger a fresh review. Not caused by
-  repo code — the upstream action exits with the wrong code. Observed on gha#92 run
-  #28034977099.
+- **`is_error=true, subtype=success` in review execution output — two distinct causes:**
+  - **Quota/auth exhaustion** (`total_cost_usd=0`, `num_turns=1`, `duration_ms` < 2000):
+    the API rejected the request before Claude did any work. Fixed in gha#102 (`@v1`):
+    the guard step now exits 0 and posts a `[!WARNING]` PR comment instead of failing the
+    check. Fix: wait for quota reset (or auth fix), then re-trigger. No need to push a
+    commit — the check will pass once quota is back.
+  - **Intermittent upstream bug** (`total_cost_usd > 0`, `duration_ms` ~192 s): the
+    `claude-code-action` completes a real review but exits with `is_error=true` anyway.
+    The guard step fails the check ❌. The prior clean review on the same diff is still
+    valid. Fix: push a trivial commit to trigger a fresh review. Observed on gha#92 run
+    #28034977099.
 - **Write accurate `workflow_dispatch` comments when adapting the upstream
   `claude-code-review.yml` template.** The upstream template says "workflow_dispatch is
   fired by claude.yml" — but that's only true when the repo's `claude.yml` actually
@@ -475,3 +482,43 @@ common patterns.
   "Fail the workflow run …" not "Fail the action …". When copying an input description
   from `action.yml` into the wrapping `workflow_call` file, update "action" → "workflow
   run". (Fixed in gha#92: `fail-if-empty` description in `check-links.yml`.)
+- **`mcp__github__get_job_logs` usage.** Two calling modes — use the right one:
+  - Single job: pass `job_id` (number) only. Do NOT pass `run_id` alongside.
+  - All failed jobs in a run: pass `run_id` (number) + `failed_only: true` + `return_content: true`. Do NOT pass `job_id`.
+  The tool's error message ("job_id is required when failed_only is false") is misleading when you pass `failed_only: true` with `run_id`; the issue is actually conflicting parameters.
+- **`update-snapshots.yml@v1`** — regenerates testthat snapshots, commits, and pushes.
+  Supports `workflow_dispatch`, `/update-snapshots` PR comment (`pr-mode: true`), and
+  auto-update before R-CMD-check (`ref: github.head_ref`). Pass system deps via
+  `apt-packages`. Added in gha#103; bcs#226 is the reference caller.
+
+## GitHub Actions workflow authoring gotchas
+
+- **Local composite refs (`./`) in reusable workflows resolve relative to the HOST repo.**
+  A `workflow_call` reusable workflow living in gha cannot call `./path/to/composite` from
+  a CALLER's repo — `./` always resolves to gha itself. Workaround: pass the data the
+  composite would have consumed as a plain input (e.g. an `apt-packages` string). Learned
+  while extracting `update-snapshots` (gha#103): bcs's `install-system-deps` composite
+  couldn't be called; the package list was passed as a string input instead.
+- **`secrets: inherit` is NOT needed when the reusable workflow only uses `github.token`.**
+  `github.token` auto-injects the caller's token via `permissions:` — not via `secrets:`.
+  `secrets: inherit` is only needed for named secrets (`secrets.MY_PAT`, etc.). Automated
+  reviewers (claude-bot, Copilot) routinely flag this as a false positive — rebut it by
+  confirming the callee has no `secrets:` inputs.
+- **Detached HEAD on `pull_request` events.** `actions/checkout` without an explicit `ref`
+  on a PR event checks out a synthetic merge commit in detached HEAD — `git push` then
+  fails. Fix: pass `ref: ${{ github.head_ref }}` so the branch name is checked out, not the
+  merge commit SHA. Required for any reusable workflow that needs to `git push` from a PR
+  caller.
+- **`always()` + optional upstream job needs an explicit result guard.** The pattern
+  `if: ${{ always() && !cancelled() && needs.X.result == 'success' }}` keeps the job
+  running when X is *skipped* (non-PR events), but also lets it run when X *fails* —
+  causing noise from a job that depended on work that didn't land. Full guard:
+  `(needs.X.result == 'success' || needs.X.result == 'skipped')`. (Fixed in bcs#226.)
+- **Canonical GitHub privacy-safe noreply email is `<numeric-id>+<username>@users.noreply.github.com`.**
+  The bare `<username>@users.noreply.github.com` is not privacy-safe and can match a real inbox.
+  For `issue_comment` events, the actor's numeric ID is in `github.event.comment.user.id`:
+  `committer-email: ${{ github.event.comment.user.id }}+${{ github.actor }}@users.noreply.github.com`.
+- **bcs `version-check` CI has no label bypass.** Unlike the changelog check (which checks
+  for a "no changelog" label), `version-check` does a pure version comparison and always
+  fails if the PR branch version ≤ main's version. For CI-only PRs (no R code changes),
+  bump `DESCRIPTION` version to unblock it.

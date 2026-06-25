@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -95,6 +96,51 @@ def check_skills() -> None:
     print(f"  checked {count} skills")
 
 
+def check_codex_wrappers() -> None:
+    wrappers_dir = ROOT / "codex-skills"
+    if not wrappers_dir.is_dir():
+        warnings.append("no codex-skills/ directory")
+        return
+
+    count = 0
+    for child in sorted(wrappers_dir.iterdir()):
+        if not child.is_dir() or child.name.startswith("."):
+            continue
+        count += 1
+        skill_md = child / "SKILL.md"
+        rel = skill_md.relative_to(ROOT)
+        if not skill_md.is_file():
+            errors.append(f"{child.relative_to(ROOT)}: no SKILL.md")
+            continue
+        fm = parse_frontmatter(skill_md.read_text(encoding="utf-8"), str(rel))
+        if fm is None:
+            continue
+        extra = sorted(set(fm) - {"name", "description"})
+        if extra:
+            errors.append(f"{rel}: Codex wrapper frontmatter has extra key(s): {', '.join(extra)}")
+        name = fm.get("name")
+        if not name or not str(name).strip():
+            errors.append(f"{rel}: frontmatter `name` is missing or empty")
+        elif name != child.name:
+            errors.append(f"{rel}: `name: {name}` does not match directory `{child.name}`")
+        desc = fm.get("description")
+        if not desc or not str(desc).strip():
+            errors.append(f"{rel}: frontmatter `description` is missing or empty")
+
+    print(f"  checked {count} Codex wrappers")
+
+    sync = subprocess.run(
+        [sys.executable, str(ROOT / "scripts/sync-codex-skill-wrappers.py"), "--check"],
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    print("  " + sync.stdout.strip().replace("\n", "\n  "))
+    if sync.returncode != 0:
+        errors.append("codex-skills/ is out of sync; run scripts/sync-codex-skill-wrappers.py")
+
+
 def check_json(rel: str, required: list[str]) -> None:
     path = ROOT / rel
     if not path.is_file():
@@ -113,6 +159,8 @@ def check_json(rel: str, required: list[str]) -> None:
 def main() -> None:
     print("Validating skills…")
     check_skills()
+    print("Validating Codex wrappers…")
+    check_codex_wrappers()
     print("Validating manifests…")
     check_json(".claude-plugin/marketplace.json", ["name", "owner", "plugins"])
     check_json(".claude-plugin/plugin.json", ["name"])

@@ -4,6 +4,8 @@ title: "Skills"
 
 Skills are markdown files that teach Claude Code a reusable workflow. Each `skills/<name>/SKILL.md` file describes when to invoke the skill, what steps to follow, and which tools it may use. Claude Code discovers skills in `~/.claude/skills/` automatically.
 
+Codex uses generated wrappers in `codex-skills/<name>/SKILL.md`. Those wrappers keep Codex frontmatter strict and point back to the canonical Claude skill in `skills/`, so the workflow stays in one place.
+
 ## How to invoke a skill
 
 | Surface | Syntax |
@@ -11,6 +13,7 @@ Skills are markdown files that teach Claude Code a reusable workflow. Each `skil
 | Local CLI | `/skill-name` or a bare keyword (e.g. `ardi`) |
 | Plugin (other repos) | `/ai-config:skill-name` |
 | `@claude` bot on PRs | `@claude skill-name` in a PR comment |
+| Codex | skill trigger from `${CODEX_HOME:-$HOME/.codex}/skills` |
 
 Most skills also respond to plain-English triggers listed in their `description` field (e.g. "grab an issue", "drive to clean", "update memories and skills").
 
@@ -85,4 +88,4 @@ Most skills also respond to plain-English triggers listed in their `description`
 
 ## Full skill list
 
-All 112+ skills are in [`skills/`](https://github.com/d-morrison/ai-config/tree/main/skills) on GitHub. Each `SKILL.md` has a `description` field that lists the trigger phrases and a full procedure.
+All 112+ canonical skills are in [`skills/`](https://github.com/d-morrison/ai-config/tree/main/skills) on GitHub. Generated Codex wrappers live in [`codex-skills/`](https://github.com/d-morrison/ai-config/tree/main/codex-skills). Each canonical `SKILL.md` has a `description` field that lists the trigger phrases and a full procedure.

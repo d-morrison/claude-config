@@ -1,8 +1,8 @@
 # ai-config
 
 Portable AI agent config — skills, memories, and commands synced across
-machines via git. Works with Claude Code, VS Code Copilot, and any agent
-that reads markdown instruction files.
+machines via git. Works with Claude Code, Codex, VS Code Copilot, and any
+agent that reads markdown instruction files.
 
 Each top-level subdir is symlinked into the appropriate consumer directory
 by `bootstrap.sh`.
@@ -21,12 +21,37 @@ Rerun `bootstrap.sh` any time a new top-level dir is added to the repo.
 After bootstrapping, confirm the symlinks resolved and the skills are visible:
 
 ```sh
-ls -l ~/.claude/skills ~/.claude/commands   # should point back into this repo
-scripts/inventory.sh                         # live counts of skills/commands/docs
+ls -l ~/.claude/skills ~/.claude/commands ~/.codex/skills
+scripts/inventory.sh                         # live counts of skills/wrappers/commands/docs
 ```
 
 In a Claude Code session, type `/` and confirm the skills appear (e.g.
 `/scout-peers`, `/ardi`).
+
+### Codex wrappers
+
+The canonical workflow bodies stay in `skills/` for Claude Code. The
+generated `codex-skills/` tree contains thin Codex-compatible wrappers with
+strict `name`/`description` frontmatter. Each wrapper tells Codex to read the
+matching canonical skill from `skills/<name>/SKILL.md` and adapt Claude-only
+metadata or tools to the current Codex session.
+
+`bootstrap.sh` links those wrappers into `${CODEX_HOME:-$HOME/.codex}/skills`.
+After adding or editing a canonical skill, regenerate the wrappers:
+
+```sh
+python3 scripts/sync-codex-skill-wrappers.py
+```
+
+### Tool mappings
+
+The canonical skills name concrete tools — mostly `gh`/`git` commands. So a
+non-Claude model knows what to run, [`tool-mappings.yml`](tool-mappings.yml)
+maps each canonical operation (e.g. `VIEW_PR`, `CREATE_ISSUE`, `PUSH`) to its
+GitHub MCP equivalent, with a per-model resolution rule (Codex, Copilot, and a
+generic CLI fallback). The sync script above embeds this table into every Codex
+wrapper and renders the full reference at [`tool-mappings.md`](tool-mappings.md).
+Edit the `.yml`, then rerun the script — CI fails if either output is stale.
 
 ## Claude Code on the web
 
@@ -145,9 +170,9 @@ registration. See [`docs/local-session-deconfliction.md`](docs/local-session-dec
 Two lightweight checks keep the skill catalog well-formed:
 
 - **CI** (`.github/workflows/validate.yml`) runs `scripts/validate-skills.py`
-  (every `SKILL.md` has valid frontmatter; the manifests are valid JSON) and
-  `scripts/check-links.py` (no broken relative markdown links) on every push
-  and PR.
+  (every `SKILL.md` has valid frontmatter, `codex-skills/` is in sync, and the
+  manifests are valid JSON) and `scripts/check-links.py` (no broken relative
+  markdown links) on every push and PR.
 - **Pre-commit** (`.pre-commit-config.yaml`) adds local secret-scanning
   ([gitleaks](https://github.com/gitleaks/gitleaks)) plus the same two
   validators. Enable once with `pre-commit install`.
@@ -166,6 +191,9 @@ them.
 ## What's tracked
 
 - `skills/` — reusable workflow skills (`~/.claude/skills/`)
+- `codex-skills/` — generated Codex wrappers (`~/.codex/skills/`)
+- `tool-mappings.yml` / `tool-mappings.md` — cross-model tool registry and its
+  generated reference (see *Tool mappings* above)
 - `commands/` — slash commands (`~/.claude/commands/`)
 - `memories/` — persistent notes & preferences (symlinked into VS Code Copilot memory dir)
 - `references/` — reviewed reference material / worked examples (e.g. a cloud

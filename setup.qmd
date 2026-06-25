@@ -4,23 +4,25 @@ title: "Setup"
 
 ## Local setup
 
-**Requirements:** git, [Claude Code CLI](https://claude.ai/code).
+**Requirements:** git, [Claude Code CLI](https://claude.ai/code), and/or Codex.
 
 ```sh
 git clone https://github.com/d-morrison/ai-config.git ~/ai-config
 bash ~/ai-config/bootstrap.sh
 ```
 
-`bootstrap.sh` symlinks each top-level directory into `~/.claude/`. Run it again any time you add a new top-level dir to the repo.
+`bootstrap.sh` symlinks Claude assets into `~/.claude/` and generated Codex wrappers into `${CODEX_HOME:-$HOME/.codex}/skills`. Run it again any time you add a new top-level dir to the repo.
 
 ### Verify the install
 
 ```sh
-ls -l ~/.claude/skills ~/.claude/commands   # should point back into this repo
-scripts/inventory.sh                         # live counts of skills/commands/docs
+ls -l ~/.claude/skills ~/.claude/commands ~/.codex/skills
+scripts/inventory.sh                         # live counts of skills/wrappers/commands/docs
 ```
 
 In a Claude Code session, type `/` and confirm skills appear (e.g. `/ardi`, `/scout-peers`).
+
+In Codex, the wrappers appear as skills from `${CODEX_HOME:-$HOME/.codex}/skills`. Each wrapper reads the matching canonical workflow from `skills/<name>/SKILL.md` and adapts Claude-specific metadata/tools to Codex.
 
 ## Web (cloud) sessions — this repo
 

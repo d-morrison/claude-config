@@ -53,6 +53,19 @@ Caveat: the plugin drives much of the behavior, so prompt-strengthening only
 *partly* moves it — verify on a live PR and iterate the wording. (Added in
 qwt#93 / rme#833.)
 
+**Pitfall — duplicate `with:` block.** When a workflow file has a commented-out
+`# with:` template block *below* the active `with:` block, do **not** uncomment
+it as a second `with:` key. YAML duplicate keys cause the second to silently
+override the first, dropping `pr-number` on `workflow_dispatch` runs. Instead,
+add `prompt-addendum` as a new key *inside* the existing `with:` block:
+
+```yaml
+    with:
+      pr-number: ${{ inputs.pr_number }}
+      prompt-addendum: |
+        ...
+```
+
 ### 3. Event-gated `track_progress`
 
 ```yaml

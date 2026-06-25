@@ -21,6 +21,7 @@ FENCE = re.compile(r"```.*?```|~~~.*?~~~", re.S)
 INLINE = re.compile(r"`[^`]*`")
 SCAN_GLOBS = [
     "skills/**/*.md",
+    "codex-skills/**/*.md",
     "commands/**/*.md",
     "docs/**/*.md",
     "references/**/*.md",

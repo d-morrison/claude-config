@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Bootstrap ai-config: symlink skills, commands, top-level files, and memories
-# into their respective consumer directories (Claude Code, VS Code Copilot, etc.).
+# into their respective consumer directories (Claude Code, Codex, VS Code
+# Copilot, etc.).
 #
 # For each top-level subdir (skills/, commands/, ...):
 #   - if ~/.claude/<name> doesn't exist yet, symlink the whole dir (so new
@@ -15,6 +16,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_DIR="${CLAUDE_HOME:-$HOME/.claude}"
+CODEX_DIR="${CODEX_HOME:-$HOME/.codex}"
 
 # VS Code Copilot memory directory (macOS default; override with COPILOT_MEMORY_DIR)
 COPILOT_MEMORY_DIR="${COPILOT_MEMORY_DIR:-$HOME/Library/Application Support/Code/User/globalStorage/github.copilot-chat/memory-tool/memories}"
@@ -66,7 +68,8 @@ for src in "$SCRIPT_DIR"/*/; do
   case "$name" in
     # references/ is documentation/example material, not consumable config, so
     # it is deliberately NOT symlinked into ~/.claude.
-    .git|node_modules|references) continue ;;
+    # codex-skills/ is linked into ~/.codex/skills below, not ~/.claude.
+    .git|node_modules|references|codex-skills) continue ;;
   esac
 
   dest="$CLAUDE_DIR/$name"
@@ -86,6 +89,16 @@ for src in "$SCRIPT_DIR"/*/; do
     link_one "$src" "$dest"
   fi
 done
+
+# --- Codex skill wrappers: symlink individual generated wrappers into Codex ---
+if [ -d "$SCRIPT_DIR/codex-skills" ]; then
+  printf '\n--- Codex skill wrappers ---\n'
+  mkdir -p "$CODEX_DIR/skills"
+  for src in "$SCRIPT_DIR"/codex-skills/*; do
+    [ -d "$src" ] || continue
+    link_one "$src" "$CODEX_DIR/skills/$(basename "$src")"
+  done
+fi
 
 # --- Memories: symlink individual .md files into VS Code Copilot memory dir ---
 if [ -d "$SCRIPT_DIR/memories" ] && [ -d "$COPILOT_MEMORY_DIR" ]; then

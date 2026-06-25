@@ -1,0 +1,107 @@
+# Central cross-model tool-mapping registry.
+#
+# The canonical skills under skills/ are written for Claude Code and name
+# concrete tools (mostly `gh`/`git` commands, sometimes `mcp__github__*`).
+# This file maps each canonical operation to the tool every supported model
+# should reach for, so a wrapper can tell Codex/Copilot/etc. exactly what to
+# run instead of "adapt it yourself."
+#
+# scripts/sync-codex-skill-wrappers.py reads this file, embeds the operations
+# table into every generated Codex wrapper, and renders the full per-model
+# reference at tool-mappings.md. Edit this file, then run that script to
+# regenerate both. CI (`validate`) fails if either is out of sync.
+
+# How each model resolves an operation. Most agents converge on "use the
+# GitHub MCP tool when the session has it, otherwise the CLI command" — only
+# the default differs, so we state the rule once here rather than repeating a
+# near-identical column per model.
+models:
+  - id: claude
+    label: Claude Code
+    resolves: GitHub MCP tool in remote/web sessions; the CLI command locally.
+  - id: codex
+    label: Codex
+    resolves: GitHub MCP tool if the session has it; otherwise the CLI command.
+  - id: copilot
+    label: VS Code Copilot
+    resolves: GitHub MCP tool.
+  - id: cli
+    label: Generic shell / CLI
+    resolves: The CLI command (fallback for any agent that just runs a shell).
+
+# Each operation gives the canonical `gh`/`git` command (the CLI fallback,
+# and what the Claude skills are written in) plus the GitHub MCP tool that
+# performs the same action. `<N>` is a PR/issue number; `<branch>` a ref.
+operations:
+  - id: VIEW_PR
+    description: Read a pull request's details and metadata.
+    cli: gh pr view <N>
+    github_mcp: mcp__github__pull_request_read (method=get)
+  - id: LIST_PRS
+    description: List pull requests.
+    cli: gh pr list
+    github_mcp: mcp__github__list_pull_requests
+  - id: DIFF_PR
+    description: Read a pull request's diff.
+    cli: gh pr diff <N>
+    github_mcp: mcp__github__pull_request_read (method=get_diff)
+  - id: PR_CHECKS
+    description: Read a pull request's CI check / status results.
+    cli: gh pr checks <N>
+    github_mcp: mcp__github__pull_request_read (method=get_check_runs)
+  - id: CREATE_PR
+    description: Open a new pull request.
+    cli: gh pr create
+    github_mcp: mcp__github__create_pull_request
+  - id: EDIT_PR
+    description: Edit a pull request (reviewers, labels, base, etc.).
+    cli: gh pr edit <N>
+    github_mcp: mcp__github__update_pull_request
+  - id: MERGE_PR
+    description: Merge a pull request.
+    cli: gh pr merge <N>
+    github_mcp: mcp__github__merge_pull_request
+  - id: COMMENT_PR
+    description: Post a top-level comment on a pull request.
+    cli: gh pr comment <N> --body "..."
+    github_mcp: mcp__github__add_issue_comment
+  - id: REPLY_REVIEW_COMMENT
+    description: Reply to an inline pull-request review comment.
+    cli: gh api (reply to review comment)
+    github_mcp: mcp__github__add_reply_to_pull_request_comment
+  - id: WATCH_PR
+    description: Subscribe to / unsubscribe from a pull request's activity.
+    cli: (no CLI equivalent)
+    github_mcp: mcp__github__subscribe_pr_activity / mcp__github__unsubscribe_pr_activity
+  - id: VIEW_ISSUE
+    description: Read an issue's details.
+    cli: gh issue view <N>
+    github_mcp: mcp__github__issue_read
+  - id: LIST_ISSUES
+    description: List issues.
+    cli: gh issue list
+    github_mcp: mcp__github__list_issues
+  - id: CREATE_ISSUE
+    description: Open a new issue.
+    cli: gh issue create
+    github_mcp: mcp__github__issue_write (method=create)
+  - id: COMMENT_ISSUE
+    description: Post a comment on an issue.
+    cli: gh issue comment <N> --body "..."
+    github_mcp: mcp__github__add_issue_comment
+  - id: PUSH
+    description: Push commits to a branch.
+    cli: git push -u origin <branch>
+    github_mcp: (use git; no GitHub MCP equivalent)
+  - id: COMMIT
+    description: Record staged changes as a commit.
+    cli: git commit -m "..."
+    github_mcp: (use git; mcp__github__create_or_update_file commits a single file)
+  - id: FETCH
+    description: Fetch refs from the remote.
+    cli: git fetch origin <branch>
+    github_mcp: (use git; no GitHub MCP equivalent)
+  - id: MERGE_BRANCH
+    description: Merge a branch into the current one.
+    cli: git merge origin/<branch>
+    github_mcp: (use git; no GitHub MCP equivalent)
