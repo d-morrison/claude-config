@@ -316,15 +316,17 @@
   check would match any file with a similar path structure. Use `-qxF` whenever
   comparing file paths literally. The `selfmod` step in `claude-code-review.yml` uses
   `grep -qxF` for this reason.
-- **Spurious `is_error=true, subtype=success` review failure (intermittent upstream
-  bug).** The `claude-code-action` occasionally completes a review in a single turn and
-  exits with `is_error=true` + `subtype=success`. The "Fail the check" step in
-  `claude-code-review.yml` catches this and marks the `review / claude-review` job ❌.
-  The review comment may be missing or show only a placeholder ("I'll analyze this and
-  get back to you"). The session ran ~192 s; the prior clean review on the same diff
-  is still valid. Fix: push a trivial commit to trigger a fresh review. Not caused by
-  repo code — the upstream action exits with the wrong code. Observed on gha#92 run
-  #28034977099.
+- **`is_error=true, subtype=success` in review execution output — two distinct causes:**
+  - **Quota/auth exhaustion** (`total_cost_usd=0`, `num_turns=1`, `duration_ms` < 2000):
+    the API rejected the request before Claude did any work. Fixed in gha#102 (`@v1`):
+    the guard step now exits 0 and posts a `[!WARNING]` PR comment instead of failing the
+    check. Fix: wait for quota reset (or auth fix), then re-trigger. No need to push a
+    commit — the check will pass once quota is back.
+  - **Intermittent upstream bug** (`total_cost_usd > 0`, `duration_ms` ~192 s): the
+    `claude-code-action` completes a real review but exits with `is_error=true` anyway.
+    The guard step fails the check ❌. The prior clean review on the same diff is still
+    valid. Fix: push a trivial commit to trigger a fresh review. Observed on gha#92 run
+    #28034977099.
 - **Write accurate `workflow_dispatch` comments when adapting the upstream
   `claude-code-review.yml` template.** The upstream template says "workflow_dispatch is
   fired by claude.yml" — but that's only true when the repo's `claude.yml` actually
@@ -458,3 +460,7 @@ common patterns.
   "Fail the workflow run …" not "Fail the action …". When copying an input description
   from `action.yml` into the wrapping `workflow_call` file, update "action" → "workflow
   run". (Fixed in gha#92: `fail-if-empty` description in `check-links.yml`.)
+- **`mcp__github__get_job_logs` usage.** Two calling modes — use the right one:
+  - Single job: pass `job_id` (number) only. Do NOT pass `run_id` alongside.
+  - All failed jobs in a run: pass `run_id` (number) + `failed_only: true` + `return_content: true`. Do NOT pass `job_id`.
+  The tool's error message ("job_id is required when failed_only is false") is misleading when you pass `failed_only: true` with `run_id`; the issue is actually conflicting parameters.

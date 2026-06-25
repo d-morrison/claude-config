@@ -43,6 +43,12 @@
   README, a config file), the task is not done at "made the local edit." Go all the way:
   file an issue, commit on a branch, and open a PR — without waiting to be asked. Stopping at
   a local edit leaves the change uncommitted and invisible to reviewers.
+- `dem-extra1/ai-config` is a FORK of the upstream `d-morrison/ai-config`. When working in
+  that fork, open PRs against the upstream original (`d-morrison/ai-config`, base `main`) as
+  a cross-fork PR with head `dem-extra1:<branch>` — NOT against the fork's own `main`. (If a
+  remote/web session is scoped only to `dem-extra1/ai-config` with no `add_repo` tool, the
+  cross-fork PR can't be created from that session; push the branch and surface that the
+  upstream PR must be opened where `d-morrison/ai-config` is in scope.)
 - Always include `Closes #N` in MR/PR descriptions to auto-close the linked issue on merge.
 - On GitLab, assign MRs to `demorrison`.
 - Run local validation before pushing R-pkg work: lintr::lint_package(), devtools::document(),
