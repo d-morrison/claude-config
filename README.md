@@ -43,6 +43,16 @@ After adding or editing a canonical skill, regenerate the wrappers:
 python3 scripts/sync-codex-skill-wrappers.py
 ```
 
+### Tool mappings
+
+The canonical skills name concrete tools — mostly `gh`/`git` commands. So a
+non-Claude model knows what to run, [`tool-mappings.yml`](tool-mappings.yml)
+maps each canonical operation (e.g. `VIEW_PR`, `CREATE_ISSUE`, `PUSH`) to its
+GitHub MCP equivalent, with a per-model resolution rule (Codex, Copilot, and a
+generic CLI fallback). The sync script above embeds this table into every Codex
+wrapper and renders the full reference at [`tool-mappings.md`](tool-mappings.md).
+Edit the `.yml`, then rerun the script — CI fails if either output is stale.
+
 ## Claude Code on the web
 
 In cloud (web) sessions you can't run `bootstrap.sh` by hand, and the
@@ -182,6 +192,8 @@ them.
 
 - `skills/` — reusable workflow skills (`~/.claude/skills/`)
 - `codex-skills/` — generated Codex wrappers (`~/.codex/skills/`)
+- `tool-mappings.yml` / `tool-mappings.md` — cross-model tool registry and its
+  generated reference (see *Tool mappings* above)
 - `commands/` — slash commands (`~/.claude/commands/`)
 - `memories/` — persistent notes & preferences (symlinked into VS Code Copilot memory dir)
 - `references/` — reviewed reference material / worked examples (e.g. a cloud
