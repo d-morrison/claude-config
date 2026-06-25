@@ -350,11 +350,31 @@
     icon rather than a misleading green checkmark. Consumers should add `require-review` (e.g.
     `review / require-review`) to their branch protection required-checks.
     Fix: wait for quota reset (or auth fix), then re-trigger. No need to push a commit.
+    ⚠️ **Verify the consumed guard actually warns — don't assume the fix is live.**
+    Observed 2026-06 on sparta#207 (consuming `d-morrison/gha@v1`) AND in `dem-extra1/gha`'s
+    own `claude-code-review.yml`: the guard still `exit 1`d on `is_error=true` (RED check, no
+    `[!WARNING]` comment) — gha#102's exit-0 behavior was not yet on the consumed `@v1` pin
+    there. Read the actual guard code on the pin you consume rather than trusting this note.
+    Note OAuth/subscription auth (`CLAUDE_CODE_OAUTH_TOKEN`) shows `total_cost_usd=0`
+    regardless, because it isn't metered per-call — so cost=0 + 1 turn + immediate `is_error`
+    points to a **subscription usage-limit**, not only API credits; confirm via the Anthropic
+    Console usage for that account.
   - **Intermittent upstream bug** (`total_cost_usd > 0`, `duration_ms` ~192 s): the
     `claude-code-action` completes a real review but exits with `is_error=true` anyway.
     The guard step fails the check ❌. The prior clean review on the same diff is still
     valid. Fix: push a trivial commit to trigger a fresh review. Observed on gha#92 run
     #28034977099.
+- **Reading the hidden error behind a failed `claude-code-review`.** The action prints
+  `Running Claude Code via SDK (full output hidden for security)…` and suppresses the real
+  API error. The reusable `claude-code-review.yml` now accepts a **`show-full-output`** input
+  (default false; added in dem-extra1/gha#1) that passes through to the action's
+  `show_full_output` — flip it to print the raw error in the job log. The live consumer pin
+  `d-morrison/gha@v1` may not carry it yet, so check the tag. You CANNOT side-channel the
+  error from a throwaway workflow on a feature branch: `claude-code-action` rejects `push`
+  events (`Unsupported event type: push`) and refuses to run unless the workflow file is
+  byte-identical to the default-branch copy (`Workflow validation failed … must … match the
+  default branch`) — both are deliberate guards, so a diagnostic workflow only works once
+  it's on `main`.
 - **Write accurate `workflow_dispatch` comments when adapting the upstream
   `claude-code-review.yml` template.** The upstream template says "workflow_dispatch is
   fired by claude.yml" — but that's only true when the repo's `claude.yml` actually

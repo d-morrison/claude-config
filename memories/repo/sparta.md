@@ -34,3 +34,20 @@ targeting `main`). That code was never in `feat/terrain-speed`'s ancestry, so th
 reviewer correctly flagged it as a "hallucinated feature." Before documenting a feature,
 `grep` for its symbol/constant (e.g. `order_response_delay`) on the current branch; if
 it's absent, move the docs to the branch where the code lives.
+
+## Demo scenario design — team 0 is stationary by default
+
+Only team 1 (enemy AI, `_run_enemy_ai()`) auto-advances. Team 0 (player units) stays
+**stationary** until given an explicit order, so any hand-authored
+`demos/scenarios/*.json` replay that needs team 0 engaged must issue a move (or attack)
+order early — at tick 0 or close to it. This bit the line-relief scenario (PR #200): the
+relief order fired before any engagement because the player unit never advanced.
+
+After writing a scenario, work out the engagement timing on paper before relying on the
+CI clip to confirm it — a mistimed scenario wastes a CI run and may silently record an
+unrelated moment.
+
+The reference tables a scenario author needs — spawn positions and UIDs, effective unit
+speeds, and the order `target`-field semantics — live with the code in sparta's
+`demos/README.md` and `REPLAY.md`, not here. A memory copy of constants like
+`SPEED_SCALE` and the spawn layout would rot silently when the game changes them.

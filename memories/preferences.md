@@ -135,6 +135,15 @@
   if conceptually related; documenting it reads as a hallucinated feature and a reviewer will
   flag it. Move those docs to the branch where the code lives. (A specific case of "NEVER
   assume; ALWAYS verify" above.)
+- Reference material derived from a repo's own code constants — tables of values, spawn
+  layouts, file-format/API semantics — belongs in THAT repo's docs next to the code, not in
+  central `ai-config` memory. A memory copy rots silently when the constants change (nobody
+  editing the game/library code thinks to update a memory in another repo) and isn't
+  discoverable by human contributors. Keep the durable *lesson/gotcha* in memory and point
+  at the in-repo docs for the tables. (Learned splitting a sparta scenario cheat-sheet: the
+  lesson "team 0 is stationary by default" stayed in `memories/repo/sparta.md`; the
+  speed/UID/order-target tables moved to sparta's `demos/README.md` + `REPLAY.md` —
+  ai-config#1 / lacaedemon/sparta#207.)
 - Avoid nested function calls and nested function definitions where feasible — prefer
   named intermediate variables (or a pipe, e.g. `|>` / `%>%` in R) over `f(g(h(x)))`, and
   prefer top-level function definitions over functions defined inside other functions.
