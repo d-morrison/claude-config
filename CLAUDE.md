@@ -236,3 +236,12 @@ run.
 
 <!-- Vendored from UCD-SERG/lab-manual; edit there, not here. See README, "Shared content". -->
 @shared/vendored/copilot-review-before-human.md
+
+## Encoding reusable feedback into ai-config
+
+When the user gives feedback, corrections, or guidance that applies beyond the
+current session (a standing rule, style preference, workflow change, or
+behavioral note), decide on your own how to encode it --- don't ask. Choose the
+right form (memory bullet in CLAUDE.md, update to a shared fragment in
+`shared/`, new or revised skill, etc.) and commit the change. Only surface the
+choice if it's ambiguous or touches something architecturally significant.
