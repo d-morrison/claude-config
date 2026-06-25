@@ -541,6 +541,32 @@ common patterns.
   CI-only / workflow-only PR (no user-visible R-package change), apply **both** labels
   rather than bumping `DESCRIPTION` and editing `NEWS.md`. (Verified on ucdavis/bcs#236 —
   corrects an earlier note that claimed `version-check` had no bypass.)
+- **bcs `docs` build (altdoc) EXECUTES the rendered man-page examples.** altdoc
+  renders each `man/*.Rd` to a `man/*.qmd` and runs the example chunk, so
+  `@examplesIf FALSE` does NOT protect an example — the code still runs and a
+  data-dependent call fails the `docs` job (`object 'pt_a' not found`). For any
+  example that needs the protected/real cohort, use `\dontrun{}` (altdoc renders
+  it without evaluating), matching the existing convention (e.g.
+  `R/calc_ip_weights.R`). Runnable examples with self-contained synthetic data
+  are fine and do execute. (Hit on ucdavis/bcs#238.)
+- **bcs `test-coverage` (codecov) is NOT a required check.** A coverage drop
+  leaves the PR `mergeable_state: unstable` (not `blocked`) and does not block
+  the merge — `docs`, `version-check`, the R-CMD-check matrix, lint, and
+  spellcheck are the required ones. So a PR that adds integration code only
+  exercisable against protected data (which inherently lowers coverage) can
+  still merge once the required checks are green. (Verified merging #238.)
+- **During a long review, re-bump `DESCRIPTION` after every `main` merge.**
+  `version-check` compares the PR version to *current* main; if main advances
+  (another PR bumps `0.0.0.905x`) and you merge main in, the PR's version is no
+  longer strictly greater and version-check flips to failing even though it
+  passed before. Bump again (e.g. `9057` -> `9058`). (Hit on #238 after main
+  moved to 9057.)
+- **bcs object-name lint (`.lintr.R` custom `snake_case_ACROs1` rex regex)**
+  rejected study/protocol codes like `ab507bs` (a lowercase segment with letters
+  *after* digits) until the lowercase branch was widened to
+  `some_of(lower), zero_or_more(one_of(lower, digit))`. As of #238 such
+  alphanumeric codes are valid name components; before that they failed
+  `lint-changed-files` with `object_name_linter`.
 
 ## Office Open XML (.docx / .xlsx) — editing committed content
 - `.docx`/`.xlsx` are zip archives. To strip or edit content (e.g. remove a sensitive
