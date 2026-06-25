@@ -20,3 +20,14 @@ button and preserves the PR history.
 If the merge has conflicts, resolve them, run the project's standard pre-commit
 checks (render / lint / spell / tests), commit, then push. Don't push a
 half-resolved merge.
+
+**A conflict-free merge does not mean derived artifacts are in sync.** If your
+branch regenerates a generated tree (e.g. `codex-skills/`, a lockfile, rendered
+docs) and `main` added a new *source* input the generator consumes (a new
+skill, a new dependency), git merges both cleanly --- but the generator never
+ran against the new input on your branch, so its output is missing or stale and
+the sync check fails on `main` after both land. After merging `main`, re-run the
+generator and commit the result whenever main touched the generator's inputs ---
+don't trust the absence of conflicts. (Concretely: merge the PR that adds the
+new skill *first*, then sync the wrapper-regenerating branch and rerun
+`scripts/sync-codex-skill-wrappers.py` before merging it.)
