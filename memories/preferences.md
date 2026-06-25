@@ -274,6 +274,7 @@
   (reconcile with origin) — use all three together on shared PR work. Registry lives under
   `.git/ai-sessions/` (never committed). Script: `~/.claude/skills/session-lock/scripts/ai-session.sh`.
 
+- When writing a description or comment that will reference a follow-up tracking issue, create the issue first, then use the specific issue URL (e.g. `#229`). Never use the generic issues list URL as a placeholder — a reviewer will catch it and the fix costs an extra ARDI round. (Learned on ucdavis/bcs#226.)
 - "dew it" means "do it".
 - After implementing a feature or fix, ALWAYS commit and push immediately — don't wait
   for the user to ask "why haven't you pushed?" The implementation isn't done until the
