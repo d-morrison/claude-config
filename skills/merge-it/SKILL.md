@@ -39,6 +39,11 @@ standing yes (see `preferences.md`).
   Verify with a fresh query, not a cached verdict:
   `mcp__github__pull_request_read` (`get` for `mergeable_state`, `get_check_runs`
   for CI) — or `gh pr view <N>` / `gh pr checks <N>` in a local session.
+- Check `mergeStateStatus` in addition to `mergeable`. A PR can be
+  `"MERGEABLE"` but `"BLOCKED"` when branch protection requires at least one
+  approving review and only bot/comment reviews exist. Fix: request
+  `d-morrison` as reviewer (`gh pr edit <N> --add-reviewer d-morrison`) and
+  leave a note that the PR is clean and ready. Don't attempt to force-merge.
 - If CI is red or the review still has open findings, **do not merge** — report
   what's blocking instead. (Only merge a not-clean PR if the user explicitly
   says to anyway.)
