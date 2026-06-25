@@ -93,6 +93,12 @@
   Do all of this automatically — including opening the follow-up branch and PR that records the
   lessons — without asking permission first; opening that follow-up PR is a standing yes.
 - Keep it simple. Don't over-explain or ask permission for straightforward fixes — just do them.
+- Don't re-ask a decision that's already settled and built. Once an answer is given and the
+  work is implemented to match it (and CI-green), don't reopen it with a fresh AskUserQuestion —
+  that invites a contradictory answer you then have to reconcile, and discounts work already
+  done. If you think the scope should change, say so explicitly with a recommendation instead
+  of silently re-asking. (Learned on gha#110: re-asked content structure + deploy after the
+  PR was built and green; the user had to reconcile the conflict with "keep what's built.")
 - When finishing work on an MR/PR (clean review, ready to merge, etc.), always provide a
   clickable link to the MR/PR in the chat message.
 - When discovering bugs in upstream/shared infrastructure (e.g., HACtions templates), always
