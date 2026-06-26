@@ -180,7 +180,7 @@
   `git add -A` swept the user's `scout-peers` skill into an unrelated `/prune` PR, adding
   several extra review rounds.)
 - Run a local session in an isolated `git worktree` by DEFAULT, not directly in the shared
-  working copy — only use the working directory when the user explicitly says to. This default
+  working copy — only use the working copy when the user explicitly says to. This default
   holds for EVERY local session, not just substantial multi-file work or when the user flags
   the wd as "in use" / "do this in a separate repo". The ai-config
   working copy is often in use by CONCURRENT Claude sessions; untracked or uncommitted files
