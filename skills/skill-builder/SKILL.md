@@ -176,19 +176,23 @@ git fetch origin main && git checkout -b add-<name>-skill origin/main
 # write skills/<name>/SKILL.md (+ alias dir, + preferences/CLAUDE.md if it's a rule)
 python3 scripts/sync-codex-skill-wrappers.py   # regenerate codex-skills/ wrappers — REQUIRED for every new/renamed skill
 python3 scripts/validate-skills.py             # frontmatter + wrapper-sync + manifest checks; mirrors the `validate` CI job
-git add skills/<name>/SKILL.md codex-skills/<name> memories/preferences.md   # stage the
-                                                            # files you touched (incl.
-                                                            # the generated wrapper) —
-                                                            # NOT `-A`, which sweeps in
-                                                            # unrelated edits
+git add skills/<name>/SKILL.md codex-skills/<name> \
+        skills/<alias>/SKILL.md codex-skills/<alias> \
+        memories/preferences.md                             # stage the files you
+                                                            # touched (incl. the
+                                                            # generated wrappers, and
+                                                            # the alias dir if you made
+                                                            # one) — NOT `-A`, which
+                                                            # sweeps in unrelated edits
 git commit -m "skills: add <name> — <summary>"
 git push -u origin HEAD && gh pr create --fill
 ```
 
 **Regenerate the Codex wrappers — every new or renamed skill needs them.**
 `codex-skills/` is a generated tree of thin Codex-compatible wrappers, one per
-`skills/<name>/`, and the `validate` CI job fails if it's out of sync ("Codex
-skill wrappers are in sync"). After writing the skill (and any alias dir), run
+`skills/<name>/`, and the `validate` CI job fails if it's out of sync (the red
+log reads `Codex skill wrappers are out of sync:`). After writing the skill (and
+any alias dir), run
 `python3 scripts/sync-codex-skill-wrappers.py`, then `git add` the new
 `codex-skills/<name>/` (and `codex-skills/<alias>/`) alongside the source.
 `scripts/validate-skills.py` reproduces the CI checks locally — run it before
