@@ -141,8 +141,8 @@
   editing the game/library code thinks to update a memory in another repo) and isn't
   discoverable by human contributors. Keep the durable *lesson/gotcha* in memory and point
   at the in-repo docs for the tables. (Learned splitting a sparta scenario cheat-sheet: the
-  lesson "team 0 is stationary by default" stayed in `memories/repo/sparta.md`; the
-  speed/UID/order-target tables moved to sparta's `demos/README.md` + `REPLAY.md` —
+  lesson "team 0 is stationary by default" now lives in sparta's `CLAUDE.md`; the
+  speed/UID/order-target tables live in sparta's `demos/README.md` + `REPLAY.md` —
   ai-config#1 / lacaedemon/sparta#207.)
 - Avoid nested function calls and nested function definitions where feasible — prefer
   named intermediate variables (or a pipe, e.g. `|>` / `%>%` in R) over `f(g(h(x)))`, and

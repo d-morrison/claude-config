@@ -446,7 +446,7 @@
 
 ## ai-config memory file structure
 - Memory files (`memories/*.md`) **may** carry YAML frontmatter (`name`,
-  `description`, `metadata`) — e.g. `memories/repo/sparta.md` — while older ones
+  `description`, `metadata`) — while older ones
   start directly with a `#` heading. Don't assume either form: `grep -rn "^name:"
   memories/` finds the frontmatter'd files, and a file without it is still valid.
   Preserve whatever frontmatter a file already has rather than stripping it.
