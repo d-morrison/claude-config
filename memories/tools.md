@@ -609,6 +609,16 @@ common patterns.
   the union (write). Cost me two red CI rounds on gha#118. To debug a `startup_failure`
   with `total_jobs: 0`: it's a graph/permission/parse error, not a runtime one — check
   the called workflow's permission ceilings first.
+- **An OMITTED key in a caller's explicit `permissions:` block defaults to `none`, not
+  "inherit" — so the caller must enumerate EVERY permission the callee's jobs request.**
+  Same `startup_failure` failure mode as above, but the trap is silence: gha's
+  `claude-code-review.yml@v1` job requests `actions: read` (for the `github_ci` MCP
+  server), and ai-config's caller granted `contents`/`pull-requests`/`issues`/`id-token`
+  but never listed `actions` — which then defaulted to `none`, so every review run died
+  at `startup_failure` (`The nested job is requesting actions: read, but is only allowed
+  actions: none`) and no review ever posted. When wiring a caller stub for a gha reusable
+  workflow, copy the `permissions:` block from the matching `examples/<name>.yml` verbatim
+  rather than hand-picking keys, and re-diff against it when the stub drifts. (ai-config#224.)
 - **Detached HEAD on `pull_request` events.** `actions/checkout` without an explicit `ref`
   on a PR event checks out a synthetic merge commit in detached HEAD — `git push` then
   fails. Fix: pass `ref: ${{ github.head_ref }}` so the branch name is checked out, not the
