@@ -164,8 +164,10 @@ hand. They passed — but CI's `R CMD check` failed with
   roxygen2, lintr, and spelling install the same way — so `roxygenise()` (diff
   check), `lint_package()`, and `spell_check_package()` are all runnable locally
   even when `renv::restore()` can't reach the full dependency set.
-  **But `test_dir()` (and `devtools::test()`) PRUNE orphaned `_snaps/` files** —
-  see the snapr section below before running it with `git add -A` in scope.
+  **Caution: a full `test_dir()` / `devtools::test()` pass can PRUNE `_snaps/`
+  files whose snapshot test was skipped or went unrun this pass** (e.g. snapr
+  tests skipped because `NOT_CRAN` is unset) — see the snapr section below before
+  running it with `git add -A` in scope.
 
 ## R test/lint gotchas that only surface in CI
 Also from ettbc#13/#14:
@@ -190,10 +192,12 @@ Also from ettbc#13/#14:
 
 ## R snapshot tests (snapr / testthat) — regenerating without collateral damage
 Hit across ucdavis/bcs#264 (the snapr-based `expect_snapshot_data` suite):
-- **`testthat::test_dir()` / `devtools::test()` DELETE orphaned `_snaps/` files**
-  for any snapshot whose test didn't run this pass. Run them over a partial set,
-  then `git add -A`, and you silently stage the deletion of every other
-  function's snapshot (23 files gone on #264). Regenerate **per file** with
+- **When a snapshot's test is skipped or doesn't run in a given pass, a full
+  `testthat::test_dir()` / `devtools::test()` run PRUNES its now-orphaned
+  `_snaps/` file** (not every routine run — the trigger is the snapshot going
+  unproduced this pass). On #264 the snapr tests were skipped (`NOT_CRAN` unset,
+  see below), so a `test_dir()` pass treated their snapshots as orphaned and
+  deleted 23 of them; `git add -A` then silently staged every deletion. Regenerate **per file** with
   `testthat::test_file("tests/testthat/test-<fn>.R")`, stage only the snapshots
   you meant to touch (`git add tests/testthat/_snaps/<fn>.md`), and if the suite
   did prune others, restore them: `git checkout origin/main -- tests/testthat/_snaps`.

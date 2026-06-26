@@ -31,6 +31,9 @@ mechanics — `NOT_CRAN=true` to un-skip snapr, per-file regen to avoid pruning
   plus a `cli::cli_warn("risk ratio is undefined")` from a zero-risk group.
   `suppress_small_sample_warnings()` (in `R/`) muffles all three in the source
   path; the test helper `without_separation_warning()` muffles the same set.
+  (The helper's name predates the broadening — despite "separation" it now
+  covers all three patterns, not just GLM separation. Defined in
+  `tests/testthat/helper-muffle_separation_warning.R`.)
   Add new patterns to BOTH if a fit starts emitting something else.
 - Committed `inst/extdata/*-validation*.rds` are a **reduced-scale** refresh
   (smaller N, fewer reps) with the **MSM bootstrap off** (`msm_n_boot = 0`), so
@@ -41,7 +44,7 @@ mechanics — `NOT_CRAN=true` to un-skip snapr, per-file regen to avoid pruning
 
 ## Repo conventions worth remembering
 
-- `cli::cli_abort()` / `cli_warn()` / `cli_inform()` — never `stop()` /
+- `cli::cli_abort()` / `cli::cli_warn()` / `cli::cli_inform()` — never `stop()` /
   `warning()` / `message()`. Native `|>` pipe, not `%>%`. `::` everywhere in
   `R/` (no `library()`). One top-level function per file, filename = function.
 - No issue numbers in source code — reference issues only in `NEWS.md` / the PR.
