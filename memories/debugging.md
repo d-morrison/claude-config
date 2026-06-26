@@ -197,7 +197,11 @@ Hit across ucdavis/bcs#264 (the snapr-based `expect_snapshot_data` suite):
   `_snaps/` file** (not every routine run — the trigger is the snapshot going
   unproduced this pass). On #264 the snapr tests were skipped (`NOT_CRAN` unset,
   see below), so a `test_dir()` pass treated their snapshots as orphaned and
-  deleted 23 of them; `git add -A` then silently staged every deletion. Regenerate **per file** with
+  deleted 23 of them; `git add -A` then silently staged every deletion. (Stock
+  testthat 3.x gates orphan *deletion* on snapshot-update mode — a normal run
+  only warns — so the #264 prune was likely either an implicit update pass or
+  snapr's own `expect_snapshot_data` pruning path; I didn't pin down which. The
+  defense below holds either way.) Regenerate **per file** with
   `testthat::test_file("tests/testthat/test-<fn>.R")`, stage only the snapshots
   you meant to touch (`git add tests/testthat/_snaps/<fn>.md`), and if the suite
   did prune others, restore them: `git checkout origin/main -- tests/testthat/_snaps`.
