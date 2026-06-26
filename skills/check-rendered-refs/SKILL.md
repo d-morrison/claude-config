@@ -74,6 +74,11 @@ Grep the rendered files. `?@` is the primary signal; `-F` keeps `?` literal:
 # Primary: unresolved cross-references (and Quarto's unresolved-citation marker)
 grep -rnoF --include='*.html' '?@' <output-dir>
 
+# Secondary heuristic: missing citation key rendered bold with a trailing ?
+# (the **key?** marker becomes <strong>key?</strong> in HTML, so the greps
+# above miss it)
+grep -rnoE --include='*.html' '<strong>[A-Za-z0-9_:.#-]+\?</strong>' <output-dir>
+
 # Secondary heuristic: raw citation syntax left in the body
 grep -rnoE --include='*.html' '\[@[A-Za-z0-9_:.#-]+' <output-dir>
 ```
