@@ -5,6 +5,7 @@
 - Always disable it: pipe `| cat` or set `GH_PAGER=cat` (e.g. `gh pr view 116 | cat`).
 - **Rate limit is shared (5000/hr) and split GraphQL vs REST.** All tools/sessions/agents share the one user's 5000/hr; **GraphQL has its own, smaller pool that exhausts first** — `gh pr checks`, `gh pr view --json comments`, `gh pr list --json` use GraphQL. When GraphQL is spent, get the same data via REST (still has budget): `gh api repos/<o>/<r>/pulls/<n>`, `.../commits/<sha>/check-runs`, `.../issues/<n>/comments`. `gh api rate_limit --jq .resources` is **free** (doesn't count) — check `core` vs `graphql` remaining/reset before retrying. Don't tight-poll; use a background watcher with `sleep` (parallel sessions drain the shared pool fast).
 - **The @claude review bot's author name differs by API:** its comment author is `claude[bot]` in REST (`.user.login`) but `claude` in GraphQL (`.author.login`). A watcher filtering REST comments for `.user.login == "claude"` silently finds nothing — use `"claude[bot]"`.
+- **Linking a sub-issue (issue-first child issues) needs an integer DB id, not the number.** `POST /repos/<o>/<r>/issues/<parent>/sub_issues` takes `sub_issue_id` = the child's **database id** (`gh api repos/<o>/<r>/issues/<child> --jq .id`), *not* its issue number. Pass it with `-F` (typed, integer), never `-f` (string) — `-f sub_issue_id=…` fails with `422 Invalid property /sub_issue_id: "…" is not of type integer`. Full call: `gh api repos/<o>/<r>/issues/<parent>/sub_issues -F sub_issue_id=<child_db_id>`. Verify with `gh api .../issues/<parent>/sub_issues --jq '.[] | "#\(.number) \(.title)"'`.
 
 ## Re-triggering the @claude PR *review* (d-morrison Quarto / R-pkg repos, e.g. `psw`)
 - Filenames below are those in the **content/package repos** (verified in
@@ -148,6 +149,18 @@
   `git fetch origin main <branch>` (both refs) **before** `git worktree add` so
   the squash commit is present when you merge. Fetching only the PR branch leaves
   origin/main stale and the merge won't pick up the commit that caused the conflict.
+
+## Git — removing a worktree that contains a submodule
+- `git worktree remove <path>` **fails** on a worktree that has an initialized
+  submodule: `fatal: working trees containing submodules cannot be moved or
+  removed`. Many repos with a vendored `.ai-config` submodule hit this after a
+  feature branch merges.
+- Fix: `git worktree remove --force <path>` removes it cleanly. (Plain `--force`
+  is enough; the submodule warning is the only blocker.) If the dir somehow
+  lingers, `rm -rf <path> && git worktree prune` finishes the cleanup.
+- The branch can't be deleted while the worktree still references it
+  (`error: cannot delete branch '…' used by worktree at '…'`), so remove the
+  worktree **first**, then `git branch -D <branch>`.
 
 ## Git — `merge --continue` takes no arguments
 - `git merge --continue --no-edit` fails with `fatal: --continue expects no arguments`.
