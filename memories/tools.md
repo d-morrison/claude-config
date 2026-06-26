@@ -620,6 +620,16 @@ common patterns.
   the union (write). Cost me two red CI rounds on gha#118. To debug a `startup_failure`
   with `total_jobs: 0`: it's a graph/permission/parse error, not a runtime one — check
   the called workflow's permission ceilings first.
+- **An OMITTED key in a caller's explicit `permissions:` block defaults to `none`, not
+  "inherit" — so the caller must enumerate EVERY permission the callee's jobs request.**
+  Same `startup_failure` failure mode as above, but the trap is silence: gha's
+  `claude-code-review.yml@v1` job requests `actions: read` (for the `github_ci` MCP
+  server), and ai-config's caller granted `contents`/`pull-requests`/`issues`/`id-token`
+  but never listed `actions` — which then defaulted to `none`, so every review run died
+  at `startup_failure` (`The nested job is requesting actions: read, but is only allowed
+  actions: none`) and no review ever posted. When wiring a caller stub for a gha reusable
+  workflow, copy the `permissions:` block from the matching `examples/<name>.yml` verbatim
+  rather than hand-picking keys, and re-diff against it when the stub drifts. (ai-config#224.)
 - **Detached HEAD on `pull_request` events.** `actions/checkout` without an explicit `ref`
   on a PR event checks out a synthetic merge commit in detached HEAD — `git push` then
   fails. Fix: pass `ref: ${{ github.head_ref }}` so the branch name is checked out, not the
@@ -669,6 +679,28 @@ common patterns.
   `some_of(lower), zero_or_more(one_of(lower, digit))`. As of #238 such
   alphanumeric codes are valid name components; before that they failed
   `lint-changed-files` with `object_name_linter`.
+- **Sync vignette captions with R-source axis labels after a label fix.**
+  A `plot_*()` function's y-axis label and its vignette figure caption often
+  carry the same phrase. Changing the axis label in the R source without
+  updating the caption leaves a stale inconsistency that the next review round
+  will catch. After fixing an axis label, grep the vignette:
+  `grep -r "old phrase" vignettes/` to find and update matching captions.
+  (bcs#253 round 3.)
+- **Check the column's scale before writing an axis label.**
+  A `prep_*()` column computed as `mean(...) * 100` is a 0–100 percentage;
+  the axis label must say `%`, not `"Probability of …"` (which implies 0–1).
+  Inspect the prep function's body or roxygen `@returns` to confirm the scale.
+  (bcs#253: `pct_annual` was 0–100, not 0–1 — label was wrong.)
+- **Use `geom_point() + geom_errorbar()` for data with a meaningful non-zero minimum.**
+  `geom_col()` draws bars from 0; for enrollment-age data (40–70+) this wastes
+  most of the chart area and makes ±SD intervals visually tiny. Use
+  `geom_point(size = 3) + geom_errorbar(...)` when 0 is not a meaningful
+  reference point. (bcs#253: `plot_results_baseline` switch from `geom_col`.)
+- **Use `helper-*.R` for shared testthat setup.**
+  testthat 3 auto-sources `tests/testthat/helper-*.R` before any tests run.
+  Put shared setup (e.g. `make_pt_data()`) in a `helper-*.R` rather than
+  repeating it across test files. One test file per source file is the bcs
+  convention — `test-plot_fn.R` for `R/plot_fn.R`. (bcs#253.)
 
 ## Office Open XML (.docx / .xlsx) — editing committed content
 - `.docx`/`.xlsx` are zip archives. To strip or edit content (e.g. remove a sensitive
