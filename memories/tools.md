@@ -314,6 +314,17 @@
   (`git checkout <my-commit> -- CLAUDE.md`, commit), then before merging verify with
   `git diff origin/main -- CLAUDE.md` being **non-empty** (an empty diff means the
   payload was silently reverted to main), and merge promptly.
+- **The `@claude` agent can push a `main`-merge commit to your PR branch — not just
+  comment.** Triggered by PR activity, the `claude.yml` agent may merge `origin/main`
+  into the branch and push it (e.g. `claude[bot]` "Merge branch 'main' into <branch>").
+  Two consequences: (1) your in-flight local push is rejected ("fetch first" / RPC
+  `HTTP 403` from the git backend — a non-fast-forward, **not** a policy denial); (2)
+  the bot may resolve a `DESCRIPTION` version conflict to `== main`, which then fails
+  `version-check`. Recovery: `git fetch origin <branch>`, `git reset --hard
+  origin/<branch>` onto the bot's merge (don't force-push a competing parallel merge of
+  your own — build on the bot's), then re-bump the version above main and push.
+  (Hit on bcs#255: the bot pushed `4807f0c` and resolved the version to `.9062` == main,
+  failing version-check until I bumped to `.9063` on top.)
 - **Dispatched reviews now post a PR comment (gha#89, now in `v1`).** Before this fix,
   `workflow_dispatch` runs wrote output to the step summary only —
   `github.event.pull_request.number` is null for dispatch events, so the action's
