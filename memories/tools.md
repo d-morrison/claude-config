@@ -576,7 +576,7 @@ common patterns.
   it shows skipped (gray) on infra conditions and success on clean reviews. See gha#104
   for the `require-review` job implementation.
 - **`mcp__github__get_job_logs` usage.** Two calling modes — use the right one:
-  - Single job: pass `job_id` (number) only. Do NOT pass `run_id` alongside.
+  - Single job: pass `job_id` (number) + `return_content: true`. Do NOT pass `run_id` alongside. Without `return_content: true` the tool returns only a `logs_url` download link and `"Job logs are available for download"` — no actual log text.
   - All failed jobs in a run: pass `run_id` (number) + `failed_only: true` + `return_content: true`. Do NOT pass `job_id`.
   The tool's error message ("job_id is required when failed_only is false") is misleading when you pass `failed_only: true` with `run_id`; the issue is actually conflicting parameters.
 - **`update-snapshots.yml@v1`** — regenerates testthat snapshots, commits, and pushes.
