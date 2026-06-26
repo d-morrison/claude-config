@@ -143,7 +143,8 @@
   returns a Duration; pick the one that matches the semantics. Only fall back to a raw day
   count when the function requires one; verify it via `365.25 × N`, not by counting leap
   years manually (e.g., "3 leap years in 2000–2003" is wrong — only 2000 qualifies), and
-  confirm with `lubridate::time_length(days_exact, "years") == N`.
+  confirm with `lubridate::time_length(lubridate::ddays(days_exact), "years") == N`
+  (`time_length()` requires a timespan object, not a bare numeric).
   (Learned on ucdavis/bcs#249: using lubridate directly avoids the error class entirely.)
 - When writing documentation in a stacked PR (or any branch), only document features whose
   code is actually present on the CURRENT branch's ancestry — `grep` for the symbol/constant
