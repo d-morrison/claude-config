@@ -23,11 +23,35 @@ a fix, or need to request a feature.
 - After discovering a bug in a dependency during normal work
 - After implementing a workaround that should really be fixed at the source
 
+## Step 0 — read the repo's contribution policy first (do this BEFORE drafting)
+
+The upstream repo is not ours; its rules bind us, and ignoring them can get the
+user's account **banned**. Before drafting a title or body, read:
+
+- **`CODE_OF_CONDUCT.md`** — some projects (e.g. `quarto-dev/quarto-cli`)
+  **ban issues/PRs from autonomous AI agents acting without human oversight**
+  and treat it as **account-bannable on first offense**. If the repo bans
+  AI-agent submissions, **stop — do not file.** Give the user the draft and let
+  *them* decide whether to submit it themselves.
+- **`CONTRIBUTING.md`** + **issue/PR templates** (`.github/ISSUE_TEMPLATE/`,
+  `.github/PULL_REQUEST_TEMPLATE.md`) — follow the required template and fill in
+  every required field instead of the generic bodies below.
+- **Destination.** Many projects route **feature requests and questions to a
+  Discussions board**, not the issue tracker. Honor that — file in Discussions
+  when the guidelines say so; reserve the tracker for what it's meant for.
+
+Pull these via the GitHub MCP `get_file_contents` (remote) or
+`gh api repos/<owner>/<repo>/contents/<path>` / a quick clone (local). If a
+required check can't be read, say so and ask the user rather than guessing.
+
+This is in addition to — not a replacement for — the human-approval gate in
+steps 3A/3B below.
+
 ## Determine the action type
 
 | Situation | Action |
 |-----------|--------|
-| Bug report, feature request, question — no code to contribute | **Issue** |
+| Bug report, feature request, question — no code to contribute | **Issue** (or **Discussion**, if the repo routes it there) |
 | You have a fix ready (patch, config change, doc fix) | **PR** |
 | You have a fix but aren't sure upstream wants it | **Issue first**, mention you have a fix ready |
 | Fork divergence — your fork has improvements the parent should get | **PR** |
@@ -219,10 +243,18 @@ Provide:
 
 ## Anti-patterns
 
+- ❌ Filing **autonomously, without the user's explicit approval** — every
+  upstream submission needs the human contributor to review and verify it.
+  Some repos' Codes of Conduct make unattended AI-agent submissions
+  account-bannable on first offense.
+- ❌ Filing **before reading the repo's `CODE_OF_CONDUCT.md` / `CONTRIBUTING.md`
+  / templates** — you can't file correctly without knowing the rules.
+- ❌ Filing a **feature request as an issue** when the project routes feature
+  requests to a **Discussions** board.
+- ❌ Posting a **free-form body when the repo provides an issue/PR template** —
+  use the template and fill in every required field.
 - ❌ Filing a vague issue ("something is broken") — always include a reprex
   or clear reproduction steps
-- ❌ Opening a PR without checking if the project accepts contributions
-  (look for CONTRIBUTING.md, issue templates, PR guidelines)
 - ❌ Sending a massive PR that mixes your fix with unrelated changes — keep
   it minimal and focused
 - ❌ Not mentioning your workaround — upstream maintainers appreciate knowing
