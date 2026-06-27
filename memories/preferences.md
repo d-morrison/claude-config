@@ -409,7 +409,7 @@
   agent docs (`CLAUDE.md`, `.github/instructions/*.md`, `.github/copilot-instructions.md`) via a
   PR, so the whole team and every `@claude` session working there sees it — not just my private
   ai-config memory. The `memories/repo/` pattern is retired (don't add to it; `memories/repo/bcs.md`
-  was relocated into ucdavis/bcs on ai-config#226, and `sparta.md` is tracked for the same move).
+  was relocated into ucdavis/bcs on ai-config#226, and `sparta.md` was relocated into Lacaedemon/sparta on ai-config#248).
   ai-config still owns genuinely cross-repo lore (`memories/debugging.md`, `tools.md`) and my own
   preferences/workflows — only the single-repo notes move out. (Learned on ai-config#226.)
 
