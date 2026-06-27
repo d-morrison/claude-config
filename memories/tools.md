@@ -432,6 +432,43 @@
   comment to say "workflow_dispatch is a manual re-review from the Actions UI" rather
   than citing `claude.yml`. The `PR_NUMBER` env comment (was "when claude.yml triggered
   us") should become "when a manual re-review is triggered." Fixed in rpt#153 and qbt#43.
+- **`@claude review` produced no review? Trace the whole dispatch chain — the
+  failure is usually in the *dispatched* review run, not the agent run.** An
+  `@claude review` *comment* fires the agent workflow `claude.yml` (issue_comment),
+  which **succeeds** and then, in a later step (a regular step after the Claude run —
+  not an Actions post-step), re-dispatches `claude-code-review.yml` via
+  `gh workflow run` (workflow_dispatch). So a green `claude.yml` run with no review
+  comment means the review died in the separately-dispatched run. Find it:
+  `actions_list` the runs of `claude-code-review.yml` filtered to
+  `event=workflow_dispatch` around the comment time, then read that run's failed
+  job logs. Don't stop at the agent run's green checkmark. (Diagnosed on rme#706:
+  agent run 28256515868 was green; the dispatched review run 28257175025 had failed.)
+- **`allowed_bots` actor gate: dispatched reviews fail in ~6 s with "Workflow
+  initiated by non-human actor: github-actions (type: Bot)".** `anthropics/claude-code-action`
+  has its **own** actor gate, separate from the workflow's job-level `if:`. Because
+  `claude.yml` re-dispatches as `github-actions[bot]`, the action aborts
+  ("Add bot to allowed_bots list or use '*'") unless the action step sets
+  `allowed_bots: "github-actions[bot]"` in its `with:` (underscore — the action's
+  own input name; the gha reusable exposes this as `allowed-bots` with a hyphen
+  and maps it through). A job `if:` that permits
+  `workflow_dispatch` is **not** enough — the run passes the `if:` then dies one layer
+  deeper in the action. The canonical gha reusable `claude-code-review.yml` already
+  sets this (via its `allowed-bots` input, default `github-actions[bot]`); a
+  standalone copy must add it. Fixed for rme in #945.
+- **Consumer repos may carry a standalone `claude-code-review.yml` that has drifted
+  from the gha reusable one — check gha first when debugging CI/infra bugs.** Not
+  every consumer calls `uses: d-morrison/gha/.github/workflows/claude-code-review.yml@v1`;
+  some (rme, pre-#948) kept a hand-maintained fork that missed fixes gha already
+  had — that drift is how the `allowed_bots` bug reached rme. When debugging a
+  CI/infra bug in a consumer repo, compare against the canonical gha `@v1` version;
+  the fix often already exists there. Preferred remedy: migrate the standalone file
+  to a thin reusable-workflow caller (gha ships example caller stubs in `examples/`)
+  so it can't drift again. Keep the workflow filename and the `pr_number`
+  workflow_dispatch input so `claude.yml`'s
+  `gh workflow run claude-code-review.yml -f pr_number=<N>` still works, mapping it
+  to the reusable's `pr-number` input; set `checkout-submodules: true` if the repo
+  has submodules the reviewer must read (e.g. rme's `latex-macros`). Done for rme
+  in #948.
 
 ## AskUserQuestion (Claude Code harness tool)
 - Each entry in `questions[]` **requires a `question` field** (the full question
