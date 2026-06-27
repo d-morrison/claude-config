@@ -145,6 +145,10 @@ eyeball.
   cleans *truth* (references that don't resolve). Complementary passes.
 - **`reprexes`** — if verifying a code reference needs actually running it,
   isolate it as a reprex first.
+- **`check-rendered-refs` / `crr`** — the output-side counterpart. This skill
+  audits *source* references; `crr` scans *rendered* HTML for crossrefs/citations
+  that broke at render time and leaked into the page as `?@key`. Hand a `?@key`
+  hit here to trace the dangling key back to its source line.
 
 ## Anti-patterns
 

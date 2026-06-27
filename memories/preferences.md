@@ -129,6 +129,23 @@
   an extra round. (Learned on d-morrison/ai-config#45: the `git -C ~/.claude/skills`
   path fix was applied to `ums/SKILL.md` but the identical line in `skill-builder/SKILL.md`
   was missed until review caught it.)
+- When renaming a variable or concept, grep for the old term in **both code and
+  comments** (including section headers, file-level comments, and inline `# ---` banners).
+  A variable rename that also appears in a section header (`# --- 2. Baseline covariates +
+  Nelson-Aalen ---`) costs an extra ARDI round every time the header is missed. After
+  changing the identifier, run `grep -r "old_name" .` before committing. (Learned on
+  ucdavis/bcs#246: `nelson_aalen` → `cumhaz_baseline` fixed the variable and the file
+  header but missed the section header — caught two ARDI rounds later.)
+- In test code, express date intervals with lubridate rather than hardcoded day counts.
+  Use `lubridate::years(N)` + date arithmetic for calendar-year intervals from a known
+  start date, or `lubridate::dyears(N)` when an exact numeric duration (`N × 365.25 × 86400`
+  seconds) is what the function under test expects — `years()` returns a Period, `dyears()`
+  returns a Duration; pick the one that matches the semantics. Only fall back to a raw day
+  count when the function requires one; verify it via `365.25 × N`, not by counting leap
+  years manually (e.g., "3 leap years in 2000–2003" is wrong — only 2000 qualifies), and
+  confirm with `lubridate::time_length(lubridate::ddays(days_exact), "years") == N`
+  (`time_length()` requires a timespan object, not a bare numeric).
+  (Learned on ucdavis/bcs#249: using lubridate directly avoids the error class entirely.)
 - When writing documentation in a stacked PR (or any branch), only document features whose
   code is actually present on the CURRENT branch's ancestry — `grep` for the symbol/constant
   first. A feature that lives in a sibling branch also targeting `main` is NOT in scope, even
@@ -180,9 +197,9 @@
   `git add -A` swept the user's `scout-peers` skill into an unrelated `/prune` PR, adding
   several extra review rounds.)
 - Run a local session in an isolated `git worktree` by DEFAULT, not directly in the shared
-  working copy — unless there's a specific reason to use the working copy. This default holds
-  for EVERY local session, not just substantial multi-file work or when the user flags the wd
-  as "in use" / "do this in a separate repo". The ai-config
+  working copy — only use the working copy when the user explicitly says to. This default
+  holds for EVERY local session, not just substantial multi-file work or when the user flags
+  the wd as "in use" / "do this in a separate repo". The ai-config
   working copy is often in use by CONCURRENT Claude sessions; untracked or uncommitted files
   there can be silently wiped by another session (branch switch / `git clean`). Create it off
   `origin/main` (`git worktree add -b <branch> ../ai-config-worktrees/<branch> origin/main`),
@@ -264,6 +281,24 @@
   `https://d-morrison.github.io/rme/pr-preview/pr-<N>/chapters/proportional-hazards-models.html`
   (the `pr-<N>` previews are per-PR and get deleted when the PR closes, so `<N>` is a
   placeholder for your PR number). (An instance of never assume; always verify, applied to math.)
+  - **In a remote/web sandbox the github.io preview may be unreachable** — if the
+    environment's network policy blocks `d-morrison.github.io` the proxy answers
+    `403` to CONNECT (curl: `CONNECT tunnel failed, response 403`; Chromium:
+    `ERR_TUNNEL_CONNECTION_FAILED`), so you can't load the preview to eyeball the
+    math. Verify locally instead: `npm i mathjax` (npmjs is allowed through the
+    proxy), then init MathJax **with the `[tex]/noundefined` extension loaded**
+    (`init({tex:{packages:{'[+]':['noundefined']}}}).then(MJ => MJ.tex2mml(defs + expr))`)
+    and check the output. With `noundefined` an undefined macro shows as
+    `<mtext mathcolor="red">\cmd</mtext>` (NOT an `<merror>` or a thrown
+    exception), so grep for `mathcolor="red"`.
+  - **MathJax ignores `\providecommand`** — only `\newcommand` / `\def` /
+    `\renewcommand` define a macro. So `\providecommand{\X}{...}` is a *silent
+    no-op* whenever `\X` shadows a LaTeX built-in (`\v` caron, `\b` bar, `\u`,
+    `\c`, …): the built-in meaning survives and renders broken (rme's
+    `\hat{\v{\mu}}` showed a red `\v`). Use `\vec` / `\vecf` (rme defines these
+    with `\renewcommand{\vec}{...}`, which properly overrides the built-in), and
+    fix upstream by switching `\providecommand` → `\def`/`\renewcommand` for
+    built-in names.
 - In Quarto, a cross-referenceable figure/table **div** (`::: {#fig-...}` / `::: {#tbl-...}`)
   uses its **last paragraph** as the caption — the caption text must come AFTER the
   image / code chunk / table, not before it. A caption placed first renders as ordinary
@@ -369,7 +404,22 @@
   sequence. A reviewer flagged on ai-config#186 that "Use the existing PR branch" was placed
   before "Claim a GitHub PR/issue" in CLAUDE.md, even though you must claim the PR before you
   look up and switch to its branch. Wrong ordering misleads the reader about the correct flow.
+- Repo-specific knowledge does NOT belong in ai-config. When a UMS/learnings pass turns up a
+  convention, gotcha, or workflow note tied to one repo we own, check it INTO that repo's own
+  agent docs (`CLAUDE.md`, `.github/instructions/*.md`, `.github/copilot-instructions.md`) via a
+  PR, so the whole team and every `@claude` session working there sees it — not just my private
+  ai-config memory. The `memories/repo/` pattern is retired (don't add to it; `memories/repo/bcs.md`
+  was relocated into ucdavis/bcs on ai-config#226, and `sparta.md` is tracked for the same move).
+  ai-config still owns genuinely cross-repo lore (`memories/debugging.md`, `tools.md`) and my own
+  preferences/workflows — only the single-repo notes move out. (Learned on ai-config#226.)
 
+
+- **Always show the draft before posting to any external system.** Before running
+  `gh issue create`, `gh pr create`, `gh pr comment`, or any equivalent that sends
+  content somewhere public, output the draft in the conversation and wait for explicit
+  "ok" / approval. This applies even when the user explicitly asked to file/post —
+  they still want to see the text first. (Learned 2026-06-26: posted a quarto-cli
+  GitHub issue without showing the draft.)
 
 ## Git author mapping
 - Commits by `dem-extra1` to repos owned by `d-morrison`, `ucd-serg`, or `ucdavis` → the true author is `d-morrison` (demorrison@ucdavis.edu); set `--author="Douglas Morrison <demorrison@ucdavis.edu>"` (or amend) when the committing identity is `dem-extra1`.

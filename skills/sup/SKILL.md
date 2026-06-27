@@ -71,6 +71,10 @@ Gather from context:
 - **Minimal reprex**: if you have one (prefer `reprexes` skill output)
 - **Workaround**: if you have one, mention it — helps others and shows you've investigated
 
+**Show the full draft (title + body) to the user and wait for explicit approval
+before posting.** Output the text as a markdown block, then ask "OK to post?"
+Do NOT run `gh issue create` until the user confirms.
+
 ```bash
 gh issue create --repo <owner>/<repo> \
   --title "<title>" \
@@ -87,6 +91,9 @@ glab issue create --repo <owner>/<repo> \
 After filing, report the issue URL back to the user.
 
 ### 3B. Open a PR (fix path)
+
+**Show the full draft (title + body) to the user and wait for explicit approval
+before running `gh pr create`.** Same rule as issues — draft first, post after "OK."
 
 #### If you have push access (collaborator/org member):
 

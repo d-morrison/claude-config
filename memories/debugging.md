@@ -164,6 +164,10 @@ hand. They passed — but CI's `R CMD check` failed with
   roxygen2, lintr, and spelling install the same way — so `roxygenise()` (diff
   check), `lint_package()`, and `spell_check_package()` are all runnable locally
   even when `renv::restore()` can't reach the full dependency set.
+  **Caution: a full `test_dir()` / `devtools::test()` pass can PRUNE `_snaps/`
+  files whose snapshot test was skipped or went unrun this pass** (e.g. snapr
+  tests skipped because `NOT_CRAN` is unset) — see the snapr section below before
+  running it with `git add -A` in scope.
 
 ## R test/lint gotchas that only surface in CI
 Also from ettbc#13/#14:
@@ -185,3 +189,38 @@ Also from ettbc#13/#14:
   limit"). It's environmental, non-blocking, and unfixable from a content PR
   (the bot can't edit `.github/workflows`). Stand in with a manual self-review
   rather than chasing it.
+
+## R snapshot tests (snapr / testthat) — regenerating without collateral damage
+Hit across ucdavis/bcs#264 (the snapr-based `expect_snapshot_data` suite):
+- **When a snapshot's test is skipped or doesn't run in a given pass, a full
+  `testthat::test_dir()` / `devtools::test()` run PRUNES its now-orphaned
+  `_snaps/` file** (not every routine run — the trigger is the snapshot going
+  unproduced this pass). On #264 the snapr tests were skipped (`NOT_CRAN` unset,
+  see below), so a `test_dir()` pass treated their snapshots as orphaned and
+  deleted 23 of them; `git add -A` then silently staged every deletion. (Stock
+  testthat 3.x gates orphan *deletion* on snapshot-update mode — a normal run
+  only warns — so the #264 prune was likely either an implicit update pass or
+  snapr's own `expect_snapshot_data` pruning path; I didn't pin down which. The
+  defense below holds either way.) Regenerate **per file** with
+  `testthat::test_file("tests/testthat/test-<fn>.R")`, stage only the snapshots
+  you meant to touch (`git add tests/testthat/_snaps/<fn>.md`), and if the suite
+  did prune others, restore them: `git checkout origin/main -- tests/testthat/_snaps`.
+- **snapr snapshot tests are skipped unless `NOT_CRAN=true`** (they're guarded
+  like `skip_on_cran()`); locally you must set the env var or every snapshot
+  silently no-ops and "passes" without comparing.
+- **`furrr`/`future` parallel workers cannot load a `pkgload::load_all()`'d
+  package** — a worker starts a fresh R process that only sees installed
+  packages, so any snapshot that runs the analysis under `future_map` errors or
+  produces nothing. Regenerate those snapshots in a **sequential** plan
+  (`future::plan("sequential")` / set workers to 1), then copy the result into
+  the parallel snapshot path — verify seq==par output on `main` first so the
+  copy is sound.
+- **`tests/testthat.R` runs with `stop_on_warning = TRUE`**, so any warning
+  during a test FAILS CI even with 0 test failures (shows as `WARN N`). When you
+  hit it, don't guess the source — **capture the actual messages**
+  (`withCallingHandlers(..., warning = \(w) {message(conditionMessage(w)); ...})`).
+  On #264 the GLM "fitted probabilities 0 or 1" / "did not converge" warnings
+  were a red herring; the real one was a `cli::cli_warn("risk ratio is undefined")`
+  from a zero-risk group at small n. Muffle expected small-sample warnings in
+  BOTH the package source (a `suppress_*_warnings()` helper wrapping the fit
+  chain) AND the test helper, matching every pattern the fits actually emit.

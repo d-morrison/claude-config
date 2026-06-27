@@ -104,8 +104,12 @@ reflect, and persist.
 - [ ] Did the user correct my behavior? → Encode as preference + skill update
 - [ ] Did I discover a tool quirk? → `/memories/tools.md`
 - [ ] Did I learn a debugging pattern? → `/memories/debugging.md`
-- [ ] Did I discover a repo convention? → that repo's Claude project memory:
-  `~/.claude/projects/<project-path>/memory/` (write directly; no git commit needed)
+- [ ] Did I discover a repo convention for a repo **we own** that has checked-in
+  agent docs? → put it IN that repo (its `CLAUDE.md` / `.github/instructions/*.md`),
+  via a PR, so the whole team and every `@claude` session there sees it. Do NOT
+  keep repo-specific notes in ai-config (`memories/repo/` is retired). For a repo
+  without agent-doc infrastructure, fall back to that repo's local Claude project
+  memory: `~/.claude/projects/<project-path>/memory/` (write directly; no commit).
 - [ ] Did the user express a new preference? → `/memories/preferences.md`
 - [ ] Did a workflow emerge that could be a new skill? → Create it
 - [ ] Are there existing skills that reference outdated info? → Fix them

@@ -226,6 +226,11 @@ and collaboration conventions.
 <!-- Shared with the lab manual; edit shared/coding/prefer-packaged-functions.md, not here. -->
 @shared/coding/prefer-packaged-functions.md
 
+## Coding: prefer per-operation grouping over persistent grouping (dplyr)
+
+<!-- Shared with the lab manual; edit shared/coding/per-operation-grouping.md, not here. -->
+@shared/coding/per-operation-grouping.md
+
 ## Writing style: plain, direct prose
 
 <!-- Shared with the lab manual; edit shared/writing/plain-prose.md, not here. -->
