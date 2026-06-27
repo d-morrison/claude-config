@@ -14,7 +14,7 @@ gh issue create --title "..." --body "..."
 
 The issue is the durable record of intent and scope. It lets the PR auto-close it via `Closes #N` and keeps the work discoverable if the PR stalls.
 
-The `start-task` skill (`/st`) runs this pattern end-to-end: search for an existing issue, file one if needed, branch, implement, open PR, and iterate to clean.
+The [`start-task`](skills/start-task/SKILL.md) skill (`/st`) runs this pattern end-to-end: search for an existing issue, file one if needed, branch, implement, open PR, and iterate to clean.
 
 ## Claim a PR before working on it
 
@@ -28,7 +28,7 @@ After the session ends (PR merged, paused, or closed), follow up with a closing 
 
 Skip the claim step if the most recent comment already claims it. Read-only inspection (checking status, explaining a diff) doesn't need a claim.
 
-The `claim-pr` skill handles the exact wording and tracks when to unclaim.
+The [`claim-pr`](skills/claim-pr/SKILL.md) skill handles the exact wording and tracks when to unclaim.
 
 ## The ARDI loop
 
@@ -42,7 +42,7 @@ For every flagged item in a review, do exactly one of:
 
 After handling every item, push the fixes, post an ARD summary comment, and re-request review. Repeat until the latest review has zero flagged items under any heading.
 
-The `ardi` skill (`/ardi`) runs this full loop automatically. Aliases: `dc`, `drive`, `clean`, `iterate`.
+The [`ardi`](skills/ardi/SKILL.md) skill (`/ardi`) runs this full loop automatically. Aliases: `dc`, `drive`, `clean`, `iterate`.
 
 ### What "fully clean" means
 
@@ -67,7 +67,7 @@ git merge origin/main
 
 Don't rebase or squash-rewrite a published PR branch unless explicitly asked — a merge commit matches GitHub's "Update branch" button and preserves PR history.
 
-The `sync-pr-branch` skill (`/sync`) does this automatically.
+The [`sync-pr-branch`](skills/sync-pr-branch/SKILL.md) skill (`/sync`) does this automatically.
 
 ## Tracking upstream issues
 
@@ -79,7 +79,7 @@ When you find a bug in a dependency or external repo:
 
 In all cases, link the upstream issue or PR in your current PR so the root cause is tracked.
 
-The `send-upstream` skill (`/sup`) handles steps 1--2.
+The [`send-upstream`](skills/send-upstream/SKILL.md) skill (`/sup`) handles steps 1--2.
 
 ## Updating memories and skills
 
@@ -91,7 +91,7 @@ After a PR merges (or at the end of any significant session), run UMS to capture
 
 UMS reviews recent context for recurring review findings, corrections, and guidance, then writes or updates the relevant memory and skill files. A merge is the natural checkpoint to bank lessons before context is lost.
 
-The `merge-it` skill chains `merge-it` → `post-merge` → UMS automatically when you say "merge it".
+The [`merge-it`](skills/merge-it/SKILL.md) skill chains `merge-it` → [`post-merge`](skills/post-merge/SKILL.md) → [`ums`](skills/ums/SKILL.md) automatically when you say "merge it".
 
 ## Queue keywords
 

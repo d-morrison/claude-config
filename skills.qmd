@@ -23,68 +23,68 @@ Most skills also respond to plain-English triggers listed in their `description`
 
 | Skill | Aliases | What it does |
 |-------|---------|--------------|
-| `ardi` | `dc`, `drive`, `clean`, `iterate` | Read the latest review, address/rebut/defer every finding, push, re-request review — loop until clean |
-| `ard` | `adr` | Single ARD pass: address, rebut, defer, or acknowledge — without the iterate loop |
-| `claim-pr` | | Post a "paws off" comment before a work session; unclaim when done |
-| `request-pr-review` | | Add a human reviewer and @-mention them with context |
-| `pr-status` | | Report the current PR's CI and review state |
-| `pr-status-all` | | Report status across all open PRs |
+| [`ardi`](skills/ardi/SKILL.md) | `dc`, `drive`, `clean`, `iterate` | Read the latest review, address/rebut/defer every finding, push, re-request review — loop until clean |
+| [`ard`](skills/ard/SKILL.md) | `adr` | Single ARD pass: address, rebut, defer, or acknowledge — without the iterate loop |
+| [`claim-pr`](skills/claim-pr/SKILL.md) | | Post a "paws off" comment before a work session; unclaim when done |
+| [`request-pr-review`](skills/request-pr-review/SKILL.md) | | Add a human reviewer and @-mention them with context |
+| [`pr-status`](skills/pr-status/SKILL.md) | | Report the current PR's CI and review state |
+| [`pr-status-all`](skills/pr-status-all/SKILL.md) | | Report status across all open PRs |
 
 ### Issue management
 
 | Skill | Aliases | What it does |
 |-------|---------|--------------|
-| `start-task` | `st` | File a tracking issue (if none exists), branch, implement, open PR, ARDI to clean |
-| `grab-issue` | `gi` | Pick the highest-priority open issue and work it end-to-end |
-| `grab-issues-in-parallel` | `gip` | Grab multiple issues and work them in parallel worktrees |
-| `defer-issue` | | File a follow-up issue for something out of scope in the current PR |
-| `cancel-superseded` | `cb` | Close issues/PRs that a merged PR made redundant |
+| [`start-task`](skills/start-task/SKILL.md) | `st` | File a tracking issue (if none exists), branch, implement, open PR, ARDI to clean |
+| [`grab-issue`](skills/grab-issue/SKILL.md) | `gi` | Pick the highest-priority open issue and work it end-to-end |
+| [`grab-issues-in-parallel`](skills/grab-issues-in-parallel/SKILL.md) | `gip` | Grab multiple issues and work them in parallel worktrees |
+| [`defer-issue`](skills/defer-issue/SKILL.md) | | File a follow-up issue for something out of scope in the current PR |
+| [`cancel-superseded`](skills/cancel-superseded/SKILL.md) | `cb` | Close issues/PRs that a merged PR made redundant |
 
 ### Branch / sync
 
 | Skill | Aliases | What it does |
 |-------|---------|--------------|
-| `sync-pr-branch` | `sync`, `merge-main`, `resync-branch` | Fetch origin, merge main into the branch, push |
-| `merge-it` | `merged` | Squash-merge a ready PR, then run post-merge cleanup |
-| `post-merge` | | After a merge: checkout main, pull, delete branch, run UMS |
-| `clean-branches` | `prune` | Delete local branches already merged or closed |
+| [`sync-pr-branch`](skills/sync-pr-branch/SKILL.md) | `sync`, `merge-main`, `resync-branch` | Fetch origin, merge main into the branch, push |
+| [`merge-it`](skills/merge-it/SKILL.md) | `merged` | Squash-merge a ready PR, then run post-merge cleanup |
+| [`post-merge`](skills/post-merge/SKILL.md) | | After a merge: checkout main, pull, delete branch, run UMS |
+| [`clean-branches`](skills/clean-branches/SKILL.md) | `prune` | Delete local branches already merged or closed |
 
 ### Memory and skills maintenance
 
 | Skill | Aliases | What it does |
 |-------|---------|--------------|
-| `ums` | `update-memories-and-skills` | Capture learnings from the session into memory files and skill definitions |
-| `memorize` | `remember`, `always` | Save a specific fact or preference to memory |
-| `record-learnings` | | Structured post-mortem: extract lessons from a completed task |
-| `consolidate-memory` | | Merge or deduplicate memory files that have drifted |
+| [`ums`](skills/ums/SKILL.md) | `update-memories-and-skills` | Capture learnings from the session into memory files and skill definitions |
+| [`memorize`](skills/memorize/SKILL.md) | `remember`, `always` | Save a specific fact or preference to memory |
+| [`record-learnings`](skills/record-learnings/SKILL.md) | | Structured post-mortem: extract lessons from a completed task |
+| [`consolidate-memory`](skills/consolidate-memory/SKILL.md) | | Merge or deduplicate memory files that have drifted |
 
 ### Writing and style
 
 | Skill | Aliases | What it does |
 |-------|---------|--------------|
-| `use-preferred-style` | `style` | Apply the plain-prose writing guide to a draft |
-| `find-ai-tells` | `ai-tells` | Scan text for AI-sounding patterns and flag them |
-| `tidy` | | Clean up code or prose without changing behavior |
-| `simplify` | | Reduce a file or function to its essential parts |
+| [`use-preferred-style`](skills/use-preferred-style/SKILL.md) | `style` | Apply the plain-prose writing guide to a draft |
+| [`find-ai-tells`](skills/find-ai-tells/SKILL.md) | `ai-tells` | Scan text for AI-sounding patterns and flag them |
+| [`tidy`](skills/tidy/SKILL.md) | | Clean up code or prose without changing behavior |
+| [`simplify`](skills/simplify/SKILL.md) | | Reduce a file or function to its essential parts |
 
 ### Repo / CI utilities
 
 | Skill | Aliases | What it does |
 |-------|---------|--------------|
-| `scout-peers` | | Survey comparable repos for ideas and conventions |
-| `check-dependency-updates` | `cdu` | Check for outdated dependencies and propose updates |
-| `dependabot` | | Add or update Dependabot config for a repo |
-| `send-upstream` | `sup` | Open a PR or issue in an upstream repo for a bug found here |
-| `reprexes` | | Build minimal reproducible examples for a bug |
-| `r-pkg-spellcheck` | | Spell-check an R package's documentation |
+| [`scout-peers`](skills/scout-peers/SKILL.md) | | Survey comparable repos for ideas and conventions |
+| [`check-dependency-updates`](skills/check-dependency-updates/SKILL.md) | `cdu` | Check for outdated dependencies and propose updates |
+| [`dependabot`](skills/dependabot/SKILL.md) | | Add or update Dependabot config for a repo |
+| [`send-upstream`](skills/send-upstream/SKILL.md) | `sup` | Open a PR or issue in an upstream repo for a bug found here |
+| [`reprexes`](skills/reprexes/SKILL.md) | | Build minimal reproducible examples for a bug |
+| [`r-pkg-spellcheck`](skills/r-pkg-spellcheck/SKILL.md) | | Spell-check an R package's documentation |
 
 ### Session management
 
 | Skill | Aliases | What it does |
 |-------|---------|--------------|
-| `session-lock` | `deconflict-sessions` | Register/deregister this session to prevent parallel clobbering |
-| `handoff` | `wrap-up` | Summarize context and open items so another session can pick up |
-| `select-model` | `model-fit`, `assess-model-fit` | Choose the right Claude model for the task at hand |
+| [`session-lock`](skills/session-lock/SKILL.md) | `deconflict-sessions` | Register/deregister this session to prevent parallel clobbering |
+| [`handoff`](skills/handoff/SKILL.md) | `wrap-up` | Summarize context and open items so another session can pick up |
+| [`select-model`](skills/select-model/SKILL.md) | `model-fit`, `assess-model-fit` | Choose the right Claude model for the task at hand |
 
 ## Full skill list
 

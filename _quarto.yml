@@ -6,6 +6,7 @@ project:
     - "setup.qmd"
     - "skills.qmd"
     - "workflow.qmd"
+    - "skills/*/SKILL.md"
 
 website:
   title: "ai-config"
