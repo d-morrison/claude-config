@@ -771,6 +771,21 @@ common patterns.
   it without evaluating), matching the existing convention (e.g.
   `R/calc_ip_weights.R`). Runnable examples with self-contained synthetic data
   are fine and do execute. (Hit on ucdavis/bcs#238.)
+- **`NEWS.md` section headers need a blank line before them.** A bullet that ends
+  immediately before a `## Next-section` heading (no blank line) can cause
+  `utils::news()` to misparse adjacent sections. Always leave one blank line
+  between the last bullet of a section and the next `##` heading. (bcs#275:
+  `## Internal` bullet → `## Tests` with no blank line; bot caught it.)
+- **`merge_group:` trigger — guard PR-context workflows at the job level.**
+  When adding `merge_group:` to a workflow's `on:` block so the GitHub merge
+  queue fires CI checks, any job that uses `github.event.pull_request.*`
+  context needs `if: github.event_name == 'pull_request'` at the job level —
+  otherwise the job errors on merge-group commits where that context is absent.
+  A job with a false `if:` counts as skipped (passing) for branch-protection
+  purposes. Also update matrix-selection shell conditions that branch on
+  `pull_request` to cover `merge_group` too (use release-only matrix for both).
+  Affected jobs in bcs: `version-check`, `news`, `lint-changed-files`, and the
+  `R-CMD-check` matrix selector. (bcs#275.)
 - **bcs `test-coverage` (codecov) is NOT a required check.** A coverage drop
   leaves the PR `mergeable_state: unstable` (not `blocked`) and does not block
   the merge — `docs`, `version-check`, the R-CMD-check matrix, lint, and
