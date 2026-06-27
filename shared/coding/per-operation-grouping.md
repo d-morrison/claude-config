@@ -1,8 +1,8 @@
 # Prefer per-operation grouping over persistent grouping (dplyr)
 
-When reviewing or writing R code that uses `dplyr`, prefer **per-operation
+When reviewing or writing `dplyr` code, prefer **per-operation
 grouping** (the `.by` argument) over persistent `group_by()` / `ungroup()`
-pairs where the grouping is only needed for one operation.
+pairs. Apply it when the grouping is only needed for one operation.
 
 ```r
 # Preferred — grouping is scoped to this summarise(), no ungroup() needed
