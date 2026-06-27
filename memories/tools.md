@@ -73,6 +73,30 @@
 - `mcp__github__add_issue_comment` parameter is **`issue_number`** (snake_case),
   NOT `issueNumber`. This is the opposite of `pull_request_read`. Reload the
   tool schema when unsure rather than guessing.
+- **Issue *writes* 404 while *reads* succeed → the issue was transferred to
+  another repo, not a permissions gap.** If `mcp__github__add_issue_comment` /
+  `issue_write` to `owner/repo#<N>` fail (`404 Not Found`, or `Could not resolve
+  to an Issue with the number of <N>`) but `issue_read` (`get`) on the *same*
+  number succeeds and PR-comment writes work, suspect a **GitHub issue
+  transfer**. A transfer redirects the old number for *reads* — `issue_read`
+  silently follows the redirect and returns the issue at its NEW home, so check
+  the returned `html_url`/`number` (they show a different repo/number). Writes to
+  the old `owner/repo/issues/<N>` 404 because the issue no longer lives there.
+  Fix: re-read to get the new repo + number, then comment/close *there*. Don't
+  misdiagnose it as a missing `Issues:write` token scope. (Caught closing
+  `gha#75`, transferred to `rme#941`.)
+- **In a fresh web/remote container, local `origin/*` refs can be stale or
+  phantom — verify true remote state via MCP, not local refs.** The clone's
+  `remotes/origin/main` may lag the real default branch by already-merged
+  commits, and the harness-assigned `claude/<id>` branch can appear under
+  `git branch -a` as `remotes/origin/claude/<id>` while not existing on the real
+  remote (`get_file_contents` with `ref: refs/heads/claude/<id>` returns 404).
+  `git fetch origin` (all refs) can also exceed the 2-min Bash limit on large
+  repos with submodules (rme). To read the real default-branch HEAD cheaply,
+  `get_file_contents` any file with no `ref` (= default branch) — the returned
+  resource path embeds the live commit SHA. Fetch the single branch you need
+  (`git fetch origin main`) and branch off that, so you don't build on a
+  stale/polluted base.
 - `mcp__github__pull_request_review_write` with `method: resolve_thread`
   requires **only `threadId`** (node ID, e.g. `PRRT_kwDO...`); `owner`,
   `repo`, and `pullNumber` are ignored for that method. Thread node IDs come
@@ -80,13 +104,19 @@
 - Webhook PR-activity events cover comments/reviews/CI *failures* but NOT CI
   *success*, new pushes, or merge-conflict transitions — don't rely on events
   alone to know a PR went green or merged; re-check explicitly.
-- **Self-wake to re-check CI in remote/web sessions.** There is no `send_later`
-  tool, and the `Monitor` tool can't reach the GitHub API (no `gh`; the only git
-  remote is a git-only proxy). Since webhooks don't deliver CI *success*, arm a
-  one-shot `Monitor` with `sleep <N>; echo recheck` as a self-check-in timer,
-  then re-poll `mcp__github__pull_request_read` (`get_check_runs`) when it fires;
-  re-arm until the build goes green. (Foreground Bash `sleep` is blocked — the
-  background `Monitor` is the workable timer.) Learned driving rme#929.
+- **Self-wake to re-check CI in remote/web sessions.** Webhooks don't deliver CI
+  *success*, new pushes, or merge transitions, so re-check on a timer. Prefer
+  `CronCreate` (a harness scheduling tool, not an MCP tool): schedule a one-shot
+  (`recurring: false`) or recurring (`recurring: true`) job whose prompt re-polls
+  `mcp__github__pull_request_read` (`get_check_runs`) and acts on the result; it
+  fires at wall-clock time without holding a background process. (Used to watch
+  both PRs' merge transitions while migrating rme's preview workflows to the gha
+  reusable family.) Fallback when `CronCreate` isn't available: arm a one-shot
+  `Monitor` with `sleep <N>; echo recheck` and re-poll when it fires — the
+  `Monitor` can't reach the GitHub API itself (no `gh`; the only git remote is a
+  git-only proxy), so it's purely a timer, and foreground Bash `sleep` is
+  blocked, which is why the background `Monitor` is the workable one. There is no
+  `send_later` tool. Re-arm until the build goes green. Learned driving rme#929.
 - The `gh`->MCP substitution **mapping table** lives in `d-morrison/gha`'s
   `CLAUDE.md` specifically (the "GitHub access in remote / web sessions" table);
   other repos' `CLAUDE.md` (e.g. `ai-config`) do NOT carry it. When a skill or
@@ -327,6 +357,18 @@
   (`git checkout <my-commit> -- CLAUDE.md`, commit), then before merging verify with
   `git diff origin/main -- CLAUDE.md` being **non-empty** (an empty diff means the
   payload was silently reverted to main), and merge promptly.
+- **The `@claude` agent can push a `main`-merge commit to your PR branch — not just
+  comment.** Triggered by PR activity, the `claude.yml` agent may merge `origin/main`
+  into the branch and push it (e.g. `claude[bot]` "Merge branch 'main' into <branch>").
+  Two consequences: (1) your in-flight local push is rejected ("fetch first" / RPC
+  `HTTP 403` from the git backend — a non-fast-forward, **not** a policy denial); (2)
+  the bot may resolve a `DESCRIPTION` version conflict to `== main`, which then fails
+  `version-check`. Recovery: stash any uncommitted work first (`git stash` — `reset
+  --hard` discards it), then `git fetch origin <branch>`, `git reset --hard
+  origin/<branch>` onto the bot's merge (don't force-push a competing parallel merge of
+  your own — build on the bot's), then re-bump the version above main and push.
+  (Hit on bcs#255: the bot pushed `4807f0c` and resolved the version to `.9062` == main,
+  failing version-check until I bumped to `.9063` on top.)
 - **Dispatched reviews now post a PR comment (gha#89, now in `v1`).** Before this fix,
   `workflow_dispatch` runs wrote output to the step summary only —
   `github.event.pull_request.number` is null for dispatch events, so the action's
@@ -403,6 +445,43 @@
   comment to say "workflow_dispatch is a manual re-review from the Actions UI" rather
   than citing `claude.yml`. The `PR_NUMBER` env comment (was "when claude.yml triggered
   us") should become "when a manual re-review is triggered." Fixed in rpt#153 and qbt#43.
+- **`@claude review` produced no review? Trace the whole dispatch chain — the
+  failure is usually in the *dispatched* review run, not the agent run.** An
+  `@claude review` *comment* fires the agent workflow `claude.yml` (issue_comment),
+  which **succeeds** and then, in a later step (a regular step after the Claude run —
+  not an Actions post-step), re-dispatches `claude-code-review.yml` via
+  `gh workflow run` (workflow_dispatch). So a green `claude.yml` run with no review
+  comment means the review died in the separately-dispatched run. Find it:
+  `actions_list` the runs of `claude-code-review.yml` filtered to
+  `event=workflow_dispatch` around the comment time, then read that run's failed
+  job logs. Don't stop at the agent run's green checkmark. (Diagnosed on rme#706:
+  agent run 28256515868 was green; the dispatched review run 28257175025 had failed.)
+- **`allowed_bots` actor gate: dispatched reviews fail in ~6 s with "Workflow
+  initiated by non-human actor: github-actions (type: Bot)".** `anthropics/claude-code-action`
+  has its **own** actor gate, separate from the workflow's job-level `if:`. Because
+  `claude.yml` re-dispatches as `github-actions[bot]`, the action aborts
+  ("Add bot to allowed_bots list or use '*'") unless the action step sets
+  `allowed_bots: "github-actions[bot]"` in its `with:` (underscore — the action's
+  own input name; the gha reusable exposes this as `allowed-bots` with a hyphen
+  and maps it through). A job `if:` that permits
+  `workflow_dispatch` is **not** enough — the run passes the `if:` then dies one layer
+  deeper in the action. The canonical gha reusable `claude-code-review.yml` already
+  sets this (via its `allowed-bots` input, default `github-actions[bot]`); a
+  standalone copy must add it. Fixed for rme in #945.
+- **Consumer repos may carry a standalone `claude-code-review.yml` that has drifted
+  from the gha reusable one — check gha first when debugging CI/infra bugs.** Not
+  every consumer calls `uses: d-morrison/gha/.github/workflows/claude-code-review.yml@v1`;
+  some (rme, pre-#948) kept a hand-maintained fork that missed fixes gha already
+  had — that drift is how the `allowed_bots` bug reached rme. When debugging a
+  CI/infra bug in a consumer repo, compare against the canonical gha `@v1` version;
+  the fix often already exists there. Preferred remedy: migrate the standalone file
+  to a thin reusable-workflow caller (gha ships example caller stubs in `examples/`)
+  so it can't drift again. Keep the workflow filename and the `pr_number`
+  workflow_dispatch input so `claude.yml`'s
+  `gh workflow run claude-code-review.yml -f pr_number=<N>` still works, mapping it
+  to the reusable's `pr-number` input; set `checkout-submodules: true` if the repo
+  has submodules the reviewer must read (e.g. rme's `latex-macros`). Done for rme
+  in #948.
 
 ## AskUserQuestion (Claude Code harness tool)
 - Each entry in `questions[]` **requires a `question` field** (the full question
@@ -502,6 +581,20 @@ any Quarto website (rme, psw, qwt, …).
   `/.quarto/` and `**/*.quarto_ipynb` to `.gitignore`. If `.quarto/` is already
   present, `/.quarto/` is redundant (the unanchored form already covers the root).
   Remove `/.quarto/` only when `.quarto/` is already present; keep `**/*.quarto_ipynb`.
+- **Manuscript projects do NOT support `repo-url` / `repo-actions` natively.**
+  `book` and `website` inherit `base-website` schema (which includes these keys);
+  `manuscript-schema` is `closed: true` with no `super`, so the keys are silently
+  ignored even when placed under `website:` or `format: html:` in `_quarto.yml`.
+  Workaround: a Lua filter that reads those keys from metadata and injects the links
+  via inline JS — see `d-morrison/qmt/_repo-links.lua` for a full implementation.
+  Upstream issue: quarto-dev/quarto-cli#14627.
+- **In Quarto Lua filters, use `quarto.doc.input_file` (not `PANDOC_STATE.input_files[1]`)
+  to get the real source path.** Quarto preprocesses `.qmd` files into temp files before
+  passing them to Pandoc; `PANDOC_STATE.input_files[1]` gives the temp path, not the
+  original `.qmd`. `quarto.doc.input_file` reads the `quarto-source` param and returns
+  the real path. To compute the repo-relative path: strip `os.getenv("QUARTO_PROJECT_DIR")`
+  from the front (`abs_input:sub(#project_root + 2)`). (Learned while writing `_repo-links.lua`
+  for d-morrison/qmt.)
 
 ## d-morrison/gha reusable workflows
 Check `d-morrison/gha` before writing bespoke CI — it has reusable workflows for
