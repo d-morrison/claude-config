@@ -393,7 +393,8 @@
 - **`@claude review` produced no review? Trace the whole dispatch chain — the
   failure is usually in the *dispatched* review run, not the agent run.** An
   `@claude review` *comment* fires the agent workflow `claude.yml` (issue_comment),
-  which SUCCEEDS and, in its post-steps, re-dispatches `claude-code-review.yml` via
+  which SUCCEEDS and then, in a later step (a regular step after the Claude run —
+  not an Actions post-step), re-dispatches `claude-code-review.yml` via
   `gh workflow run` (workflow_dispatch). So a green `claude.yml` run with no review
   comment means the review died in the separately-dispatched run. Find it:
   `actions_list` the runs of `claude-code-review.yml` filtered to
@@ -405,7 +406,9 @@
   has its OWN actor gate, separate from the workflow's job-level `if:`. Because
   `claude.yml` re-dispatches as `github-actions[bot]`, the action aborts
   ("Add bot to allowed_bots list or use '*'") unless the action step sets
-  `allowed_bots: "github-actions[bot]"` in its `with:`. A job `if:` that permits
+  `allowed_bots: "github-actions[bot]"` in its `with:` (underscore — the action's
+  own input name; the gha reusable exposes this as `allowed-bots` with a hyphen
+  and maps it through). A job `if:` that permits
   `workflow_dispatch` is NOT enough — the run passes the `if:` then dies one layer
   deeper in the action. The canonical gha reusable `claude-code-review.yml` already
   sets this (via its `allowed-bots` input, default `github-actions[bot]`); a
