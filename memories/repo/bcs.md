@@ -73,8 +73,7 @@ install.packages("/tmp/snapr.tar.gz", repos = NULL, type = "source")
 ```
 
 `snapr::expect_snapshot_data()` silently skips snapshot generation and comparison when
-`NOT_CRAN` is unset (the behavior comes from `testthat::expect_snapshot_file()`, which
-snapr delegates to; it respects the standard CRAN-skip convention):
+`NOT_CRAN` is unset (respects the standard CRAN-skip convention):
 
 ```bash
 NOT_CRAN=true Rscript -e 'devtools::test()'

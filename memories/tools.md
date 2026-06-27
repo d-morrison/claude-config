@@ -274,8 +274,7 @@
   `install.packages("readr")`, then
   `install.packages("/tmp/snapr.tar.gz", repos=NULL, type="source")`.
   `snapr::expect_snapshot_data()` silently skips snapshot generation/comparison when
-  `NOT_CRAN` is unset (respects the standard CRAN-skip convention, via
-  `testthat::expect_snapshot_file()` which snapr delegates to):
+  `NOT_CRAN` is unset (respects the standard CRAN-skip convention):
   `NOT_CRAN=true Rscript -e 'devtools::test()'`.
 - The `latex-macros` submodule (d-morrison/macros) is uninitialized on a fresh
   clone → `git submodule update --init latex-macros` before any render, else
