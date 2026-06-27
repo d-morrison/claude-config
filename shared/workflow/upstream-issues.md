@@ -17,10 +17,11 @@ them wrong can get the user's account banned. Check, in the upstream repo:
 - **Where the item belongs.** Many projects route **feature requests and
   questions to a Discussions board**, not the issue tracker. File bugs as
   issues only if that's what the guidelines say; otherwise use Discussions.
-- **Human oversight.** Never open an upstream issue/PR autonomously. Draft it,
-  show the user the full text, and **get explicit approval before posting** —
-  the user is the human contributor who reviews and verifies the submission, as
-  most AI-contribution policies require.
+
+Beyond what you read in those files: **never open an upstream issue/PR
+autonomously.** Draft it, show the user the full text, and **get explicit
+approval before posting** — the user is the human contributor who reviews and
+verifies the submission, as most AI-contribution policies require.
 
 When the policy allows AI-assisted contributions with human review, proceed
 through the escalation path:
