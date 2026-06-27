@@ -281,6 +281,22 @@
   `https://d-morrison.github.io/rme/pr-preview/pr-<N>/chapters/proportional-hazards-models.html`
   (the `pr-<N>` previews are per-PR and get deleted when the PR closes, so `<N>` is a
   placeholder for your PR number). (An instance of never assume; always verify, applied to math.)
+  - **In a remote/web sandbox the github.io preview may be unreachable** — if the
+    environment's network policy blocks `d-morrison.github.io` the proxy answers
+    `403` to CONNECT (curl: `CONNECT tunnel failed, response 403`; Chromium:
+    `ERR_TUNNEL_CONNECTION_FAILED`), so you can't load the preview to eyeball the
+    math. Verify locally instead: `npm i mathjax` (npmjs is allowed through the
+    proxy), then `require('mathjax').init({...}).then(MJ => MJ.tex2mml(defs + expr))`
+    and check the output. With the `noundefined` package an undefined macro shows
+    as `<mtext mathcolor="red">\cmd</mtext>` (NOT an `<merror>`), so grep for
+    `mathcolor="red"`.
+  - **MathJax ignores `\providecommand`** — only `\newcommand` / `\def` /
+    `\renewcommand` define a macro. So `\providecommand{\X}{...}` is a *silent
+    no-op* whenever `\X` shadows a LaTeX built-in (`\v` caron, `\b` bar, `\u`,
+    `\c`, …): the built-in meaning survives and renders broken (rme's
+    `\hat{\v{\mu}}` showed a red `\v`). Use `\vec` / `\vecf` (the macros
+    `\renewcommand` `\vec`), and fix upstream by switching `\providecommand` →
+    `\def`/`\renewcommand` for built-in names.
 - In Quarto, a cross-referenceable figure/table **div** (`::: {#fig-...}` / `::: {#tbl-...}`)
   uses its **last paragraph** as the caption — the caption text must come AFTER the
   image / code chunk / table, not before it. A caption placed first renders as ordinary
