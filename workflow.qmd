@@ -91,7 +91,7 @@ After a PR merges (or at the end of any significant session), run UMS to capture
 
 UMS reviews recent context for recurring review findings, corrections, and guidance, then writes or updates the relevant memory and skill files. A merge is the natural checkpoint to bank lessons before context is lost.
 
-The [`merge-it`](skills/merge-it/SKILL.md) skill chains `merge-it` → `post-merge` → UMS automatically when you say "merge it".
+The [`merge-it`](skills/merge-it/SKILL.md) skill chains `merge-it` → [`post-merge`](skills/post-merge/SKILL.md) → [`ums`](skills/ums/SKILL.md) automatically when you say "merge it".
 
 ## Queue keywords
 
