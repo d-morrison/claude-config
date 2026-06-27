@@ -396,6 +396,13 @@
   preferences/workflows — only the single-repo notes move out. (Learned on ai-config#226.)
 
 
+- **Always show the draft before posting to any external system.** Before running
+  `gh issue create`, `gh pr create`, `gh pr comment`, or any equivalent that sends
+  content somewhere public, output the draft in the conversation and wait for explicit
+  "ok" / approval. This applies even when the user explicitly asked to file/post —
+  they still want to see the text first. (Learned 2026-06-26: posted a quarto-cli
+  GitHub issue without showing the draft.)
+
 ## Git author mapping
 - Commits by `dem-extra1` to repos owned by `d-morrison`, `ucd-serg`, or `ucdavis` → the true author is `d-morrison` (demorrison@ucdavis.edu); set `--author="Douglas Morrison <demorrison@ucdavis.edu>"` (or amend) when the committing identity is `dem-extra1`.
 - Commits to `sparta` by `d-morrison` → the true author is `dem-extra1` (dougmor@gmail.com); set `--author="dem-extra1 <dougmor@gmail.com>"` when the committing identity is `d-morrison`.
