@@ -771,7 +771,7 @@ common patterns.
   `pull_request` to cover `merge_group` too (use release-only matrix for both).
   Affected jobs in bcs: `version-check`, `news`, `lint-changed-files`, and the
   `R-CMD-check` matrix selector. (bcs#275.)
-- **`bcs` test-coverage (codecov) is NOT a required check.** A coverage drop
+- **bcs `test-coverage` (codecov) is NOT a required check.** A coverage drop
   leaves the PR `mergeable_state: unstable` (not `blocked`) and does not block
   the merge — `docs`, `version-check`, the R-CMD-check matrix, lint, and
   spellcheck are the required ones. So a PR that adds integration code only
