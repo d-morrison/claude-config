@@ -17,4 +17,4 @@ stub-only command: it removes whole dead worktrees and their branches (a `git
 worktree prune` is just step 2 of the sweep). Read and follow the canonical
 skill:
 
-→ **`~/.claude/skills/clean-worktrees/SKILL.md`**
+→ **[clean-worktrees](../clean-worktrees/SKILL.md)**

@@ -13,4 +13,4 @@ This is a short alias for the **fetch-all** skill — fetch from origin across
 every git repo under a directory and report per-repo status. Read and follow the
 canonical skill:
 
-→ **`~/.claude/skills/fetch-all/SKILL.md`**
+→ **[fetch-all](../fetch-all/SKILL.md)**

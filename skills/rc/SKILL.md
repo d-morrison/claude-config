@@ -13,4 +13,4 @@ allowed-tools:
 
 This is a short alias. Read and follow the canonical skill:
 
-→ **`~/.claude/skills/resolve-conflicts/SKILL.md`**
+→ **[resolve-conflicts](../resolve-conflicts/SKILL.md)**

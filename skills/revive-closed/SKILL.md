@@ -13,4 +13,4 @@ allowed-tools:
 
 This is a spelled-out alias. Read and follow the canonical skill:
 
-→ **`~/.claude/skills/rescue-closed/SKILL.md`**
+→ **[rescue-closed](../rescue-closed/SKILL.md)**

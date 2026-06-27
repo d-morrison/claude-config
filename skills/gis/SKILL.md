@@ -13,6 +13,6 @@ allowed-tools:
 
 This is an alias for the **gii** skill. Read and follow the full procedure in:
 
-`~/.claude/skills/gii/SKILL.md`
+[gii](../gii/SKILL.md)
 
 Invoke the gii skill procedure exactly as documented there.

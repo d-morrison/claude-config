@@ -14,4 +14,4 @@ allowed-tools:
 This is a mnemonic alias for the **ardi** skill — *drive* a PR/MR to a clean
 review verdict. Read and follow the canonical skill:
 
-→ **`~/.claude/skills/ardi/SKILL.md`**
+→ **[ardi](../ardi/SKILL.md)**

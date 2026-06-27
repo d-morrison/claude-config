@@ -9,4 +9,4 @@ user-invocable: true
 This is a synonym alias for the **find-overlap** skill. Read and follow the
 canonical skill:
 
-→ **`~/.claude/skills/find-overlap/SKILL.md`**
+→ **[find-overlap](../find-overlap/SKILL.md)**

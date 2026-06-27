@@ -16,7 +16,7 @@ the repo's entire work queue end to end: drive every open PR/MR to a clean
 review verdict with green CI, and open a PR for every open issue that lacks one
 (each new PR is itself driven to clean). Read and follow the canonical skill:
 
-→ **`~/.claude/skills/gia/SKILL.md`**
+→ **[gia](../gia/SKILL.md)**
 
 > `gia` runs PRs-first (ARDIA), then issues (GII), even though "clear-all"
 > describes the issues half first — the end state is identical (every issue has

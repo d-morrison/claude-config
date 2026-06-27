@@ -12,4 +12,4 @@ allowed-tools:
 
 This is a short alias. Read and follow the canonical skill:
 
-→ **`~/.claude/skills/check-rendered-refs/SKILL.md`**
+→ **[check-rendered-refs](../check-rendered-refs/SKILL.md)**

@@ -116,7 +116,7 @@ allowed-tools:               # real skill: list its tools. alias: mirror the can
 
   This is a spelled-out alias. Read and follow the canonical skill:
 
-  → **`~/.claude/skills/<canonical>/SKILL.md`**
+  → **[<canonical>](../<canonical>/SKILL.md)**
   ```
   Keep the real content in **one** canonical file; aliases never duplicate it.
   The alias's `allowed-tools` is the one exception: copy the canonical's list

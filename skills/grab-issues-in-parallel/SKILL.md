@@ -14,4 +14,4 @@ allowed-tools:
 
 This is a spelled-out alias. Read and follow the canonical skill:
 
-→ **`~/.claude/skills/gip/SKILL.md`**
+→ **[gip](../gip/SKILL.md)**

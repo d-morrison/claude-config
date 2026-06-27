@@ -14,4 +14,4 @@ allowed-tools:
 This is the spelled-out alias for the **ardiaei** skill. Read and follow the
 canonical skill:
 
-→ **`~/.claude/skills/ardiaei/SKILL.md`**
+→ **[ardiaei](../ardiaei/SKILL.md)**

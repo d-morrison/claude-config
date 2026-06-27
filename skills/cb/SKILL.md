@@ -14,6 +14,6 @@ allowed-tools:
 This is an alias for the **clean-branches** skill. Read and follow the full
 procedure in:
 
-`~/.claude/skills/clean-branches/SKILL.md`
+[clean-branches](../clean-branches/SKILL.md)
 
 Invoke the clean-branches skill procedure exactly as documented there.

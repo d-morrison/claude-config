@@ -14,4 +14,4 @@ allowed-tools:
 This is a transposition-typo alias for the **ardia** skill. Read and follow the
 canonical skill:
 
-→ **`~/.claude/skills/ardia/SKILL.md`**
+→ **[ardia](../ardia/SKILL.md)**

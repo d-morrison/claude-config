@@ -14,4 +14,4 @@ allowed-tools:
 `model-fit` and `assess-model-fit` are synonyms — same behavior regardless of which
 name you use. Read and follow the canonical skill:
 
-→ **`~/.claude/skills/assess-model-fit/SKILL.md`**
+→ **[assess-model-fit](../assess-model-fit/SKILL.md)**

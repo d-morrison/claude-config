@@ -17,7 +17,7 @@ any phrasing that fires `wrap-up` ("wrap up", "finish up", "are we done?") fires
 `done` too, and both run the same procedure. That is why this skill's
 `description` repeats those triggers.
 
-**Do this:** read `~/.claude/skills/wrap-up/SKILL.md` and follow its
+**Do this:** read [wrap-up](../wrap-up/SKILL.md) and follow its
 instructions exactly. Everything that skill says — verify the real state of
 every PR/issue/branch/working tree, report a linked final summary that surfaces
 anything still open, then run a UMS review to persist what was learned —

@@ -14,4 +14,4 @@ allowed-tools:
 This is the spelled-out alias for the **gia** skill. Read and follow the
 canonical skill:
 
-→ **`~/.claude/skills/gia/SKILL.md`**
+→ **[gia](../gia/SKILL.md)**

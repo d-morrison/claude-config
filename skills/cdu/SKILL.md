@@ -14,4 +14,4 @@ allowed-tools:
 
 This is a short alias. Read and follow the canonical skill:
 
-→ **`~/.claude/skills/check-dependency-updates/SKILL.md`**
+→ **[check-dependency-updates](../check-dependency-updates/SKILL.md)**

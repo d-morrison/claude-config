@@ -14,4 +14,4 @@ allowed-tools:
 
 This is a short alias. Read and follow the canonical skill:
 
-→ **`~/.claude/skills/find-ai-tells/SKILL.md`**
+→ **[find-ai-tells](../find-ai-tells/SKILL.md)**

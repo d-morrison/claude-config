@@ -14,6 +14,6 @@ allowed-tools:
 This is an alias for the **sup** skill. Read and follow the full
 procedure in:
 
-`~/.claude/skills/sup/SKILL.md`
+[sup](../sup/SKILL.md)
 
 Invoke the sup skill procedure exactly as documented there.

@@ -10,4 +10,4 @@ This is a synonym alias for the **ardi** skill (ARD + Iterate) — the per-findi
 disposition is framed as Address / Rebut / Defer, but the loop is the same one
 you'd reach for under "iterate until clean". Read and follow the canonical skill:
 
-→ **`~/.claude/skills/ardi/SKILL.md`**
+→ **[ardi](../ardi/SKILL.md)**

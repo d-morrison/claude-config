@@ -15,4 +15,4 @@ This is a mnemonic alias for the **clean-branches** skill — it prunes dead and
 stale branches in **both your local checkout and the remote**. Read and follow
 the canonical skill:
 
-→ **`~/.claude/skills/clean-branches/SKILL.md`**
+→ **[clean-branches](../clean-branches/SKILL.md)**

@@ -8,4 +8,4 @@ user-invocable: true
 
 This is an alias. Read and follow the canonical skill:
 
-→ **`~/.claude/skills/chores/SKILL.md`**
+→ **[chores](../chores/SKILL.md)**

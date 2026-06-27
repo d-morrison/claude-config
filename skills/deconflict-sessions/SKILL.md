@@ -12,4 +12,4 @@ This is a descriptive alias for the **session-lock** skill — deconflicting
 multiple AI sessions operating locally on the same repo. Read and follow the
 canonical skill:
 
-→ **`~/.claude/skills/session-lock/SKILL.md`**
+→ **[session-lock](../session-lock/SKILL.md)**

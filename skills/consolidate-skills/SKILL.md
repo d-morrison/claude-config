@@ -52,7 +52,7 @@ cluster into exactly one of three buckets:
    `ard`/`adr`/`address-rebut-defer`, `cb`/`prune`/`clean-branches`,
    `sync-pr-branch`/`merge-main`/`resync-branch`). This is the *target* state,
    not a problem. Tell: the others' bodies are ~5 lines ending in
-   `→ ~/.claude/skills/<canonical>/SKILL.md`.
+   `→ **[<canonical>](../<canonical>/SKILL.md)**`.
 2. **Adjacent-but-distinct — LEAVE ALONE (maybe cross-link).** Same theme,
    genuinely different procedure (e.g. `tidy` audits for refactors vs `simplify`
    prunes dead code; `split-concerns` splits a PR vs `defer-issue` files a
@@ -133,7 +133,7 @@ user-invocable: true
 
 This is an alias for the **<canonical>** skill. Read and follow the canonical skill:
 
-→ **`~/.claude/skills/<canonical>/SKILL.md`**
+→ **[<canonical>](../<canonical>/SKILL.md)**
 ```
 
 Carry the absorbed skill's own trigger phrases into the stub's `description` so

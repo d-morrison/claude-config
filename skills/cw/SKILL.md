@@ -14,4 +14,4 @@ allowed-tools:
 This is a short alias for the **clean-worktrees** skill. Read and follow the
 canonical skill:
 
-→ **`~/.claude/skills/clean-worktrees/SKILL.md`**
+→ **[clean-worktrees](../clean-worktrees/SKILL.md)**

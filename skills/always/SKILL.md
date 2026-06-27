@@ -16,4 +16,4 @@ which word the user uses. An "always …" (or "never …") directive is a standi
 preference to persist, so it routes to the same canonical skill. Read and
 follow the canonical skill:
 
-→ **`~/.claude/skills/memorize/SKILL.md`**
+→ **[memorize](../memorize/SKILL.md)**

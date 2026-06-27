@@ -9,4 +9,4 @@ user-invocable: true
 This is a synonym alias for the **consolidate-skills** skill. Read and follow
 the canonical skill:
 
-→ **`~/.claude/skills/consolidate-skills/SKILL.md`**
+→ **[consolidate-skills](../consolidate-skills/SKILL.md)**

@@ -14,4 +14,4 @@ allowed-tools:
 `remember` and `memorize` are synonyms — same behavior regardless of which word
 the user uses. Read and follow the canonical skill:
 
-→ **`~/.claude/skills/memorize/SKILL.md`**
+→ **[memorize](../memorize/SKILL.md)**

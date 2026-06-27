@@ -18,4 +18,4 @@ allowed-tools:
 
 This is a short alias. Read and follow the canonical skill:
 
-→ **`~/.claude/skills/opposition-research/SKILL.md`**
+→ **[opposition-research](../opposition-research/SKILL.md)**
