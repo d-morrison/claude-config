@@ -104,8 +104,11 @@ reflect, and persist.
 - [ ] Did the user correct my behavior? → Encode as preference + skill update
 - [ ] Did I discover a tool quirk? → `/memories/tools.md`
 - [ ] Did I learn a debugging pattern? → `/memories/debugging.md`
+- [ ] Did I create a *new* file under `/memories/`? → register it in
+  `memories/MEMORY.md` as an index entry
+
 - [ ] Did I discover a repo convention for a repo **we own** that has checked-in
-  agent docs? → put it IN that repo (its `CLAUDE.md` / `.github/instructions/*.md`),
+  agent docs? → put it IN that repo (its `CLAUDE.md`, `.github/agents/*.md`, or `.github/instructions/*.md`),
   via a PR, so the whole team and every `@claude` session there sees it. Do NOT
   keep repo-specific notes in ai-config (`memories/repo/` is retired). For a repo
   without agent-doc infrastructure, fall back to that repo's local Claude project
@@ -136,3 +139,9 @@ record-as-you-go, or when the user wants to ensure nothing was missed.
 - ❌ Updating only preferences when a skill also needs the fix
 - ❌ `git add -A` — it sweeps unrelated in-flight edits (the user's work, other
   draft skills) into your commit/PR. Stage the specific files you touched.
+- ❌ Creating `memories/repo/<repo>.md` for any repo — this pattern is retired.
+  Put repo-specific lore in the repo's own agent docs (`.github/agents/`,
+  `CLAUDE.md`, `.github/instructions/`) via a PR, or in
+  `~/.claude/projects/<project-path>/memory/` (local project memory, no commit) if the
+  repo has no agent-doc infrastructure. See the checklist item above and
+  `memories/preferences.md` for the full rule.

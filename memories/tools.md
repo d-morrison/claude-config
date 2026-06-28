@@ -268,6 +268,15 @@
     back and nothing installs — drop the unavailable pkg and retry. (Holds for
     `pak::pkg_install()`, and for `install.packages()` while renv's pak backend
     is active; base `install.packages()` on its own is NOT atomic.)
+  - The **`renv` autoloader can shadow a system-library install.** If you
+    `install.packages()` a Suggests-only tool (e.g. `lintr`, `spelling`) into the
+    *default* libPaths rather than the active renv library, `Rscript` run from the
+    repo root STILL fails with "no package called 'lintr'" — the project
+    `.Rprofile` autoloader resets `.libPaths()` to the renv library on startup.
+    Either install into the renv library (the P3M path above), or run the one-off
+    with the autoloader off:
+    `RENV_CONFIG_AUTOLOADER_ENABLED=FALSE Rscript -e 'lintr::lint("path/to/file.qmd")'`.
+    (Used to lint the changed files for rme #873 when lintr wasn't in the renv lib.)
 - **renv activation failure when a GitHub remote is blocked**: if `DESCRIPTION`
   lists a GitHub `Remotes:` entry the proxy can't reach (e.g. bcs's
   `d-morrison/altdoc@recursive-qmd-search`), renv activation (via `.Rprofile`)

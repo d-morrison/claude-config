@@ -54,15 +54,18 @@ Say so and route it there; don't store a note that will never fire.
      `~/.claude/CLAUDE.md` (it's loaded every session)
    - **General reference fact** — a cross-project fact that only matters when
      relevant ("gh opens a pager — pipe to cat") → a topical file in
-     `/memories/` (e.g. `tools.md`, `debugging.md`)
+     `/memories/` (e.g. `tools.md`, `debugging.md`). When you add a *new* file
+     here (not just a bullet to an existing one), register it in
+     `memories/MEMORY.md` as an index entry.
    - **Conversation-only** → `/memories/session/`
    - When ambiguous between project and general, judge by relevance; default
      to general.
 3. **Choose file**: read the target's current contents first. Append to an
    existing section/file if one fits; otherwise create a descriptively named
-   file. Don't duplicate — if it's already recorded, update in place rather
-   than stacking a second copy, and say so. Delete a memory that turns out
-   wrong instead of leaving a contradiction.
+   file — and when you create a *new* file under `/memories/`, add a row for it
+   to `memories/MEMORY.md` (the index). Don't duplicate — if it's already
+   recorded, update in place rather than stacking a second copy, and say so.
+   Delete a memory that turns out wrong instead of leaving a contradiction.
 4. **Write** a concise bullet (one line preferred), matching the file's voice;
    include the *why* if it isn't obvious. Don't record what the repo already
    documents (code structure, git history) — capture only the non-obvious.

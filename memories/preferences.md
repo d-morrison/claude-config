@@ -5,6 +5,15 @@
   on one, confirm it with a tool call — don't rely on what was true earlier in the
   session or what "should" be the case. State drifts between turns. "It should be X" /
   "I left it as X" / "presumably X" are red flags; replace with a fresh check.
+- NEVER fabricate anything, under any circumstances — always PRODUCE IT FOR REAL.
+  Demos/recordings must be captured from the actual system through the real code path
+  (not hand-authored data dressed up as a recording); results/metrics must come from
+  actually running the thing; screenshots must be of real state. If it can't be produced
+  for real yet, do the work to make it real (build the harness, drive the real pipeline) —
+  do NOT fall back to "disclosing a limitation" instead, and never mock/synthesize/hand-author
+  something and present it as captured or real. (Learned the hard way on sparta#247: a demo's
+  "mouse recording" was hand-written JSON; the fix was a cursor-injection seam so a real
+  recorder drives the actual game.)
 - ALWAYS record what I learn in memory/AI-instruction notes as I work (standing request).
 - When recording a factual claim about tool/workflow behavior (an implementation detail
   or a causal explanation derived from a specific source), cite the source inline —
