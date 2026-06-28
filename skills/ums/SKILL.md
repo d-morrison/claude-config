@@ -104,6 +104,9 @@ reflect, and persist.
 - [ ] Did the user correct my behavior? → Encode as preference + skill update
 - [ ] Did I discover a tool quirk? → `/memories/tools.md`
 - [ ] Did I learn a debugging pattern? → `/memories/debugging.md`
+- [ ] Did I create a *new* file under `/memories/`? → register it in
+  `memories/MEMORY.md` as an index entry
+
 - [ ] Did I discover a repo convention for a repo **we own** that has checked-in
   agent docs? → put it IN that repo (its `CLAUDE.md`, `.github/agents/*.md`, or `.github/instructions/*.md`),
   via a PR, so the whole team and every `@claude` session there sees it. Do NOT
