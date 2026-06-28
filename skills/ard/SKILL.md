@@ -158,7 +158,11 @@ glab api -X PUT "projects/:id/merge_requests/<N>/discussions/<discussion_id>?res
 **Resolve only when the item is actually settled:**
 
 - **Address** — resolve after the fix is **pushed** (reply names the SHA). Never
-  resolve an Address whose fix isn't on the branch yet.
+  resolve an Address whose fix isn't on the branch yet. Not confident the fix
+  fully settles the concern? When the finding is ambiguous, turns on a design
+  choice, or admits only a partial fix, reply explaining what you did and
+  **ask for confirmation** instead of resolving. Leave the thread open for the
+  reviewer to verify.
 - **Defer** — reply with the tracked issue link, then resolve (work lives
   elsewhere now).
 - **Acknowledge** — reply briefly, then resolve.
