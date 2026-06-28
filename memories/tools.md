@@ -64,6 +64,13 @@
   which can connect asynchronously after session start. Don't conclude a tool is
   absent from one check — `ToolSearch` for what you need before deciding it's
   missing (and don't assume the `github_ci` server is present either).
+- **`mcp__github__actions_run_trigger` can't re-run CI jobs in these sessions —
+  it 403s.** `method: rerun_failed_jobs` (and `rerun_workflow_run`) returns
+  `403 Resource not accessible by integration`: the integration token lacks the
+  `actions: write` the re-run API needs. So a flaky CI failure can't be re-kicked
+  via MCP — **push a commit to re-trigger the whole workflow** (the normal path
+  during an iterate loop anyway), or ask the user to click Re-run. (Hit
+  re-running a flaky `link-checker` timeout on a lab-manual PR.)
 - `mcp__github__pull_request_read` `method:` enum: `get` · `get_diff` (PR
   unified diff — equivalent to `gh pr diff`) · `get_status` · `get_files` ·
   `get_commits` · `get_review_comments` · `get_reviews` · `get_comments` ·
