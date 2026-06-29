@@ -67,12 +67,31 @@ pick, or proceed with #1 if they say "just go":
 
 If the user already specified an issue ("gi #12"), skip this step.
 
-### 4. Check history
+### 4. Check for existing PRs on the issue
+
+Before claiming or branching, check whether an open PR already exists for
+the chosen issue:
+
+```bash
+# GitHub — look for PRs that reference the issue number in title or body
+gh pr list --state open --json number,title,headRefName | cat
+# Also check the issue's linked PRs:
+gh issue view <N> --json timelineItems 2>/dev/null | cat
+```
+
+If an open PR already exists for the issue:
+- **Don't open a competing PR.** The issue is already being worked.
+- Skip it and grab the next unblocked issue instead.
+- Or, if the existing PR is stalled/abandoned and you're taking it over,
+  check it out (use the existing PR branch), claim the PR, and ARDI it
+  rather than starting fresh.
+
+### 5. Check history
 
 Before implementing, invoke the `check-history` skill to review merged
 MRs/PRs that touched the same area. Don't undo past progress.
 
-### 5. Claim the issue
+### 6. Claim the issue
 
 ```bash
 # GitHub
@@ -82,7 +101,7 @@ gh issue comment <N> --body "Claude Code CLI (local session) is working on this 
 glab issue note <N> --message "Claude Code CLI (local session) is working on this — paws off until I'm done."
 ```
 
-### 6. Create a branch
+### 7. Create a branch
 
 ```bash
 git fetch origin main
@@ -95,7 +114,7 @@ Branch naming:
 - Docs → `docs/<issue-slug>`
 - Refactor → `refactor/<issue-slug>`
 
-### 7. Implement
+### 8. Implement
 
 - Read the issue description carefully — understand "done" criteria
 - Make the changes (code, tests, docs as needed)
@@ -103,7 +122,7 @@ Branch naming:
 - Commit with a message referencing the issue:
   `fix: handle auth timeout on slow networks (closes #12)`
 
-### 8. Push and open MR/PR
+### 9. Push and open MR/PR
 
 ```bash
 git push -u origin fix/<slug>
