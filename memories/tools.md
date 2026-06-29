@@ -356,9 +356,9 @@
   Observed verbatim: "send-pack: unexpected disconnect" / "remote end hung up", then a
   misleading "Everything up-to-date" (the proxy returns that no-op message instead of a
   normal `failed to push some refs` error), but the command still exits non-zero. So a
-  throwaway branch (e.g. a push-capability
-  probe) can't be cleaned up from the session; delete it via the GitHub UI/API, or just
-  leave it if it's identical to `main` and has no PR. (Seen on ai-config, 2026-06-28.)
+  throwaway branch (e.g. a push-capability probe) can't be cleaned up from the session;
+  delete it via the GitHub UI/API, or just leave it if it's identical to `main` and has
+  no PR. (Seen on ai-config, 2026-06-28.)
 - Consequence: you CANNOT poll PR review/CI state from a background Monitor.
   Rely on `mcp__github__subscribe_pr_activity`, which delivers review comments
   and CI *failures* — but NOT CI success, new pushes, or merge-conflict
