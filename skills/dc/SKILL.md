@@ -11,7 +11,7 @@ allowed-tools:
 
 # dc — "drive to clean" (alias for `ardi`)
 
-This is a mnemonic alias for the **ardi** skill — *drive to clean*. Read and
-follow the canonical skill:
+This is a mnemonic alias for the **ardi** skill — *drive to clean*.
+Read and follow the canonical skill:
 
 → **[ardi](../ardi/SKILL.md)**

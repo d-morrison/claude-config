@@ -14,9 +14,7 @@ import sys
 from pathlib import Path
 
 
-# --------------------------------------------------------------------------- #
-#  Sentence splitting                                                          #
-# --------------------------------------------------------------------------- #
+# Sentence splitting
 
 # Abbreviations whose trailing period should NOT trigger a sentence split.
 # Matched as whole words (word-boundary on the left, literal period on right).
@@ -63,9 +61,7 @@ def split_sentences(text: str) -> list[str]:
     return [p for p in parts if p]
 
 
-# --------------------------------------------------------------------------- #
-#  Paragraph / bullet helpers                                                  #
-# --------------------------------------------------------------------------- #
+# Paragraph / bullet helpers
 
 _BULLET_RE = re.compile(r'^(\s*)([-*+]|\d+\.)\s+(.*)', re.DOTALL)
 _HEADING_RE = re.compile(r'^\s*#{1,6}[\s#]')
@@ -89,16 +85,13 @@ def _is_new_block(line: str) -> bool:
     )
 
 
-# --------------------------------------------------------------------------- #
-#  Blockquote prose flusher                                                    #
-# --------------------------------------------------------------------------- #
+# Blockquote prose flusher
 
 def _flush_bq_prose(bq_lines: list[str], output: list[str]) -> None:
     """Sentence-split accumulated blockquote prose lines and append to output."""
     if not bq_lines:
         return
-    prefix_m = re.match(r'^(\s*>\s*)', bq_lines[0])
-    bq_prefix = prefix_m.group(1) if prefix_m else '> '
+    bq_prefix = re.match(r'^(\s*>\s*)', bq_lines[0]).group(1)
     bq_text = ' '.join(re.sub(r'^\s*>\s*', '', bl).strip() for bl in bq_lines)
     bq_text = re.sub(r'\s+', ' ', bq_text).strip()
     sentences = split_sentences(bq_text)
@@ -109,9 +102,7 @@ def _flush_bq_prose(bq_lines: list[str], output: list[str]) -> None:
             output.append(bq_prefix + s)
 
 
-# --------------------------------------------------------------------------- #
-#  File processor                                                               #
-# --------------------------------------------------------------------------- #
+# File processor
 
 def process_file(path: Path) -> bool:
     """
@@ -131,9 +122,7 @@ def process_file(path: Path) -> bool:
         line = lines[i]
         stripped = line.strip()
 
-        # ------------------------------------------------------------------ #
         #  YAML frontmatter                                                   #
-        # ------------------------------------------------------------------ #
         if not frontmatter_done and not in_frontmatter and i == 0 and stripped == '---':
             in_frontmatter = True
             output.append(line)
@@ -148,9 +137,7 @@ def process_file(path: Path) -> bool:
             i += 1
             continue
 
-        # ------------------------------------------------------------------ #
         #  Fenced code blocks                                                 #
-        # ------------------------------------------------------------------ #
         if _FENCE_RE.match(stripped):
             in_code_block = not in_code_block
             output.append(line)
@@ -162,9 +149,7 @@ def process_file(path: Path) -> bool:
             i += 1
             continue
 
-        # ------------------------------------------------------------------ #
         #  Pass-through: blank, heading, table row, horizontal rule          #
-        # ------------------------------------------------------------------ #
         if (not stripped or
                 _HEADING_RE.match(line) or
                 _TABLE_RE.match(line) or
@@ -173,9 +158,7 @@ def process_file(path: Path) -> bool:
             i += 1
             continue
 
-        # ------------------------------------------------------------------ #
         #  Blockquotes — process line by line                                #
-        # ------------------------------------------------------------------ #
         if _BQ_RE.match(line):
             # Process the blockquote line-by-line, tracking fence state so
             # code blocks nested inside blockquotes are emitted verbatim.
@@ -203,9 +186,7 @@ def process_file(path: Path) -> bool:
             i = j
             continue
 
-        # ------------------------------------------------------------------ #
         #  Bullet points                                                      #
-        # ------------------------------------------------------------------ #
         bullet_m = _BULLET_RE.match(line)
         if bullet_m:
             pre = bullet_m.group(1)    # leading spaces
@@ -253,9 +234,7 @@ def process_file(path: Path) -> bool:
             i = j
             continue
 
-        # ------------------------------------------------------------------ #
         #  Prose paragraphs                                                   #
-        # ------------------------------------------------------------------ #
         # Leading indent of the paragraph's first line.
         para_lead = len(line) - len(line.lstrip())
         indent_str = ' ' * para_lead
@@ -294,9 +273,7 @@ def process_file(path: Path) -> bool:
     return False
 
 
-# --------------------------------------------------------------------------- #
-#  Entry point                                                                  #
-# --------------------------------------------------------------------------- #
+# Entry point
 
 def main():
     if len(sys.argv) < 2:

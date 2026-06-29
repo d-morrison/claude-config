@@ -12,14 +12,59 @@ on:
         type: string
 
 jobs:
+  gather-context:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: read
+    outputs:
+      prior-reviews: ${{ steps.fetch.outputs.prior-reviews }}
+    steps:
+      - id: fetch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Fetch last 3 claude[bot] review comments (REST author login is "claude[bot]")
+          REVIEWS=$(gh api "repos/${REPO}/issues/${PR_NUMBER}/comments" \
+            --jq '[.[] | select(.user.login == "claude[bot]")] | .[-3:] |
+                  .[] | "=== Review posted \(.created_at) ===\n\(.body)\n"' \
+            2>/dev/null | head -c 12000 || true)
+          {
+            echo 'prior-reviews<<__REVIEWS_EOF__'
+            echo "$REVIEWS"
+            echo '__REVIEWS_EOF__'
+          } >> "$GITHUB_OUTPUT"
+
   review:
+    needs: gather-context
     permissions:
       contents: read
       pull-requests: write
       issues: write
       id-token: write
-      actions: read   # lets the reviewer read CI status (github_ci MCP server); without it the reusable workflow requests a permission the caller didn't grant and the run dies at startup_failure
+      actions: read   # lets the reviewer read CI status (github_ci MCP server)
     uses: d-morrison/gha/.github/workflows/claude-code-review.yml@v1
     secrets: inherit
     with:
       pr-number: ${{ inputs.pr_number }}
+      prompt-addendum: |
+        ## Review scope
+
+        Do not flag cosmetic raw-source line-wrapping in Markdown prose files
+        (`.md`, `.qmd`). A noun phrase or sentence split across a hard wrap
+        looks odd in raw source but renders identically — it is not a genuine
+        prose problem. Keep flagging real prose issues: ambiguity, grammar that
+        changes meaning, factual errors, or missing words.
+
+        ## Prior review context
+
+        The comments below are the last few reviews you (claude[bot]) posted on this PR.
+        Before posting your findings, check whether each finding you are about to raise
+        was already raised in a prior round. If it was, and the author replied with a
+        rebuttal explaining why the code is correct or the finding is a false positive,
+        and that thread was resolved — do not re-raise it. Only re-raise if the current
+        diff introduces a new instance of the same issue on a different line, or if the
+        author's fix is absent from the current diff.
+
+        ${{ needs.gather-context.outputs.prior-reviews }}
