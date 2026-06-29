@@ -44,6 +44,8 @@ Scan the issue list and rank by priority. Use these signals (in order):
 | Age (older unresolved issues accumulate cost) | Medium |
 | Size/complexity (prefer issues you can complete in one session) | Tie-breaker |
 | Already assigned to someone else | **Skip** |
+| Issue comment says "Working on this" | **Skip** |
+| Open PR already exists for the issue | **Skip** |
 
 **Re-triage if helpful:** If labels are stale, missing, or inconsistent, briefly
 suggest re-labeling to the user before proceeding. Don't unilaterally relabel
