@@ -34,6 +34,14 @@ _ABBREV_RE = re.compile(
 _SENT_BREAK_RE = re.compile(r'([.!?][`"\')\]]*)\s+(?=[A-Z"\'`\*\[])')
 
 
+_PLACEHOLDER = '\x00'
+
+
+def _protect_inline_code(m: re.Match) -> str:
+    """Replace sentence-ending punctuation inside backtick spans with placeholders."""
+    return m.group(0).replace('.', _PLACEHOLDER).replace('!', '\x01').replace('?', '\x02')
+
+
 def split_sentences(text: str) -> list[str]:
     """Split text at sentence boundaries; return list of sentences."""
     text = re.sub(r'\s+', ' ', text).strip()
@@ -41,20 +49,16 @@ def split_sentences(text: str) -> list[str]:
         return []
 
     # Protect abbreviations by replacing their dot with a placeholder.
-    placeholder = '\x00'
-    protected = _ABBREV_RE.sub(lambda m: m.group(1) + placeholder, text)
+    protected = _ABBREV_RE.sub(lambda m: m.group(1) + _PLACEHOLDER, text)
 
     # Also protect periods inside backtick spans (inline code).
-    def protect_code(m: re.Match) -> str:
-        return m.group(0).replace('.', placeholder).replace('!', '\x01').replace('?', '\x02')
-
-    protected = re.sub(r'`[^`]+`', protect_code, protected)
+    protected = re.sub(r'`[^`]+`', _protect_inline_code, protected)
 
     # Insert newline at sentence boundaries.
     protected = _SENT_BREAK_RE.sub(lambda m: m.group(1) + '\n', protected)
 
     # Split and restore.
-    parts = [p.replace(placeholder, '.').replace('\x01', '!').replace('\x02', '?').strip()
+    parts = [p.replace(_PLACEHOLDER, '.').replace('\x01', '!').replace('\x02', '?').strip()
              for p in protected.split('\n')]
     return [p for p in parts if p]
 
@@ -70,17 +74,6 @@ _HR_RE = re.compile(r'^\s*[-*_]{3,}\s*$')
 _FENCE_RE = re.compile(r'^\s*```')
 _BQ_RE = re.compile(r'^\s*>')
 _BLANK_RE = re.compile(r'^\s*$')
-
-
-def _is_special(line: str) -> bool:
-    """True if line should be passed through unchanged."""
-    return bool(
-        _BLANK_RE.match(line) or
-        _HEADING_RE.match(line) or
-        _TABLE_RE.match(line) or
-        _HR_RE.match(line) or
-        _BQ_RE.match(line)
-    )
 
 
 def _is_new_block(line: str) -> bool:
@@ -165,11 +158,21 @@ def process_file(path: Path) -> bool:
         # ------------------------------------------------------------------ #
         if _BQ_RE.match(line):
             # Collect consecutive blockquote lines (may wrap across lines).
+            # Stop when we hit a fenced code block inside the blockquote so
+            # we don't strip fence markers and mangle their content.
             bq_lines = []
             j = i
             while j < len(lines) and _BQ_RE.match(lines[j]):
+                if _FENCE_RE.match(lines[j].lstrip('> ')):
+                    break
                 bq_lines.append(lines[j])
                 j += 1
+
+            if not bq_lines:
+                # Hit a fence immediately; emit this line verbatim and move on.
+                output.append(line)
+                i += 1
+                continue
 
             # Try to join wrapped lines in the blockquote and re-split.
             # Detect the prefix ("> " or ">  " etc.).
@@ -212,6 +215,9 @@ def process_file(path: Path) -> bool:
                 nl = lines[j]
                 ns = nl.strip()
                 if not ns:
+                    break
+                # Stop at a fenced code block — emit the rest verbatim.
+                if _FENCE_RE.match(nl):
                     break
                 nl_lead = len(nl) - len(nl.lstrip())
                 # Stop at a new top-level bullet (same or lower indent) or
