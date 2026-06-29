@@ -12,7 +12,8 @@ allowed-tools:
 # assess-model-fit — Evaluate current model capability
 
 Determine whether the current Claude model is sufficient for your task, or recommend
-escalation to a higher-level model. Runs in **procedural mode** (checklist guidance)
+escalation to a higher-level model.
+Runs in **procedural mode** (checklist guidance)
 or **executable mode** (analyze a task and auto-recommend).
 
 ## Procedure
@@ -45,7 +46,6 @@ or **executable mode** (analyze a task and auto-recommend).
    - **Escalate to higher model** if you checked yes on any red flag above
 
 4. **If escalation needed,** invoke `/select-model` to determine the target.
-
    Describe your task, and `select-model` will recommend Sonnet or Opus and suggest
    a config update if you want it.
 

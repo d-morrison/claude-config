@@ -12,6 +12,7 @@ allowed-tools:
 # drive — "drive to clean" (alias for `ardi`)
 
 This is a mnemonic alias for the **ardi** skill — *drive* a PR/MR to a clean
-review verdict. Read and follow the canonical skill:
+review verdict.
+Read and follow the canonical skill:
 
 → **[ardi](../ardi/SKILL.md)**
