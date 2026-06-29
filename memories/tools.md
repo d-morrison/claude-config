@@ -75,6 +75,14 @@
   unified diff — equivalent to `gh pr diff`) · `get_status` · `get_files` ·
   `get_commits` · `get_review_comments` · `get_reviews` · `get_comments` ·
   `get_check_runs`.
+- **`get_status` can return "pending / 0 checks" even after CI has finished.**
+  Use `get_check_runs` for the authoritative CI state — it returns the real
+  job conclusions (`success`, `failure`, `skipped`). `get_status` aggregates
+  across check suites and can lag or show a stale "pending" when all runs have
+  actually completed. Don't rely on `get_status` alone to declare CI green.
+  (Hit during the ai-config #275 GII session — `get_status` showed
+  `total_count: 0` / `pending` while `get_check_runs` correctly showed all 5
+  checks `success`.)
 - `mcp__github__pull_request_read` parameter names are **camelCase** — use
   `pullNumber`, NOT `pull_number`. Snake_case fails silently or errors.
 - `mcp__github__add_issue_comment` parameter is **`issue_number`** (snake_case),
@@ -133,6 +141,25 @@
   `CLAUDE.md` mapping table" — that cross-reference
   resolves only in gha and reads as a fabricated reference elsewhere. (Caught in
   ai-config#137 review: the gip skill referenced a table ai-config doesn't have.)
+
+## GII (Grab Issues Iteratively) — startup cleanup sweep
+
+When starting a GII loop, do a cleanup pass before diving into ARDI:
+
+1. **List all open PRs** with `mcp__github__list_pull_requests`. Look for
+   stale bot-opened PRs that target the same issues as the queue.
+2. **Close empty PRs** — bot-opened branches with no commits (e.g. a `@claude`
+   task run that posted a comment but never pushed code). Check `get_commits`
+   on each PR before closing.
+3. **Identify the canonical PR** for each in-flight issue. Superseded drafts
+   should be closed with a note pointing to the canonical one.
+4. **Collapse stacked changes** — if two open PRs both touch the same file,
+   merge one branch into the other before starting ARDI, so the reviewer
+   evaluates the combined diff rather than two separate PRs.
+
+Skipping this sweep leads to confusion: multiple PRs for the same issue,
+closed-issue references in multiple PR bodies, and stacking conflicts mid-ARDI.
+(Learned from the ai-config #275 / #272 / #265 / #266 cleanup pass.)
 
 ## Git tags (force-move / slide)
 - To move a tag to a new commit: `git tag -d <tag> && git tag <tag> <target> && git push origin :refs/tags/<tag> && git push origin <tag>`
@@ -775,6 +802,18 @@ DELIMITER="eof_$(openssl rand -hex 8)"
   echo "${DELIMITER}"
 } >> "$GITHUB_OUTPUT"
 ```
+The ai-config `claude-review.yml` (merged in #275) uses a static
+`__REVIEWS_EOF__` delimiter instead — accepted by design but is a known
+divergence from this best practice.
+
+**Content filter for issue-comments endpoint.** When fetching
+`/issues/{n}/comments` for prior reviews, the filter
+`select(.user.login == "claude[bot]")` picks up BOTH review summaries AND
+`@claude` task-handler responses ("Claude finished…" / "Claude Code is
+working…"). Add `and (.body | test("### Code Review"))` to discriminate review
+summaries from task-handler posts. The ai-config `claude-review.yml` (#275)
+omits this content filter — it was accepted, but task-handler responses can
+appear in the `prior-reviews` context.
 
 **`needs.X.result != 'cancelled'` vs `== 'success'`** — when the dependency job
 is non-critical (acceptable to proceed without its output), use
