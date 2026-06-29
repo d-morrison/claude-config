@@ -122,7 +122,7 @@ def process_file(path: Path) -> bool:
         line = lines[i]
         stripped = line.strip()
 
-        #  YAML frontmatter                                                   #
+        # YAML frontmatter
         if not frontmatter_done and not in_frontmatter and i == 0 and stripped == '---':
             in_frontmatter = True
             output.append(line)
@@ -137,7 +137,7 @@ def process_file(path: Path) -> bool:
             i += 1
             continue
 
-        #  Fenced code blocks                                                 #
+        # Fenced code blocks
         if _FENCE_RE.match(stripped):
             in_code_block = not in_code_block
             output.append(line)
@@ -149,7 +149,7 @@ def process_file(path: Path) -> bool:
             i += 1
             continue
 
-        #  Pass-through: blank, heading, table row, horizontal rule          #
+        # Pass-through: blank, heading, table row, horizontal rule
         if (not stripped or
                 _HEADING_RE.match(line) or
                 _TABLE_RE.match(line) or
@@ -158,7 +158,7 @@ def process_file(path: Path) -> bool:
             i += 1
             continue
 
-        #  Blockquotes — process line by line                                #
+        # Blockquotes — process line by line
         if _BQ_RE.match(line):
             # Process the blockquote line-by-line, tracking fence state so
             # code blocks nested inside blockquotes are emitted verbatim.
@@ -186,7 +186,7 @@ def process_file(path: Path) -> bool:
             i = j
             continue
 
-        #  Bullet points                                                      #
+        # Bullet points
         bullet_m = _BULLET_RE.match(line)
         if bullet_m:
             pre = bullet_m.group(1)    # leading spaces
@@ -234,7 +234,7 @@ def process_file(path: Path) -> bool:
             i = j
             continue
 
-        #  Prose paragraphs                                                   #
+        # Prose paragraphs
         # Leading indent of the paragraph's first line.
         para_lead = len(line) - len(line.lstrip())
         indent_str = ' ' * para_lead
