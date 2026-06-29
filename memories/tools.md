@@ -745,6 +745,45 @@ common patterns.
   auto-update before R-CMD-check (`ref: github.head_ref`). Pass system deps via
   `apt-packages`. Added in gha#103; bcs#226 is the reference caller.
 
+## GitHub Actions — gathering prior review context in reusable workflows
+
+When a reusable workflow needs to fetch prior `claude[bot]` review comments for
+deduplication, two API endpoints carry different content:
+
+- **`/repos/{owner}/{repo}/issues/{n}/comments`** — top-level PR comments
+  (summary/tracking verdicts). Filter to review comments with
+  `select(.user.login == "claude[bot]" and (.body | test("### Code Review")))`.
+  This pattern discriminates review summaries from `@claude` task-handler responses
+  (which also post as `claude[bot]` but use "Claude finished…" / "Claude Code is
+  working…" headers, not the "### Code Review" heading the review workflow uses).
+- **`/repos/{owner}/{repo}/pulls/{n}/comments`** — inline review findings posted
+  via the review API. These are already `claude[bot]`-only (the `@claude` task
+  handler posts to `/issues/`, not `/pulls/`), so no content filter is needed.
+  Fetch the most recent ~30, map to `"=== Inline finding on {path}:{line} ===\n{body}"`.
+
+Combine both (inline first, summary last) and cap at ~12000 chars with `head -c`.
+Require `pull-requests: read` permission in the job that fetches inline comments.
+
+**`GITHUB_OUTPUT` multiline heredoc — always use a random delimiter.**
+A static delimiter like `__EOF__` collides with content in prior review comments
+(e.g. a review suggestion showing a shell heredoc). Use:
+```bash
+DELIMITER="eof_$(openssl rand -hex 8)"
+{
+  echo "my-output<<${DELIMITER}"
+  printf '%s\n' "$VALUE"
+  echo "${DELIMITER}"
+} >> "$GITHUB_OUTPUT"
+```
+
+**`needs.X.result != 'cancelled'` vs `== 'success'`** — when the dependency job
+is non-critical (acceptable to proceed without its output), use
+`!= 'cancelled'` in the dependent job's `if:` so genuine failures fall through
+rather than blocking. When the dependency is truly required, use `== 'success'`
+(not `!= 'failure'` — that still runs when the dep was cancelled, which usually
+means its output was never produced). (gha#133: `gather-context` failure should
+not block `claude-review`.)
+
 ## GitHub Actions workflow authoring gotchas
 
 - **Local composite refs (`./`) in reusable workflows resolve relative to the HOST repo.**
