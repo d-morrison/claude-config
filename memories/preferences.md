@@ -145,6 +145,18 @@
   changing the identifier, run `grep -r "old_name" .` before committing. (Learned on
   ucdavis/bcs#246: `nelson_aalen` → `cumhaz_baseline` fixed the variable and the file
   header but missed the section header — caught two ARDI rounds later.)
+- When removing decorative comment banners (e.g. `# ---...---` / `#  Name  #` blocks),
+  scan for **every** occurrence in the file — both file-scope banners and inner
+  function-body banners. Removing only the outer ones leaves the inner ones, and a
+  reviewer catches the inconsistency as a separate finding. Run
+  `grep -n "^[[:space:]]*#[[:space:]]*[-=*_#]" file` to surface padded/decorated
+  banner lines before committing. (Learned on
+  d-morrison/ai-config#274: outer banners stripped in round 1, inner ones missed until
+  round 2.)
+- Do not commit scratch test files that are not wired into CI. A file like `test_fix.py`
+  with a dead `sys.path.insert` at the top and no pytest/CI integration adds noise without
+  value and costs an extra ARDI round. Delete it before the initial push, or as soon as
+  a reviewer flags it. (Learned on d-morrison/ai-config#274.)
 - In test code, express date intervals with lubridate rather than hardcoded day counts.
   Use `lubridate::years(N)` + date arithmetic for calendar-year intervals from a known
   start date, or `lubridate::dyears(N)` when an exact numeric duration (`N × 365.25 × 86400`
