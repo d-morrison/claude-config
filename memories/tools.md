@@ -532,6 +532,11 @@
   to the reusable's `pr-number` input; set `checkout-submodules: true` if the repo
   has submodules the reviewer must read (e.g. rme's `latex-macros`). Done for rme
   in #948.
+- **The `@claude` reviewer may re-raise a finding that was previously rebutted and
+  its thread resolved, if a new commit triggers a fresh review cycle.** Each review
+  run re-reads the diff from scratch; a rebuttal reply in the thread does not persist
+  into the next run's context. Keep the rebuttal text ready to post again. (Hit
+  repeatedly on ai-config#267 with the MD060/table-column-style finding.)
 
 ## AskUserQuestion (Claude Code harness tool)
 - Each entry in `questions[]` **requires a `question` field** (the full question
@@ -861,6 +866,22 @@ common patterns.
   Put shared setup (e.g. `make_pt_data()`) in a `helper-*.R` rather than
   repeating it across test files. One test file per source file is the bcs
   convention — `test-plot_fn.R` for `R/plot_fn.R`. (bcs#253.)
+
+## markdownlint / markdownlint-cli2
+- **MD060/table-column-style is a real rule, present in `markdownlint-cli2@0.22.1`**
+  (added in a recent markdownlint version; the `@claude` reviewer's rule list is
+  outdated — it claims rules "top out at MD058", but `MD060/table-column-style` is a
+  distinct real rule).
+  Under default config it fires ~330 times on the ai-config corpus (2026-06 snapshot;
+  count grows as files are added; every table with compact pipe style).
+  Reproduction (move aside `.markdownlint-cli2.jsonc` first):
+  `npx markdownlint-cli2@0.22.1 "**/*.md" "!codex-skills/**"`. The disable in
+  `.markdownlint-cli2.jsonc` is load-bearing; do not remove it on the reviewer's say-so
+  — rebut with the reproduction command. (Hit on ai-config#267.)
+- **Introducing markdownlint to a legacy corpus — baseline strategy.** Run with all
+  defaults first (no config): collect the full violation list. Disable every failing rule
+  to achieve a green baseline with zero corpus churn. Re-enable rules incrementally after
+  targeted fix passes. This prevents flooding CI with hundreds of pre-existing violations.
 
 ## Office Open XML (.docx / .xlsx) — editing committed content
 - `.docx`/`.xlsx` are zip archives. To strip or edit content (e.g. remove a sensitive
