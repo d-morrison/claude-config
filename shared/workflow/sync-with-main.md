@@ -12,7 +12,7 @@ git merge origin/main
 ```
 
 If the push is rejected because `main` has moved (non-fast-forward or
-`with origin/main; fetch first`), fetch and merge before retrying — don't
+`with origin/main; fetch first`), fetch and merge before retrying --- don't
 force-push.
 
 Always do this before triggering a fresh review too, so the reviewer evaluates
