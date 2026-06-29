@@ -79,7 +79,7 @@
   Use `get_check_runs` for the authoritative CI state — it returns the real
   job conclusions (`success`, `failure`, `skipped`). `get_status` aggregates
   across check suites and can lag or show a stale "pending" when all runs have
-  actually completed. Always use `get_check_runs` to check CI state; `get_status` is unreliable.
+  actually completed; `get_status` is unreliable for CI state.
   (Hit during the ai-config #275 GII session — `get_status` showed
   `total_count: 0` / `pending` while `get_check_runs` correctly showed all 5
   checks `success`.)
