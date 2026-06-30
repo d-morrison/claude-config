@@ -470,6 +470,18 @@
 - Don't use URLs verbatim from issue body text without verifying they're stable. Beta or staging subdomains (e.g. `beta.p5js.org`) are often ephemeral and will fail link-check CI. Search for the canonical/production URL. (Learned on lab-manual#360: the issue referenced `https://beta.p5js.org/...`; substituted with the GitHub source URL.)
 - UCD-SERG/lab-manual branch protection requires at least one human approving review. Bot reviews (automated `@claude` review) alone leave `mergeable_state: blocked`. Request `d-morrison` as a reviewer once the bot gives a clean verdict. (Learned on lab-manual#360.)
 
+- When adding a new `@shared/workflow/*.md` (or `@shared/coding/*.md`, `@shared/writing/*.md`)
+  include to `CLAUDE.md`, add the `<!-- Shared with the lab manual; edit
+  shared/<dir>/<name>.md, not here. -->` comment on the line immediately before
+  the `@shared/...` directive, matching every sibling include. Missing it was
+  flagged as a review nit. (Learned on ai-config#297.)
+- When writing a new shared standing-preference fragment that's wired into more
+  than one skill (e.g. a tie-breaker used by both PR-ordering and issue-triage),
+  check all the consuming skills first and write the fragment's prose generically
+  enough to cover all of them — don't phrase it around only the first skill you
+  edit. (Learned on ai-config#297: a "PR" rule had to be broadened to "PR or
+  issue" after it turned out to also apply to `gi`'s issue triage.)
+
 ## Git author mapping
 - Commits by `dem-extra1` to repos owned by `d-morrison`, `ucd-serg`, or `ucdavis` → the true author is `d-morrison` (demorrison@ucdavis.edu); set `--author="Douglas Morrison <demorrison@ucdavis.edu>"` (or amend) when the committing identity is `dem-extra1`.
 - Commits to `sparta` by `d-morrison` → the true author is `dem-extra1` (dougmor@gmail.com); set `--author="dem-extra1 <dougmor@gmail.com>"` when the committing identity is `d-morrison`.
