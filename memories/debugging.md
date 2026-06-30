@@ -141,7 +141,7 @@ reverted fixes. Defenses:
 When a code block is placed in a shared path (e.g. the non-append `else:` branch
 of an order dispatcher), it implicitly covers every non-append command type —
 plain moves, reform moves, form-up drags, etc. — even if the PR's focus was one
-specific case. The reviewer will flag missing test coverage for the implicit paths.
+specific case. Reviewers flag missing coverage for implicit paths.
 
 Pattern: after placing a change in a shared branch, enumerate the full set of
 command types that reach it, and add at least one test per type beyond the primary
