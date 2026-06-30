@@ -44,6 +44,8 @@ Scan the issue list and rank by priority. Use these signals (in order):
 | Age (older unresolved issues accumulate cost) | Medium |
 | Size/complexity (prefer issues you can complete in one session) | Tie-breaker |
 | Already assigned to someone else | **Skip** |
+| Issue comment says "Working on this" | **Skip** |
+| Open PR already exists for the issue | **Skip** |
 
 **Re-triage if helpful:** If labels are stale, missing, or inconsistent, briefly
 suggest re-labeling to the user before proceeding. Don't unilaterally relabel
@@ -67,12 +69,50 @@ pick, or proceed with #1 if they say "just go":
 
 If the user already specified an issue ("gi #12"), skip this step.
 
-### 4. Check history
+### 4. Check the issue isn't already in-flight
+
+Before claiming or branching, confirm no other session is already on this
+issue. Two signals must **both** be clear (`gh issue list` in step 1 returns
+titles, labels, and assignees but neither comment text nor linked PRs, so
+check both explicitly here).
+
+**(1) No "Working on this" claim in the most recent comment:**
+
+```bash
+# GitHub — read the issue's latest comment:
+gh issue view <N> --json comments --jq '.comments | last | .body' | cat
+```
+
+If it contains "Working on this" / "paws off" (or an equivalent claim), skip
+the issue.
+
+**(2) No open PR already references the issue:**
+
+```bash
+# GitHub — list open PRs and scan for any whose title or branch references this issue:
+gh pr list --state open --json number,title,headRefName | cat
+# Authoritative — the issue's cross-referenced open PRs via the REST timeline API.
+# (gh issue view --json has no timelineItems field; in the timeline, source.type is
+#  always "issue", so a PR is one whose source.issue.pull_request is non-null. The
+#  state filter keeps only open PRs — merged/closed siblings aren't active competitors.
+#  --paginate walks every page so a cross-reference past the first 30 events isn't missed.)
+gh api --paginate repos/<owner>/<repo>/issues/<N>/timeline \
+  --jq '.[] | select(.event == "cross-referenced") | .source.issue | select(.pull_request != null) | select(.state == "open") | "#\(.number) \(.title)"' | cat
+```
+
+If an open PR already exists for the issue:
+- **Don't open a competing PR.** The issue is already being worked.
+- Skip it and grab the next unblocked issue instead.
+- Or, if the existing PR is stalled/abandoned and you're taking it over,
+  check it out (use the existing PR branch), claim the PR, and ARDI it
+  rather than starting fresh.
+
+### 5. Check history
 
 Before implementing, invoke the `check-history` skill to review merged
 MRs/PRs that touched the same area. Don't undo past progress.
 
-### 5. Claim the issue
+### 6. Claim the issue
 
 ```bash
 # GitHub
@@ -82,7 +122,7 @@ gh issue comment <N> --body "Claude Code CLI (local session) is working on this 
 glab issue note <N> --message "Claude Code CLI (local session) is working on this — paws off until I'm done."
 ```
 
-### 6. Create a branch
+### 7. Create a branch
 
 ```bash
 git fetch origin main
@@ -95,7 +135,7 @@ Branch naming:
 - Docs → `docs/<issue-slug>`
 - Refactor → `refactor/<issue-slug>`
 
-### 7. Implement
+### 8. Implement
 
 - Read the issue description carefully — understand "done" criteria
 - Make the changes (code, tests, docs as needed)
@@ -103,7 +143,7 @@ Branch naming:
 - Commit with a message referencing the issue:
   `fix: handle auth timeout on slow networks (closes #12)`
 
-### 8. Push and open MR/PR
+### 9. Push and open MR/PR
 
 ```bash
 git push -u origin fix/<slug>
@@ -123,12 +163,12 @@ glab mr create --title "<title>" --description "Closes #<N>
 
 Include `Closes #N` in the description to auto-close the issue on merge.
 
-### 9. ARDI to clean
+### 10. ARDI to clean
 
 Invoke the `ardi` skill on the newly opened MR/PR. Drive it through
 review rounds until the verdict is clean (zero findings).
 
-### 10. Report
+### 11. Report
 
 When ARDI completes clean, report:
 - Issue number + link
@@ -167,9 +207,9 @@ dependency, needs design decision, upstream bug):
 
 ## Relationship to other skills
 
-- **`check-history`** — invoked in step 4 to avoid undoing past work
-- **`ardi`** — invoked in step 9 to drive the MR/PR to clean
-- **`claim-pr`** — the issue claim in step 5 follows the same pattern
+- **`check-history`** — invoked in step 5 to avoid undoing past work
+- **`ardi`** — invoked in step 10 to drive the MR/PR to clean
+- **`claim-pr`** — the issue claim in step 6 follows the same pattern
 - **`split-concerns`** — if the implementation grows too large, offer to split
 - **`defer-issue`** — if sub-tasks emerge during implementation, defer them
 
