@@ -328,14 +328,21 @@ closed-issue references in multiple PR bodies, and stacking conflicts mid-ARDI.
   `.Rprofile` entirely. Install needed packages from P3M into the user library
   and proceed. (Observed on ucdavis/bcs cloud sessions.)
 - **To check whether a CRAN package is archived, query the PPM JSON API, not
-  WebFetch against the CRAN HTML page.**
+  WebFetch against the CRAN HTML page — and check `is_archived`, NOT
+  `tran_archive`.**
   `curl -s https://packagemanager.posit.co/__api__/repos/cran/packages/<pkg>`
-  returns a `tran_archive` field (`null` = not archived) — structured and
-  authoritative. WebFetch summarizing `cran.r-project.org/package=<pkg>` can
-  return confident-sounding but unverified specifics (an "Archival Date" /
-  "Reason" framing CRAN's actual archived-package page doesn't present that
-  way) — cross-check against the PPM API before citing a date or reason as
-  fact. (Surfaced on ucdavis/fxtas#157: pak failed to resolve `pryr` +
+  returns a top-level boolean `"is_archived": true|false` — that's the
+  authoritative field. `tran_archive` is a decoy: it's present in the same
+  response but stays `null` even for a package that **is** archived (verified
+  directly — `pryr`'s response has `"tran_archive": null` alongside
+  `"is_archived": true`), so checking it gives a false "not archived" on every
+  query. Confirmed by curling both packages live: `pryr` and `veccompare` each
+  return `"is_archived": true`. WebFetch summarizing
+  `cran.r-project.org/package=<pkg>` can also return confident-sounding but
+  unverified specifics (an "Archival Date" / "Reason" framing CRAN's actual
+  archived-package page doesn't present that way) — cross-check against the
+  PPM API's `is_archived` field before citing a date or reason as fact.
+  (Surfaced on ucdavis/fxtas#157: pak failed to resolve `pryr` +
   `veccompare` from the PPM snapshot; the repo owner verified via this
   endpoint before concluding they were genuinely archived.)
 - **`snapr` is not on CRAN or P3M**: install from the GitHub tarball.
