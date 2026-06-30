@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression tests for the three bugs fixed in semantic-line-breaks.py."""
+"""Regression tests for the six bugs fixed in semantic-line-breaks.py."""
 import tempfile
 from pathlib import Path
 import sys
