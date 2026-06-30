@@ -1,0 +1,46 @@
+---
+name: "convert-repo-format"
+description: "Codex wrapper for the ai-config Claude skill `convert-repo-format`. Convert a repo from one SERG project format to another \u2014 R package, Quarto website, Quarto book, or Quarto manuscript \u2014 using the lab's template repos (`rpt`, `qwt`, `qbt`, `qmt`) as the source of truth for the target's structure. Detect the current format, swap the project config, add/remove format-specific files and CI workflows, adapt `DESCRIPTION`, then verify against the target's checks. Use when asked to 'convert this repo to a <format>', 'crf', 'convert repo format', 'turn this book into a website', 'make this manuscript an R package', 'reformat this repo as a Quarto book', or 'change this repo's project type'. Use when Codex is asked to use `convert-repo-format`, `/convert-repo-format`, or the corresponding ai-config/Claude skill workflow."
+---
+
+# convert-repo-format (Codex wrapper)
+
+This is a generated Codex wrapper around the canonical ai-config Claude skill.
+
+Source: [skills/convert-repo-format/SKILL.md](../../skills/convert-repo-format/SKILL.md)
+
+Before acting, read the source skill completely and follow its workflow, adapting it to Codex.
+
+The source lives at `skills/convert-repo-format/SKILL.md` in the same ai-config checkout as this wrapper. If this wrapper was loaded through `${CODEX_HOME:-$HOME/.codex}/skills/convert-repo-format`, resolve the symlink target for this wrapper directory first, then read `../../skills/convert-repo-format/SKILL.md` relative to that real directory. Do not resolve that relative path from inside `${CODEX_HOME:-$HOME/.codex}/skills`, because it points back at the wrapper tree.
+
+- Treat `user-invocable` and `allowed-tools` as Claude metadata, not Codex permissions.
+- Use the tools available in this Codex session for equivalent operations.
+- If the source mentions a Claude-only path such as `~/.claude/skills`, use this repository's `skills/` path while editing.
+- Keep procedural changes in the canonical source skill unless the user specifically asks to change this wrapper.
+
+## Tool mappings
+
+The canonical skill names `gh`/`git` commands (and sometimes `mcp__github__*`
+tools). Use the GitHub MCP tool below if this Codex session has it; otherwise
+run the CLI command. Full per-model reference: [tool-mappings.md](../../tool-mappings.md).
+
+| Operation | Does | CLI (`gh`/`git`) | GitHub MCP tool |
+| --- | --- | --- | --- |
+| `VIEW_PR` | Read a pull request's details and metadata. | `gh pr view <N>` | `mcp__github__pull_request_read (method=get)` |
+| `LIST_PRS` | List pull requests. | `gh pr list` | `mcp__github__list_pull_requests` |
+| `DIFF_PR` | Read a pull request's diff. | `gh pr diff <N>` | `mcp__github__pull_request_read (method=get_diff)` |
+| `PR_CHECKS` | Read a pull request's CI check / status results. | `gh pr checks <N>` | `mcp__github__pull_request_read (method=get_check_runs)` |
+| `CREATE_PR` | Open a new pull request. | `gh pr create` | `mcp__github__create_pull_request` |
+| `EDIT_PR` | Edit a pull request (reviewers, labels, base, etc.). | `gh pr edit <N>` | `mcp__github__update_pull_request` |
+| `MERGE_PR` | Merge a pull request. | `gh pr merge <N>` | `mcp__github__merge_pull_request` |
+| `COMMENT_PR` | Post a top-level comment on a pull request. | `gh pr comment <N> --body "..."` | `mcp__github__add_issue_comment` |
+| `REPLY_REVIEW_COMMENT` | Reply to an inline pull-request review comment. | `gh api (reply to review comment)` | `mcp__github__add_reply_to_pull_request_comment` |
+| `WATCH_PR` | Subscribe to / unsubscribe from a pull request's activity. | (no CLI equivalent) | `mcp__github__subscribe_pr_activity / mcp__github__unsubscribe_pr_activity` |
+| `VIEW_ISSUE` | Read an issue's details. | `gh issue view <N>` | `mcp__github__issue_read` |
+| `LIST_ISSUES` | List issues. | `gh issue list` | `mcp__github__list_issues` |
+| `CREATE_ISSUE` | Open a new issue. | `gh issue create` | `mcp__github__issue_write (method=create)` |
+| `COMMENT_ISSUE` | Post a comment on an issue. | `gh issue comment <N> --body "..."` | `mcp__github__add_issue_comment` |
+| `PUSH` | Push commits to a branch. | `git push -u origin <branch>` | (use git; no GitHub MCP equivalent) |
+| `COMMIT` | Record staged changes as a commit. | `git commit -m "..."` | (use git; mcp__github__create_or_update_file commits a single file) |
+| `FETCH` | Fetch refs from the remote. | `git fetch origin <branch>` | (use git; no GitHub MCP equivalent) |
+| `MERGE_BRANCH` | Merge a branch into the current one. | `git merge origin/<branch>` | (use git; no GitHub MCP equivalent) |

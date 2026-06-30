@@ -71,6 +71,7 @@ Most skills also respond to plain-English triggers listed in their `description`
 
 | Skill | Aliases | What it does |
 |-------|---------|--------------|
+| [`convert-repo-format`](skills/convert-repo-format/SKILL.md) | `crf` | Convert a repo between the lab's template formats (R package, Quarto website/book/manuscript) |
 | [`scout-peers`](skills/scout-peers/SKILL.md) | | Survey comparable repos for ideas and conventions |
 | [`check-dependency-updates`](skills/check-dependency-updates/SKILL.md) | `cdu` | Check for outdated dependencies and propose updates |
 | [`dependabot`](skills/dependabot/SKILL.md) | | Add or update Dependabot config for a repo |
