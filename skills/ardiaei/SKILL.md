@@ -11,13 +11,20 @@ allowed-tools:
 
 # ARDIAEI — ARDIA + Edit Instructions
 
-Clear the open-PR review queue **and** capture what doing so taught you, by composing two existing skills in sequence:
+Clear the open-PR review queue **and** capture what doing so taught you, by
+composing two existing skills in sequence:
 
-1. **Phase 1 — `ardia`** ([ardia](../ardia/SKILL.md), ARD + Iterate-All): drive every open PR/MR to a clean review verdict, in series.
-2. **Phase 2 — `ums`** ([ums](../ums/SKILL.md), Update Memories and Skills): review what the ARDIA loop surfaced — recurring review findings, CI quirks, tool gotchas, workflow gaps — and persist it by editing memory files and skill definitions.
+1. **Phase 1 — `ardia`** ([ardia](../ardia/SKILL.md), ARD +
+   Iterate-All): drive every open PR/MR to a clean review verdict, in series.
+2. **Phase 2 — `ums`** ([ums](../ums/SKILL.md), Update Memories and
+   Skills): review what the ARDIA loop surfaced — recurring review findings, CI
+   quirks, tool gotchas, workflow gaps — and persist it by editing memory files
+   and skill definitions.
 
-The order matters: run the full review loop **first** so Phase 2 has the complete set of lessons (every finding, rebuttal, deferral, and CI surprise) to draw on.
-"Edit instructions" = update the durable guidance (memories + skills), not the PR code.
+The order matters: run the full review loop **first** so Phase 2 has the
+complete set of lessons (every finding, rebuttal, deferral, and CI surprise) to
+draw on. "Edit instructions" = update the durable guidance (memories + skills),
+not the PR code.
 
 ## When this fires
 
@@ -29,12 +36,13 @@ The order matters: run the full review loop **first** so Phase 2 has the complet
 
 ### Phase 1 — ARDIA (drive every open PR/MR to clean)
 
-Run the full `ardia` procedure ([ardia](../ardia/SKILL.md)): list every open PR/MR and drive each to a clean verdict in series.
-`ardia` handles forge detection (GitHub `gh` / GitLab `glab`) and all per-PR rules from `ardi`.
-If there are zero open PRs/MRs, Phase 1 is a no-op — note it and go to Phase 2.
+Run the full `ardia` procedure ([ardia](../ardia/SKILL.md)): list every
+open PR/MR and drive each to a clean verdict in series. `ardia` handles forge
+detection (GitHub `gh` / GitLab `glab`) and all per-PR rules from `ardi`. If
+there are zero open PRs/MRs, Phase 1 is a no-op — note it and go to Phase 2.
 
-**While iterating, keep a running lessons list** — the raw material Phase 2 persists.
-Capture anything reusable:
+**While iterating, keep a running lessons list** — the raw material Phase 2
+persists. Capture anything reusable:
 
 - Review findings that recurred across PRs (a class worth a skill rule).
 - CI / workflow quirks hit during the loop (e.g. canceled review runs).
@@ -42,10 +50,16 @@ Capture anything reusable:
 
 ### Phase 2 — UMS (edit instructions)
 
-Once every PR is clean, run the full `ums` procedure ([ums](../ums/SKILL.md)) against the lessons list from Phase 1: for each lesson decide whether it belongs in a **memory** file, a **skill** definition, or both, and make the edits.
-Don't invent lessons to look busy — if the loop was uneventful, say so and persist nothing.
+Once every PR is clean, run the full `ums` procedure
+([ums](../ums/SKILL.md)) against the lessons list from Phase 1: for
+each lesson decide whether it belongs in a
+**memory** file, a **skill** definition, or both, and make the edits. Don't
+invent lessons to look busy — if the loop was uneventful, say so and persist
+nothing.
 
-> Phase 2 edits the durable guidance (memories/skills), which in this repo is committed and pushed like any other change — follow the repo's normal commit/PR rules for those edits (they are separate from the Phase 1 PRs).
+> Phase 2 edits the durable guidance (memories/skills), which in this repo is
+> committed and pushed like any other change — follow the repo's normal
+> commit/PR rules for those edits (they are separate from the Phase 1 PRs).
 
 ### Final report
 
@@ -68,20 +82,24 @@ Print one combined summary:
 
 ## Stopping conditions
 
-- Honor ARDIA's asymptotic-noise guard in Phase 1: if a single PR won't converge after 3–4 rounds, surface it and move on rather than spinning.
-- If Phase 1 produced no durable lessons, Phase 2 records nothing — that's a valid outcome; don't manufacture edits.
+- Honor ARDIA's asymptotic-noise guard in Phase 1: if a single PR won't
+  converge after 3–4 rounds, surface it and move on rather than spinning.
+- If Phase 1 produced no durable lessons, Phase 2 records nothing — that's a
+  valid outcome; don't manufacture edits.
 
 ## Orchestration
 
-The ARDIA phase is a fan-out case: each open PR/MR is an independent review-and-iterate target.
-Consult `shared/workflow/when-to-orchestrate.md` --- at ~4+ open PRs, drive them through a Workflow (one pipeline per PR) rather than serially.
-The trailing UMS phase stays inline: it reasons over the whole session's learnings at once and is not decomposable.
-Launch directly when an opt-in signal is present; otherwise propose with a cost estimate first.
+The ARDIA phase is serial by design --- shared review runners, see `ardia` --- so
+don't fan out the push --- re-review loop; at most orchestrate the read-only
+review survey across PRs. The UMS phase reasons over the whole session's learnings
+at once and is not decomposable, so it stays inline. Consult
+`shared/workflow/when-to-orchestrate.md` (the shared-runner exception).
 
 ## Relationship to other skills
 
 - **`ardia`** / `adria` — Phase 1 in full (itself nests `ardi`, `ard`).
 - **`ums`** / `update-memories-and-skills` — Phase 2 in full.
-- **`record-learnings`** — the passive sibling of Phase 2; `ardiaei` is the explicit "do it now, after the loop" checkpoint.
-- Use **`ardia`** alone to only clear the PR queue, or **`ums`** alone to only update instructions.
-  `ardiaei` is the clean-then-capture combination.
+- **`record-learnings`** — the passive sibling of Phase 2; `ardiaei` is the
+  explicit "do it now, after the loop" checkpoint.
+- Use **`ardia`** alone to only clear the PR queue, or **`ums`** alone to only
+  update instructions. `ardiaei` is the clean-then-capture combination.

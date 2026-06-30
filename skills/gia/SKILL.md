@@ -11,12 +11,18 @@ allowed-tools:
 
 # GIA — Grab Issues + iterate-All
 
-Clear the repo's **entire** work queue end to end by composing two existing skills in sequence:
+Clear the repo's **entire** work queue end to end by composing two existing
+skills in sequence:
 
-1. **Phase 1 — [`ardia`](../ardia/SKILL.md)** (ARD + Iterate-All): drive every *already-open* PR/MR to a clean review verdict.
-2. **Phase 2 — [`gii`](../gii/SKILL.md)** (Grab Issues Iteratively): work through every open issue — grab, implement, open an MR/PR, ARDI it to clean, recurse.
+1. **Phase 1 — [`ardia`](../ardia/SKILL.md)** (ARD + Iterate-All): drive every
+   *already-open* PR/MR to a clean review verdict.
+2. **Phase 2 — [`gii`](../gii/SKILL.md)** (Grab Issues Iteratively): work
+   through every open issue — grab, implement, open an MR/PR, ARDI it to clean,
+   recurse.
 
-PRs-first, then issues: clearing the existing review backlog first means new issue work lands on top of an already-clean queue (and may even unblock or close issues that the open PRs address).
+PRs-first, then issues: clearing the existing review backlog first means new
+issue work lands on top of an already-clean queue (and may even unblock or
+close issues that the open PRs address).
 
 ## When this fires
 
@@ -28,18 +34,24 @@ PRs-first, then issues: clearing the existing review backlog first means new iss
 
 ### 0. Establish context
 
-Detect the forge (GitHub `gh` / GitLab `glab`) from `git remote get-url origin`.
-Note the default branch (`main` / `master`).
+Detect the forge (GitHub `gh` / GitLab `glab`) from `git remote get-url
+origin`. Note the default branch (`main` / `master`).
 
-**Confirm which repo first when several are in reach.** GIA (like `ardia` and `gii`) clears *one* repo's queue, but a session may start in a directory holding several repos (e.g. a web session scoped to multiple repos).
-If the working dir isn't itself a single repo, or more than one repo is in scope, ask which repo's queue to clear before surveying --- don't assume the first one found.
+**Confirm which repo first when several are in reach.** GIA (like `ardia` and
+`gii`) clears *one* repo's queue, but a session may start in a directory holding
+several repos (e.g. a web session scoped to multiple repos). If the working dir
+isn't itself a single repo, or more than one repo is in scope, ask which repo's
+queue to clear before surveying --- don't assume the first one found.
 
 ### Phase 1 — ARDIA (existing open PRs/MRs)
 
-Run the full [`ardia`](../ardia/SKILL.md) procedure: list every open PR/MR and drive each to a clean verdict in series (claim → ARD every finding → push → post summary → re-request review → repeat until clean).
-Per-PR rules from `ardi` apply (sync main first, re-request even on Rebut/Defer-only rounds).
+Run the full [`ardia`](../ardia/SKILL.md) procedure: list every open PR/MR and
+drive each to a clean verdict in series (claim → ARD every finding → push →
+post summary → re-request review → repeat until clean). Per-PR rules from
+`ardi` apply (sync main first, re-request even on Rebut/Defer-only rounds).
 
-If there are **zero open PRs/MRs**, Phase 1 is a no-op — note "no open PRs" in the report's Phase 1 section and go straight to Phase 2.
+If there are **zero open PRs/MRs**, Phase 1 is a no-op — note "no open PRs" in
+the report's Phase 1 section and go straight to Phase 2.
 
 Carry forward an interim table:
 
@@ -47,16 +59,20 @@ Carry forward an interim table:
 |-------|--------|--------------|
 | [#25](url) | 3 | ✅ Clean |
 
-> **Why before issues:** a PR that's already open may close an issue on merge (`Closes #N`).
-> Finishing PRs first avoids grabbing an issue that a pending PR already resolves.
+> **Why before issues:** a PR that's already open may close an issue on merge
+> (`Closes #N`). Finishing PRs first avoids grabbing an issue that a pending PR
+> already resolves.
 
 ### Phase 2 — GII (open issues)
 
-Once every pre-existing PR/MR is clean, run the full [`gii`](../gii/SKILL.md) loop: grab the highest-priority open issue → check history → implement → open MR/PR → ARDI to clean → recurse.
-Stack MRs when a later issue depends on an earlier unmerged branch.
-Respect GII's stopping conditions (backlog empty, user stop, or the default 5-issue checkpoint — ask before continuing past it).
+Once every pre-existing PR/MR is clean, run the full [`gii`](../gii/SKILL.md)
+loop: grab the highest-priority open issue → check history → implement → open
+MR/PR → ARDI to clean → recurse. Stack MRs when a later issue depends on an
+earlier unmerged branch. Respect GII's stopping conditions (backlog empty, user
+stop, or the default 5-issue checkpoint — ask before continuing past it).
 
-> Each PR that GII opens in this phase is itself ARDI'd to clean, so it does **not** need a second pass through Phase 1.
+> Each PR that GII opens in this phase is itself ARDI'd to clean, so it does
+> **not** need a second pass through Phase 1.
 
 ### Final report
 
@@ -80,30 +96,41 @@ Print one combined summary covering both phases:
 2. [#30](url) — fix: … (stacked on #16 if applicable)
 ```
 
-List the merge order across **both** phases — Phase 1 PRs can be stacked on each other just as Phase 2 issue-PRs can, so a dependency may run PR → PR, PR → issue-PR, or issue-PR → issue-PR.
-Order so every base merges before whatever stacks on it.
+List the merge order across **both** phases — Phase 1 PRs can be stacked on each
+other just as Phase 2 issue-PRs can, so a dependency may run PR → PR, PR →
+issue-PR, or issue-PR → issue-PR. Order so every base merges before whatever
+stacks on it.
 
 ## Stopping conditions
 
-- If the trigger was ambiguous about whether to also burn down issues (e.g. a bare "clean up the PRs"), stop after Phase 1 and check in before starting Phase 2.
+- If the trigger was ambiguous about whether to also burn down issues (e.g. a
+  bare "clean up the PRs"), stop after Phase 1 and check in before starting
+  Phase 2.
 - Honor GII's 5-issue checkpoint in Phase 2 (ask before continuing).
 - Stop if a PR or issue is blocked and surface it rather than spinning.
-- If Phase 1's reviewer keeps emitting new nits each round on the same PR (asymptotic noise after 3–4 rounds), surface it and ask whether to continue.
+- If Phase 1's reviewer keeps emitting new nits each round on the same PR
+  (asymptotic noise after 3–4 rounds), surface it and ask whether to continue.
 
 ## Orchestration
 
-Both GIA phases are fan-out candidates: the ARDIA sweep has one independent target per open PR/MR, and the GII burn-down has one per open issue.
-Consult `shared/workflow/when-to-orchestrate.md`.
-At ~4+ targets in a phase, drive that phase through a Workflow instead of serially --- but keep stacked/dependent issues serial (see GIP's independence rule), since orchestration assumes the targets don't depend on each other.
-Launch directly when an opt-in signal is present; otherwise propose with a cost estimate first.
+Both GIA phases push commits that trigger shared review runners, so neither fans
+out freely --- the same constraint that makes `ardia` serial and caps `gip`. You
+may orchestrate the read-only parts (survey all open PRs' reviews, or triage the
+issue backlog) in parallel, but route the actual implement --- push --- review
+work through the serial or capped paths: `ardia` for the PR phase, `gip` for
+provably-independent issues. Consult `shared/workflow/when-to-orchestrate.md` (the
+shared-runner exception).
 
 ## Relationship to other skills
 
 - **`ardia`** / `adria` — Phase 1 in full.
-- **`gii`** / `gis` — Phase 2 in full (which itself nests `gi`, `ardi`, `check-history`, `sync-pr-branch`, `defer-issue`).
-- Use **`ardia`** alone to only clear the PR queue, or **`gii`** alone to only work the issue backlog.
-  `gia` is the both-in-one sweep.
-- **`gip`** — when Phase 2's issues are provably independent (no stacking dependency, no file overlap), run that phase with `gip` to work them concurrently instead of serially.
+- **`gii`** / `gis` — Phase 2 in full (which itself nests `gi`, `ardi`,
+  `check-history`, `sync-pr-branch`, `defer-issue`).
+- Use **`ardia`** alone to only clear the PR queue, or **`gii`** alone to only
+  work the issue backlog. `gia` is the both-in-one sweep.
+- **`gip`** — when Phase 2's issues are provably independent (no stacking
+  dependency, no file overlap), run that phase with `gip` to work them
+  concurrently instead of serially.
 
 ## Anti-patterns
 
