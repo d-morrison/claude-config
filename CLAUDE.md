@@ -215,6 +215,7 @@ main's actual position instead of assuming the branch is current. The
 
 ## Prioritize internal infrastructure PRs slightly over feature PRs
 
+<!-- Shared with the lab manual; edit shared/workflow/pr-prioritization.md, not here. -->
 @shared/workflow/pr-prioritization.md
 
 A tie-breaker for `ardia`'s PR-ordering step and `gi`'s issue-priority table
