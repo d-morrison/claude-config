@@ -456,6 +456,12 @@
   they still want to see the text first. (Learned 2026-06-26: posted a quarto-cli
   GitHub issue without showing the draft.)
 
+- Before adding a new content section to a Quarto book chapter, search the repo for existing content on the same topic (`mcp__github__search_code` or grep) to catch overlap before committing. Duplicate content costs a review round when the reviewer spots it and asks for consolidation. (Learned on UCD-SERG/lab-manual#360: a new "PR Roles" section was added to `github.qmd` before discovering that `ai-tools/reviewing-copilot-prs.qmd` already covered several of the same roles.)
+- When inserting a new section between two existing content blocks, check whether lead-in sentences for the subsequent block become orphaned. A sentence like "Other helpful commands are listed below." becomes a non-sequitur when a new section is inserted before the commands block. (Learned on lab-manual#360.)
+- When creating a new `_sec-*.qmd` fragment for a Quarto book, check sibling `_sec-*.qmd` files in the same directory for their heading style (`### Heading {#sec-id}` vs. `**Bold pseudo-headings**`) before committing. Style inconsistency with siblings is a blocker finding in automated review. (Learned on lab-manual#360: used bold pseudo-headings; sibling `_sec-cli-tools.qmd` used `###` subheadings — flagged in round 1.)
+- Don't use URLs verbatim from issue body text without verifying they're stable. Beta or staging subdomains (e.g. `beta.p5js.org`) are often ephemeral and will fail link-check CI. Search for the canonical/production URL. (Learned on lab-manual#360: the issue referenced `https://beta.p5js.org/...`; substituted with the GitHub source URL.)
+- UCD-SERG/lab-manual branch protection requires at least one human approving review. Bot reviews (automated `@claude` review) alone leave `mergeable_state: blocked`. Request `d-morrison` as a reviewer once the bot gives a clean verdict. (Learned on lab-manual#360.)
+
 ## Git author mapping
 - Commits by `dem-extra1` to repos owned by `d-morrison`, `ucd-serg`, or `ucdavis` → the true author is `d-morrison` (demorrison@ucdavis.edu); set `--author="Douglas Morrison <demorrison@ucdavis.edu>"` (or amend) when the committing identity is `dem-extra1`.
 - Commits to `sparta` by `d-morrison` → the true author is `dem-extra1` (dougmor@gmail.com); set `--author="dem-extra1 <dougmor@gmail.com>"` when the committing identity is `d-morrison`.
