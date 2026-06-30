@@ -133,6 +133,18 @@ adjacent-but-distinct missing a link → `link-skills`; redundant code → `tidy
 cluster — a raw similarity list with no disposition just pushes the judgment back
 to the reader.
 
+## Orchestration
+
+Overlap detection over a large corpus decomposes by comparison cluster --- each
+candidate group of comparable units can be classified independently, and the work
+is pure reading with no shared-runner cost. Consult
+`shared/workflow/when-to-orchestrate.md`. When the corpus is large (many skills,
+memories, or files), run a Workflow: parallel agents each judging one cluster
+against the three buckets, then a synthesis stage that assembles the
+dispositions, rather than reading the whole corpus in one context. This stays
+read-only; it only parallelizes the reading and classification. Launch directly
+when an opt-in signal is present; otherwise propose with a cost estimate first.
+
 ## Relationship to other skills
 
 - **`consolidate-skills`** — the action counterpart for the skills corpus; it

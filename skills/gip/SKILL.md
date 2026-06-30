@@ -183,6 +183,18 @@ If the `Agent` tool isn't available in the session, you can't fan out — fall
 back to [`gii`](../gii/SKILL.md) and work the whole in-scope set serially. The
 per-issue work and the final report are the same; only the concurrency is lost.
 
+## Orchestration
+
+GIP already fans out --- it is the manual form of this pattern, one
+worktree-isolated subagent per provably-independent issue. When the harness
+supports it, prefer driving that fan-out through a **Workflow** (per
+`shared/workflow/when-to-orchestrate.md`): the deterministic pipeline gives each
+issue the same implement --- open-PR --- ARDI chain plus worktree isolation,
+rather than ad-hoc subagents. The independence gate and the concurrency cap stay
+unchanged --- only provably-independent issues run at once, and still capped (the
+shared-runner limit the fragment describes). Launch directly when an opt-in
+signal is present; otherwise propose with a cost estimate first.
+
 ## Relationship to other skills
 
 - **`gii`** / **`gis`** — the **serial** counterpart and the safe fallback. GIP

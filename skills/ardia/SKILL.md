@@ -84,6 +84,18 @@ each to a clean review verdict in series.
    is one glance, not a re-investigation. Don't merge anything — opening merges
    is the user's call.
 
+## Orchestration
+
+ARDIA drives PRs **one at a time on purpose** (see *Process PRs one at a time*
+above): each round pushes commits and triggers shared review runners, so parallel
+pushes collide and make per-PR status illegible. A Workflow does not change that
+external limit --- do **not** fan out the push --- re-review --- merge loop. What
+you *can* orchestrate is the read-only survey: pull every open PR's latest review
+and triage its findings in parallel, then feed that into the serial fix loop.
+Consult `shared/workflow/when-to-orchestrate.md` (the shared-runner exception);
+default to the serial loop, and propose the read-only fan-out only when there are
+many PRs to survey.
+
 ## Recurring / unattended runs
 
 If asked to keep the queue clean on an interval, drive this skill from a

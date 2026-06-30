@@ -94,6 +94,17 @@ course book.
 - Note submission-logistics problems (missing pages, wrong file, unrelated
   page) separately from content errors; they need a different follow-up.
 
+## Orchestration
+
+Grading is verification-bearing and decomposes cleanly --- one independent target
+per submission, or per grading dimension on one large item --- and it touches no
+shared CI runners, so it fans out safely. Consult
+`shared/workflow/when-to-orchestrate.md`. At ~4+ items or dimensions, run a
+Workflow: one grader agent per target, then a synthesis stage that reconciles the
+scores; use a panel (several independent graders per item) when the verdict
+carries weight. Launch directly when an opt-in signal is present; otherwise
+propose with a cost estimate first.
+
 ## Related
 
 - **plan-review-session** — turns the ranked error catalog into a review

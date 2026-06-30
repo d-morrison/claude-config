@@ -213,6 +213,21 @@ impasse — for the final call rather than looping.
 main's actual position instead of assuming the branch is current. The
 `sync-pr-branch` / `merge-main` skill runs this.)
 
+## Auto-orchestration: let heavy skills choose Workflows
+
+The heavy, parallelizable skills (`ardia`, `ardiaei`, `gia`, `gip`,
+`grade-work`, `opposition-research`, `find-overlap`) decide on their own whether
+a task warrants multi-agent orchestration via the `Workflow` tool --- so I don't
+have to type `ultracode` every time. The `Workflow` tool stays opt-in-gated for
+bare prompts; an invoked skill is itself the sanctioned opt-in. Launch a workflow
+directly when an opt-in signal is already present (`ultracode`, a `+Nk` budget,
+or "use a workflow"), otherwise propose one with a one-line cost estimate and
+wait. The PR/issue-iteration skills stay serial where pushes collide on shared
+review runners (see the fragment's shared-runner exception).
+
+<!-- Shared with the lab manual; edit shared/workflow/when-to-orchestrate.md, not here. -->
+@shared/workflow/when-to-orchestrate.md
+
 ## Coding style: avoid nesting; follow the lab manual
 
 Follow the SERG lab manual (https://ucd-serg.github.io/lab-manual/) for coding

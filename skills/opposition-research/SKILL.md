@@ -146,6 +146,17 @@ copy, screenshots, or roadmap text.
 4. **Recommended issues to file** — the shortlist you'd open, pending the
    user's pick.
 
+## Orchestration
+
+Step 3 already fans out --- one agent per community surface (issue tracker,
+feature board, subreddit, Q&A site, forum, review site), each blind to the
+others, and the work is web reading with no shared-runner cost. That is the
+workflow-shaped pattern in `shared/workflow/when-to-orchestrate.md`. When the
+surfaces are many or the ask says "thorough", drive that fan-out through a
+Workflow: parallel finders by surface, then the dedupe-and-rank synthesis stage
+(step 6). Launch directly when an opt-in signal is present; otherwise propose with
+a cost estimate first.
+
 ## Relationship to other skills
 
 - **`scout-peers`** — the sibling, mirror image. `scout-peers` reads a

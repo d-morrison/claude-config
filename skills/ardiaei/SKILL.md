@@ -87,6 +87,14 @@ Print one combined summary:
 - If Phase 1 produced no durable lessons, Phase 2 records nothing — that's a
   valid outcome; don't manufacture edits.
 
+## Orchestration
+
+The ARDIA phase is serial by design --- shared review runners, see `ardia` --- so
+don't fan out the push --- re-review loop; at most orchestrate the read-only
+review survey across PRs. The UMS phase reasons over the whole session's learnings
+at once and is not decomposable, so it stays inline. Consult
+`shared/workflow/when-to-orchestrate.md` (the shared-runner exception).
+
 ## Relationship to other skills
 
 - **`ardia`** / `adria` — Phase 1 in full (itself nests `ardi`, `ard`).

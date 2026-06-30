@@ -111,6 +111,16 @@ stacks on it.
 - If Phase 1's reviewer keeps emitting new nits each round on the same PR
   (asymptotic noise after 3–4 rounds), surface it and ask whether to continue.
 
+## Orchestration
+
+Both GIA phases push commits that trigger shared review runners, so neither fans
+out freely --- the same constraint that makes `ardia` serial and caps `gip`. You
+may orchestrate the read-only parts (survey all open PRs' reviews, or triage the
+issue backlog) in parallel, but route the actual implement --- push --- review
+work through the serial or capped paths: `ardia` for the PR phase, `gip` for
+provably-independent issues. Consult `shared/workflow/when-to-orchestrate.md` (the
+shared-runner exception).
+
 ## Relationship to other skills
 
 - **`ardia`** / `adria` — Phase 1 in full.
