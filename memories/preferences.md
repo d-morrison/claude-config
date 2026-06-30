@@ -102,6 +102,13 @@
   given along the way. A merge is the natural checkpoint to bank lessons before context is lost.
   Do all of this automatically — including opening the follow-up branch and PR that records the
   lessons — without asking permission first; opening that follow-up PR is a standing yes.
+- **This applies per-merge, not once per session.** During a backlog-clearing run (many PRs
+  merged back-to-back), it's easy to treat "run UMS after merging" as a one-off end-of-session
+  step and batch it — wrong: run it after EACH merge, before starting the next PR. Caught on
+  sparta (2026-06-30): merged ~8 PRs in one session without running UMS once, until the user
+  explicitly said "do ums after each merge; then keep going." The existing instruction already
+  covered this; the gap was execution discipline in a fast multi-merge loop, not missing
+  guidance — re-read this bullet at the top of every "pick the next backlog item" cycle.
 - Keep it simple. Don't over-explain or ask permission for straightforward fixes — just do them.
 - Don't re-ask a decision that's already settled and built. Once an answer is given and the
   work is implemented to match it (and CI-green), don't reopen it with a fresh AskUserQuestion —

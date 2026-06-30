@@ -961,6 +961,23 @@ not block `claude-review`.)
   Put shared setup (e.g. `make_pt_data()`) in a `helper-*.R` rather than
   repeating it across test files. One test file per source file is the bcs
   convention — `test-plot_fn.R` for `R/plot_fn.R`. (bcs#253.)
+- **A push can trigger ZERO check-runs on a `pull_request`-triggered workflow — not a
+  quota skip, not an error, just total silence.** Symptom: `gh pr checks <N>` shows
+  stale/old results or "no checks reported"; `gh api repos/<o>/<r>/commits/<sha>/check-runs`
+  (the new commit's SHA) returns an **empty** `check_runs` array — confirms literally
+  nothing was dispatched for that push, distinct from a job that ran and failed/skipped.
+  `gh run list --branch <branch>` likewise shows no new run after the push timestamp.
+  This hit on an otherwise-healthy repo (sparta) mid-ARDI: a normal `git push` to an
+  open PR's branch produced no CI activity for 15+ minutes. Recovery — manually dispatch
+  every required workflow rather than waiting longer or re-pushing (a re-push doesn't
+  reliably fix it either): for any `workflow_dispatch`-enabled workflow keyed off the
+  branch, `gh workflow run <file>.yml --ref <branch>`; for a PR-number-keyed review
+  workflow (e.g. `claude-code-review.yml` with a `pr_number` input — see the
+  `workflow_dispatch` re-trigger pattern above), `gh workflow run <file>.yml -f
+  pr_number=<N>`. Poll the dispatched run's own ID (`gh run view <id> --json
+  status,conclusion`), not the (still-empty) push-event check list. If a workflow has
+  no `workflow_dispatch` trigger, that one specific check stays stuck — note it and ask
+  the user rather than silently treating the PR as green without it.
 
 ## markdownlint / markdownlint-cli2
 - **MD060/table-column-style is a real rule, present in `markdownlint-cli2@0.22.1`**
