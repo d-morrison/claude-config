@@ -44,6 +44,13 @@ each to a clean review verdict in series.
    If a circular stack is found (impossible in practice but check anyway),
    surface it to the user and skip those PRs.
 
+   **Tie-break with infrastructure-first.** Among PRs with no stacking
+   relationship, when otherwise equally pressing, process internal
+   infrastructure PRs (shared tooling, CI workflows, reusable actions,
+   templates) slightly ahead of feature PRs — see
+   [`pr-prioritization`](../../shared/workflow/pr-prioritization.md). This
+   never overrides the stacking order above.
+
    Report the in-scope list (with bare PR URLs) **before** you start, so the
    user can veto any before the loop pushes commits.
 

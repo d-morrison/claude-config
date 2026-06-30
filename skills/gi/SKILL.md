@@ -43,6 +43,7 @@ Scan the issue list and rank by priority. Use these signals (in order):
 | Bug vs feature (bugs first, generally) | Medium |
 | Age (older unresolved issues accumulate cost) | Medium |
 | Size/complexity (prefer issues you can complete in one session) | Tie-breaker |
+| Internal infrastructure vs feature (infra slightly preferred — see [`pr-prioritization`](../../shared/workflow/pr-prioritization.md)) | Tie-breaker |
 | Already assigned to someone else | **Skip** |
 | Issue comment says "Working on this" | **Skip** |
 | Open PR already exists for the issue | **Skip** |
