@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Quick regression tests for the three bugs fixed in semantic-line-breaks.py."""
+"""Regression tests for the three bugs fixed in semantic-line-breaks.py."""
 import tempfile
 from pathlib import Path
 import sys
@@ -103,6 +103,49 @@ check(
     "> This is sentence one. And this is sentence two.\n",
     "> This is sentence one.\n"
     "> And this is sentence two.\n",
+)
+
+# Bug 4: a mid-sentence prose line starting with "@" must not be treated
+# as a directive — only a standalone "@path.md" line is a directive.
+check(
+    "prose line starting with @ is still sentence-split",
+    "Comments come from the bot, by a human, or by a re-trigger,\n"
+    "@claude bot, by a human, or by a re-trigger), and that newer review may\n"
+    "contain findings the old one missed. Always check.\n",
+    "Comments come from the bot, by a human, or by a re-trigger, @claude bot, "
+    "by a human, or by a re-trigger), and that newer review may contain "
+    "findings the old one missed.\n"
+    "Always check.\n",
+)
+
+# Bug 5: multi-line HTML comments must be preserved verbatim, not reflowed.
+check(
+    "multi-line HTML comment preserved",
+    "<!--\n"
+    "Shared with the lab manual; edit shared/writing/ai-tells.md, not here.\n"
+    "Second line of the comment.\n"
+    "-->\n"
+    "@shared/writing/ai-tells.md\n",
+    "<!--\n"
+    "Shared with the lab manual; edit shared/writing/ai-tells.md, not here.\n"
+    "Second line of the comment.\n"
+    "-->\n"
+    "@shared/writing/ai-tells.md\n",
+)
+
+# Bug 6: a tilde fence inside a backtick-fenced block must not close it.
+check(
+    "mismatched fence characters don't close the block",
+    "```\n"
+    "~~~\n"
+    "code line\n"
+    "~~~\n"
+    "```\n",
+    "```\n"
+    "~~~\n"
+    "code line\n"
+    "~~~\n"
+    "```\n",
 )
 
 print(f"\n{passes} passed, {failures} failed")

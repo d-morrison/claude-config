@@ -72,7 +72,7 @@ _FENCE_RE = re.compile(r'^\s*(`{3,}|~{3,})')
 _BQ_RE = re.compile(r'^\s*>')
 _BLANK_RE = re.compile(r'^\s*$')
 _HTML_COMMENT_RE = re.compile(r'^\s*<!--')
-_AT_DIRECTIVE_RE = re.compile(r'^\s*@\S')
+_AT_DIRECTIVE_RE = re.compile(r'^\s*@[\w./-]+\.md\s*$')
 
 
 def _is_new_block(line: str) -> bool:
@@ -122,6 +122,7 @@ def process_file(path: Path) -> bool:
     frontmatter_done = False
     in_code_block = False
     fence_char_count = 0
+    fence_open_char = None
     i = 0
 
     while i < len(lines):
@@ -143,19 +144,25 @@ def process_file(path: Path) -> bool:
             i += 1
             continue
 
-        # Fenced code blocks — track opening fence length so inner fences
-        # with fewer characters are treated as content, not closers.
+        # Fenced code blocks — track opening fence length and character so
+        # inner fences of a different character, or fewer characters, are
+        # treated as content rather than closers (CommonMark §4.5).
         fence_m = _FENCE_RE.match(stripped)
         if fence_m:
-            fence_len = len(fence_m.group(1))
+            fence_str = fence_m.group(1)
+            fence_len = len(fence_str)
+            fence_char = fence_str[0]
             if not in_code_block:
                 in_code_block = True
                 fence_char_count = fence_len
-            elif fence_len >= fence_char_count:
+                fence_open_char = fence_char
+            elif fence_char == fence_open_char and fence_len >= fence_char_count:
                 in_code_block = False
                 fence_char_count = 0
-            # else: shorter fence inside a code block — fall through to
-            # the in_code_block pass-through below
+                fence_open_char = None
+            # else: a shorter fence, or one using a different character,
+            # inside a code block — fall through to the in_code_block
+            # pass-through below
             else:
                 output.append(line)
                 i += 1
@@ -169,13 +176,27 @@ def process_file(path: Path) -> bool:
             i += 1
             continue
 
+        # HTML comments — may span multiple lines; track open/close so
+        # interior prose isn't reflowed.
+        if _HTML_COMMENT_RE.match(line):
+            output.append(line)
+            j = i + 1
+            if '-->' not in line:
+                while j < len(lines) and '-->' not in lines[j]:
+                    output.append(lines[j])
+                    j += 1
+                if j < len(lines):
+                    output.append(lines[j])
+                    j += 1
+            i = j
+            continue
+
         # Pass-through: blank, heading, table row, horizontal rule,
-        # HTML comments, and @-import directives.
+        # and @-import directives.
         if (not stripped or
                 _HEADING_RE.match(line) or
                 _TABLE_RE.match(line) or
                 _HR_RE.match(stripped) or
-                _HTML_COMMENT_RE.match(line) or
                 _AT_DIRECTIVE_RE.match(line)):
             output.append(line)
             i += 1
