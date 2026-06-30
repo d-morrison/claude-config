@@ -44,7 +44,7 @@
   and follow through — autofix CI failures and address review comments per the
   ARD framework — without asking first. Keep following until the PR is merged or
   closed (or I say stop). Don't ask "want me to watch it?"; just do it.
-- **Before grabbing any issue (GI/GII), check that no other session is already on it.** Two signals must BOTH be clear: (1) the issue's most recent comment does NOT contain "Working on this" or equivalent claim; (2) there is NO open PR whose branch name, title, or body references the issue number. If either signal fires, skip that issue — don't open a competing PR or claim it. (Twice grabbed issues already in-flight: sparta#325 had PR #327 open; sparta#292 had PR #329 open. Both required closing a duplicate.)
+- **Before grabbing any issue (GI/GII), check that no other session is already on it.** Two signals must BOTH be clear: (1) the issue's most recent comment does NOT contain "Working on this" or equivalent claim; (2) there is NO open PR referencing the issue — by branch name or title, or via a cross-reference event on the issue (which covers most `#N` / `Closes #N` body mentions). If either signal fires, skip that issue — don't open a competing PR or claim it. (Twice grabbed issues already in-flight: sparta#325 had PR #327 open; sparta#292 had PR #329 open. Both required closing a duplicate.)
 - Before starting a new task, always go issue-first: search the tracker for an existing issue;
   if none covers it, FILE one before branching or opening a PR. Never jump straight into a PR
   without a tracking issue behind it. (see the `st` / `start-task` skill — the issue is the

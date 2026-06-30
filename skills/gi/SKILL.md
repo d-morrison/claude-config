@@ -69,19 +69,34 @@ pick, or proceed with #1 if they say "just go":
 
 If the user already specified an issue ("gi #12"), skip this step.
 
-### 4. Check for existing PRs on the issue
+### 4. Check the issue isn't already in-flight
 
-Before claiming or branching, check whether an open PR already exists for
-the chosen issue:
+Before claiming or branching, confirm no other session is already on this
+issue. Two signals must **both** be clear (`gh issue list` in step 1 returns
+titles, labels, and assignees but neither comment text nor linked PRs, so
+check both explicitly here).
+
+**(1) No "Working on this" claim in the most recent comment:**
+
+```bash
+# GitHub — read the issue's latest comment:
+gh issue view <N> --json comments --jq '.comments | last | .body' | cat
+```
+
+If it contains "Working on this" / "paws off" (or an equivalent claim), skip
+the issue.
+
+**(2) No open PR already references the issue:**
 
 ```bash
 # GitHub — list open PRs and scan for any whose title or branch references this issue:
 gh pr list --state open --json number,title,headRefName | cat
-# Authoritative — the issue's cross-referenced PRs via the REST timeline API.
+# Authoritative — the issue's cross-referenced open PRs via the REST timeline API.
 # (gh issue view --json has no timelineItems field; in the timeline, source.type is
-#  always "issue", so a PR is one whose source.issue.pull_request is non-null.)
+#  always "issue", so a PR is one whose source.issue.pull_request is non-null. The
+#  state filter keeps only open PRs — merged/closed siblings aren't active competitors.)
 gh api repos/<owner>/<repo>/issues/<N>/timeline \
-  --jq '.[] | select(.event == "cross-referenced") | .source.issue | select(.pull_request != null) | "#\(.number) \(.title) [\(.state)]"' | cat
+  --jq '.[] | select(.event == "cross-referenced") | .source.issue | select(.pull_request != null) | select(.state == "open") | "#\(.number) \(.title)"' | cat
 ```
 
 If an open PR already exists for the issue:
