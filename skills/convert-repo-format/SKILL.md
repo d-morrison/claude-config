@@ -111,8 +111,12 @@ Add what the target needs; remove what only the source needed. Per target:
   `VignetteBuilder`, `Config/Needs/website: quarto`. Move any prose content into
   a vignette (`.qmd`/`.Rmd`) under `vignettes/`.
 - Docs are built by **altdoc** (not pkgdown, no `_quarto.yml`) via the
-  `docs.yaml` workflow — `altdoc::render_docs()` generates `altdoc/man/*.qmd`
-  from `man/*.Rd` at build time (not committed).
+  `docs.yaml` workflow. The `rpt` template uses the lab's own altdoc config —
+  a committed `altdoc/` directory (`altdoc/quarto_website.yml`, `_extensions/`,
+  `scripts/`) plus a custom `d-morrison/altdoc` fork — so `render_docs()`
+  generates `.qmd` files into `altdoc/man/` from `man/*.Rd` at build time (not
+  committed), then renders the site. Mirror `rpt`'s `altdoc/` directory rather
+  than configuring altdoc from scratch.
 
 ### → Quarto website (`qwt`)
 
@@ -155,7 +159,8 @@ shared four from Step 3). The format-specific workflows:
   `check-readme.yaml`, `docs.yaml` (altdoc deploy), `lint-changed-files.yaml`,
   `news.yaml`, `pr-commands.yaml`, `test-coverage.yaml`, `version-check.yaml`.
 - **Quarto, all three**: `check-bibliography-dois.yml`, `check-links.yml`,
-  `check-non-standard-chars.*`, `lint-project.yaml`, `preview.yml`,
+  `check-non-standard-chars.{yaml,yml}` (the extension varies by template —
+  `.yaml` in `qwt`/`qmt`, `.yml` in `qbt`), `lint-project.yaml`, `preview.yml`,
   `publish.yml` (deploy to `gh-pages`), `summary.yml`. The website and
   manuscript formats also carry `lint-changed-files.yaml`; the book format does
   not.
@@ -185,7 +190,9 @@ the body, and ARDI it to clean.
   (e.g. splitting prose into chapters for a book, or into a vignette for a
   package).
 - **`macros/` is a git submodule** in `qwt`/`qbt` — add it with
-  `git submodule add`, don't copy the files.
+  `git submodule add <url> macros`, don't copy the files. Read `<url>` from the
+  target template's `.gitmodules` (currently
+  `https://github.com/d-morrison/macros`).
 - **Generated files** (`man/`, `NAMESPACE`, `README.md`, `_site/`/`docs/`/
   `_manuscript/`) are build outputs — regenerate them, don't hand-edit.
 - When the conversion is between the two **light-package** Quarto formats
