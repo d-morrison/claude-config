@@ -235,6 +235,10 @@ Then, as their own explicit steps (don't leave them buried in a comment):
 
 ## Relationship to other skills
 
+- **`spot-skill-opportunities`** — the recognition step that runs before this
+  one: it notices, continuously and in the moment, that a pattern is
+  skill-shaped and hands off here to build it. `ums` / `record-learnings`
+  route through it too rather than judging recurrence themselves.
 - **`ums` / `record-learnings`** — when a session reveals a workflow worth
   codifying, they hand off to this skill to build it.
 - **`memorize` / `remember`** — for a one-line fact or preference (not a

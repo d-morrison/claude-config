@@ -75,7 +75,9 @@ For standing instructions that should always be in context:
 4. **Write concisely** — bullet points, not prose. Include the *why* not just
    the *what*. If you created a *new* file under `/memories/`, also add a row
    for it to `memories/MEMORY.md` (the index)
-5. **If it's a skill** — create it in `~/.claude/skills/` (symlink to the
+5. **If it's a skill** — hand off to `spot-skill-opportunities` to judge
+   whether the pattern is genuinely recurring (not a one-off) and to
+   `skill-builder` to scaffold it in `~/.claude/skills/` (symlink to the
    cloned repo; discover the repo path with
    `git -C ~/.claude/skills/record-learnings rev-parse --show-toplevel`)
 
@@ -112,6 +114,16 @@ After adding or updating any skill file, always commit and push to origin:
 - If a PR/branch for skill changes is already open, push there.
 - Otherwise, create a new branch + PR on the ai-config repo.
 - Never leave skill edits as local-only uncommitted changes.
+
+## Relationship to other skills
+
+- **`spot-skill-opportunities`** — the dedicated recognition step for the
+  "is this a skill?" case in step 5 above; hand off to it rather than judging
+  recurrence inline here.
+- **`skill-builder`** — scaffolds the `SKILL.md` once `spot-skill-opportunities`
+  (or this skill directly) decides a new one is warranted.
+- **`ums`** — the explicit, session-checkpoint counterpart to this skill's
+  continuous, passive recording.
 
 ## Anti-patterns
 

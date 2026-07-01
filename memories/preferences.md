@@ -464,6 +464,8 @@
   `handoff` and `wait-for-results` skills.
 - Always look for opportunities to create new reusable skills from multi-step processes.
   When a workflow emerges that could be codified, proactively suggest creating a skill for it.
+  (see the `spot-skill-opportunities` skill — the continuous recognition step that hands off
+  to `skill-builder`.)
 - When asked to build/create a new skill, FIRST check whether an existing skill should be
   extended instead — search `skills/` for an adjacent one AND scan ALL branches (`git ls-tree`
   over every remote branch) for in-flight similar work — before scaffolding a new one. Prefer
