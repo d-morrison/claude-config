@@ -137,15 +137,19 @@
   git-only proxy), so it's purely a timer, and foreground Bash `sleep` is
   blocked, which is why the background `Monitor` is the workable one. There is no
   `send_later` tool. Re-arm until the build goes green. Learned driving rme#929.
-- The `gh`->MCP substitution **mapping table** lives in `d-morrison/gha`'s
-  `CLAUDE.md` specifically (the "GitHub access in remote / web sessions" table);
-  other repos' `CLAUDE.md` (e.g. `ai-config`) do NOT carry it. When a skill or
-  doc tells a reader to "use the GitHub MCP tools," name the tools by example
-  (`mcp__github__add_issue_comment`, `mcp__github__create_pull_request`,
-  `mcp__github__search_pull_requests`) rather than pointing at "the repo's
-  `CLAUDE.md` mapping table" — that cross-reference
-  resolves only in gha and reads as a fabricated reference elsewhere. (Caught in
-  ai-config#137 review: the gip skill referenced a table ai-config doesn't have.)
+- `d-morrison/gha`'s `CLAUDE.md` carries its own `gh`->MCP substitution table
+  (the "GitHub access in remote / web sessions" section), scoped to that repo.
+  `d-morrison/ai-config` has its own cross-model registry at
+  [`tool-mappings.md`](../tool-mappings.md) (generated from `tool-mappings.yml`),
+  which ai-config skills can point to directly — see `CLAUDE.md`'s "Skills that
+  call gh/glab" section. When a skill or doc in a **different** repo (one with
+  neither table) tells a reader to "use the GitHub MCP tools," name the tools by
+  example (`mcp__github__add_issue_comment`, `mcp__github__create_pull_request`,
+  `mcp__github__search_pull_requests`) rather than pointing at a `CLAUDE.md`
+  mapping table that repo doesn't have — that cross-reference resolves only
+  where the table actually lives. (Caught in ai-config#137 review: the gip
+  skill referenced a table ai-config didn't have at the time; ai-config#327
+  later added `tool-mappings.md` to close that gap.)
 
 ## GII (Grab Issues Iteratively) — startup cleanup sweep
 

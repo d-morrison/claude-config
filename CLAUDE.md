@@ -124,6 +124,17 @@ as a single clean commit so no sensitive history leaks through), comment on the
 original PR pointing to the replacement, and close the original once the new PR
 merges. Don't retry the 403 --- it's a policy denial, not a transient error.
 
+## Skills that call gh/glab: fall back to tool-mappings.md in remote sessions
+
+Many skills under `skills/` name concrete `gh`/`glab` CLI commands (e.g.
+`gh pr comment`, `gh issue create`). In a remote/web session where `gh`/`glab`
+isn't on `PATH`, substitute the equivalent GitHub MCP tool from
+[`tool-mappings.md`](tool-mappings.md) instead of failing or improvising. That
+registry is the single source of truth for the gh/glab-to-MCP mapping in this
+repo --- don't inline a separate translation table into individual skills;
+point to `tool-mappings.md` and let it stay the one place to update. (GitLab
+operations have no MCP equivalent listed there; `glab` stays CLI-only.)
+
 ## File an issue before starting a new task
 
 <!-- Shared with the lab manual; edit shared/workflow/issue-first.md, not here. -->
