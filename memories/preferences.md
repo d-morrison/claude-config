@@ -44,11 +44,77 @@
   and follow through — autofix CI failures and address review comments per the
   ARD framework — without asking first. Keep following until the PR is merged or
   closed (or I say stop). Don't ask "want me to watch it?"; just do it.
-- **Before grabbing any issue (GI/GII), check that no other session is already on it.** Two signals must BOTH be clear: (1) the issue's most recent comment does NOT contain "Working on this" or equivalent claim; (2) there is NO open PR referencing the issue — by branch name or title, or via a cross-reference event on the issue (which covers most `#N` / `Closes #N` body mentions). If either signal fires, skip that issue — don't open a competing PR or claim it. (Twice grabbed issues already in-flight: sparta#325 had PR #327 open; sparta#292 had PR #329 open. Both required closing a duplicate.)
+- When there's a well-scoped next step — a filed follow-up issue, a sequenced item, an obvious
+  continuation of the current work — just start it; don't pause to ask "want me to keep going?"
+  first. The answer is a standing yes. This removes the extra "should I continue?" pause between
+  already-scoped steps; it does NOT override holding for genuinely ambiguous or architecturally
+  significant decisions. When unsure whether a step is "well-scoped" vs. "needs a decision," lean
+  toward continuing and flag any judgment calls made along the way. (Learned on sparta 2026-07-01.)
+- If I ask the user a question and they don't answer within ~5 minutes, make an informed guess from
+  the conversation, their established preferences, and sensible defaults, then proceed — stating the
+  assumption so they can redirect. This lowers the bar to proceed on my own judgment; it does NOT
+  mean fire questions and barrel ahead. Still reserve questions for genuine decisions their answer
+  would change, and still hold for truly irreversible or high-stakes actions. For the ordinary
+  "which of these reasonable options" case, pick the best after a short wait and keep moving.
+- Operate as a COORDINATOR, not an implementer. Delegate all hands-on implementation to subagents
+  (Agent tool, worktree isolation) — even core, high-stakes, architecturally-significant changes.
+  Stay at the birds-eye level: decide WHAT to build and in what order, write precise specs,
+  launch/direct agents, sequence merges, verify results, surface decisions to the user, and relay
+  feedback to the right agent. Don't drop into editing files, running the suite, or resolving merge
+  conflicts by hand when an agent can. What stays mine: the merge button, decisions the user must
+  weigh in on, and relaying user feedback — NOT the implementation. Keep the pipeline full; delegate
+  broadly and in parallel. (Learned on sparta 2026-07-01: "always delegate; stay at a birds-eye level.")
+- Delegating implementation does NOT mean trusting an agent's "CLEAN, ready to merge" report blind.
+  Before merging (or reporting a PR clean), the coordinator double-checks the agent's work against
+  ground truth: re-verify CI myself (`gh pr checks <N>` / `gh pr view <N> --json mergeable,mergeStateStatus`
+  — a flaky check may have passed by luck, or main may have moved); read the diff on anything
+  load-bearing (CI/workflow files, security-relevant code, conflict resolutions — an agent can
+  merge-resolve semantically but silently drop one side, so spot-check both features survived); and
+  read verification artifacts myself. ESPECIALLY when the bot review self-skipped (the PR edits
+  `claude-code-review.yml`/`claude.yml`, so the action only runs after merge) or was quota-skipped —
+  then my own diff read is the ONLY review. The merge gate is MY independent check, not the agent's word.
+- A verification artifact (state transcript, frame/state dump) is worthless unless something actually
+  READS it. Put it where the reviewer looks: the `@claude` review bot reviews only the checked-out PR
+  tree plus the diff, so a JSON linked by raw URL on a side/media branch is invisible to it — inline a
+  compact state summary in the PR conversation/diff (and add a line telling the reviewer to use it); a
+  bare link is decoration. And the coordinator must actually read the dumps too — don't build a
+  verification tool and then keep trusting agents' written "I verified tick-by-tick" reports without
+  ever reading a dump. Design for the CONSUMER first (what the review bot / human sees), then durability.
+- Don't merge a PR while ANY of its workflows is red — INCLUDING non-gating checks like the
+  `Test coverage` / codecov job — unless there's a specific, deliberate reason stated for THAT merge.
+  "It's only the non-gating Coverage job" / "it's a pre-existing flake" is not a blanket pass; the
+  project wants to maintain decent coverage, so a red Coverage job is a real signal to fix. If a red
+  check is a genuine flake, the fix is to make it green (sequence the flake-fix PR FIRST so main goes
+  green, then resync the dependent PRs onto green main) — not to merge past it. Refines the fully-clean
+  rule (ALL workflows green, not just the required set). (Learned on sparta 2026-07-01.)
+- During multi-PR autonomous work, keep a live TaskList (one task per claimed issue/PR: issue#, PR#,
+  branch, state — open/review-pending/merged/blocked) and refresh it with fresh `gh pr view` /
+  `gh issue view` queries on any status ask — never recite state from memory (per never-assume/always-verify).
+  A merge/close event or an explicit "status?" ask is the trigger to refresh. This is a session tool;
+  it doesn't survive `/clear`, so don't rely on it across sessions. (Learned on sparta 2026-07-01, after
+  several PRs in flight plus stacked-branch fallout made it easy to lose track.)
+- When several in-flight PRs touch the SAME files, merging any one moves `main` and re-conflicts the
+  rest — so serialize the merges: merge one, wait for the others to recompute (CONFLICTING/DIRTY, or
+  briefly UNKNOWN — re-poll after a few seconds), and merge the next only once it's re-resynced clean.
+  Merge the most-isolated PR (disjoint files) FIRST — it rides through without a re-resync; sequence
+  foundational/big same-file PRs LAST so lighter PRs rebase onto simpler `main`. An agent watching a
+  PR must POLL its own `mergeable`/`mergeStateStatus` on EVERY watch tick (a newly-appearing conflict
+  from someone else's merge is NOT a CI event, so a CI-completion monitor never fires on it), and on
+  catching one immediately `git fetch origin main && git merge origin/main`, resolve, re-run checks,
+  push — staying in the watch loop until the PR is merged or closed (clean regresses to CONFLICTING
+  when main moves). The coordinator's nudge is only a backstop for a genuinely-dead agent. (Learned on
+  sparta 2026-07-01 merging the movement cluster.)
+- **Before grabbing any issue (GI/GII), check that no other session is already on it.** Two signals must BOTH be clear: (1) the issue's most recent comment does NOT contain "Working on this" or equivalent claim; (2) there is NO open PR referencing the issue — by branch name or title, or via a cross-reference event on the issue (which covers most `#N` / `Closes #N` body mentions). If either signal fires, skip that issue — don't open a competing PR or claim it. (Twice grabbed issues already in-flight: sparta#325 had PR #327 open; sparta#292 had PR #329 open. Both required closing a duplicate.) And once both signals are clear, **post your own claim comment the INSTANT you decide to work the issue** — before the investigation phase (reading the body in depth, grepping, designing), not just before branching. The claim flags the issue as actively worked so a parallel session or the `@claude` agent doesn't collide, and that collision risk begins the moment you start investigating. (Learned after investigating sparta#390 fully before claiming, and after fully implementing sparta#404 only to find an unclaimed in-flight PR #405 had already fixed it — a duplicate that had to be closed.)
 - Before starting a new task, always go issue-first: search the tracker for an existing issue;
   if none covers it, FILE one before branching or opening a PR. Never jump straight into a PR
   without a tracking issue behind it. (see the `st` / `start-task` skill — the issue is the
   durable record of intent/scope/"done" and lets the PR auto-close it via `Closes #N`.)
+  Search EVEN when the idea emerged organically mid-conversation (a design discussion, a
+  code-review finding) and feels novel — "I haven't seen it this session" is not evidence
+  it doesn't exist. Always `gh issue list --search "<keywords>" --state all` before every
+  `gh issue create`, regardless of how the idea surfaced. (Learned on sparta: filed #447
+  without searching; the user had already filed #446 with the same core ask minutes earlier,
+  and #447 had to be closed as a duplicate and folded into #446.)
 - When implementing a user instruction that edits a tracked file in the repo (e.g. CLAUDE.md,
   README, a config file), the task is not done at "made the local edit." Go all the way:
   file an issue, commit on a branch, and open a PR — without waiting to be asked. Stopping at
@@ -109,6 +175,13 @@
   explicitly said "do ums after each merge; then keep going." The existing instruction already
   covered this; the gap was execution discipline in a fast multi-merge loop, not missing
   guidance — re-read this bullet at the top of every "pick the next backlog item" cycle.
+  In a multi-AGENT pipeline, UMS runs at BOTH levels: each subagent runs UMS once ITS PR
+  merges (it stops after reporting CLEAN, so the coordinator resumes it post-merge with a
+  "your PR merged, run UMS" nudge — or the agent-launch spec bakes in a final UMS step), and
+  the coordinator runs its own UMS for the cross-PR orchestration learnings no single subagent
+  can see (merge-order sequencing, conflict-cascade handling, pipeline mechanics). Each agent
+  writes its OWN memory file plus one MEMORY.md index line to keep the conflict surface small;
+  avoid rewriting shared memory bodies concurrently. (Learned on sparta 2026-07-01.)
 - Keep it simple. Don't over-explain or ask permission for straightforward fixes — just do them.
 - Don't re-ask a decision that's already settled and built. Once an answer is given and the
   work is implemented to match it (and CI-green), don't reopen it with a fresh AskUserQuestion —
@@ -218,6 +291,13 @@
   and push everything to origin (on the current branch if a PR is already open, or
   create a new branch + PR if the change is out of scope). Never leave ANY changes in
   ai-config as local-only uncommitted edits — including memory files.
+- **AI memories, skills, and commands never stay local-only.** When I capture a durable
+  learning, commit it to the right repo via PR — GENERAL/cross-project learnings go to
+  `d-morrison/ai-config` (as bullets in the right `memories/*.md` topic file); PROJECT-SPECIFIC
+  learnings go to that project's own repo (its `CLAUDE.md` / agent docs / `.claude/memories/`).
+  A memory kept only under `~/.claude/projects/<path>/memory/` is invisible to other sessions,
+  machines, and humans, and rots silently — so migrate it. Capturing a learning isn't done until
+  it's committed where the right audience will see it.
 - When committing, stage the SPECIFIC files you touched — NEVER `git add -A`. The working
   tree often holds unrelated in-flight edits (the user's own UMS/skill commits, another
   draft); `git add -A` silently sweeps those into your commit and onto your PR, bloating the
