@@ -56,6 +56,12 @@ Track each completed issue in a running table:
 
 #### c. Decide the next base branch (stacking)
 
+A clean-but-unmerged MR is **not** a stopping point. Merging is human-gated
+(you don't self-merge), but that gates only the merge, not the loop — keep
+going to the next issue instead of pausing to wait for a human to merge first.
+Stacking is what lets the loop keep moving without merges. See
+[`stack-dont-pause`](../../shared/workflow/stack-dont-pause.md).
+
 After ARDI completes clean on the current MR/PR:
 
 - **If the MR was merged** (user said "merge" or auto-merge is on):
@@ -155,4 +161,6 @@ If the user says "just go", "do all", "work through everything", or similar:
 - ❌ Forgetting to note stack dependencies in MR descriptions
 - ❌ Basing on main when the previous MR hasn't merged yet and the next issue
   touches the same files (creates guaranteed conflicts)
+- ❌ Pausing after a clean-but-unmerged MR to wait for a human merge — you don't
+  self-merge, but that's no reason to stop; keep going and stack the next issue
 - ❌ Running unbounded without a checkpoint — always pause at 5

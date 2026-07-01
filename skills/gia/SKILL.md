@@ -24,6 +24,13 @@ PRs-first, then issues: clearing the existing review backlog first means new
 issue work lands on top of an already-clean queue (and may even unblock or
 close issues that the open PRs address).
 
+**The sweep runs to the end of the queue without pausing for merges.** Merging
+is human-gated — you don't self-merge — but that gates only the merge, not the
+run. A PR reaching clean-but-unmerged is not a stopping point in either phase;
+move to the next item, and when that item isn't naturally independent of a
+completed-but-unmerged PR, **stack** it on that PR's branch instead of waiting
+for a merge. See [`stack-dont-pause`](../../shared/workflow/stack-dont-pause.md).
+
 ## When this fires
 
 - "gia", "ardia+gii", "adria+gii", "gii+ardia", "gii+adria"

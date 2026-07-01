@@ -15,3 +15,9 @@ like human approval (and Claude Code's auto-mode classifier will rightly deny it
 as a self-authored merge). Drive to fully clean, report ready, and leave the
 merge --- and any other destructive one-off, e.g. a `gh workflow run` that
 force-pushes --- for explicit human authorization.
+
+In the **clear-all family** (`ardia`, `gia`, `gii`, `gip`), "report ready, don't
+merge" gates only the merge --- it does **not** pause the sweep. A
+clean-but-unmerged PR is not a stop; move to the next item, and stack it when it
+isn't naturally independent of that PR. See
+[`stack-dont-pause`](stack-dont-pause.md).

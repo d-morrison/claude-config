@@ -65,7 +65,11 @@ each to a clean review verdict in series.
    merge it, then start the derived PR. Never run ARDI on a derived PR while its
    base is still open and unclean — you'd be reviewing against a moving target.
 
-   Drive each to a terminal state:
+   Drive each to a terminal state. A PR reaching **clean-but-unmerged** is that
+   PR's terminal state, **not** a reason to pause the sweep: merging is
+   human-gated (you don't self-merge), but that gates only the merge — move
+   straight to the next PR rather than waiting for a human to merge first. See
+   [`stack-dont-pause`](../../shared/workflow/stack-dont-pause.md).
    - **Clean** — zero flagged items under any heading; post the unclaim
      comment, record the round count.
    - **Asymptotic noise** — per ARDI's guard, if after 3–4 rounds the reviewer

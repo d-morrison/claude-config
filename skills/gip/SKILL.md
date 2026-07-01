@@ -152,7 +152,9 @@ in the orchestrator — never have each subagent re-do it.
 
 After the parallel wave, run the **dependent remainder** through the normal
 serial [`gii`](../gii/SKILL.md) loop — it stacks branches and handles same-file
-ordering correctly. Don't try to parallelize it.
+ordering correctly. Don't try to parallelize it. GII keeps going through that
+remainder without pausing for merges — a clean-but-unmerged base is stacked on,
+not waited on (see [`stack-dont-pause`](../../shared/workflow/stack-dont-pause.md)).
 
 ### 6. Combined report (orchestrator)
 
