@@ -59,8 +59,8 @@ glab issue list --search "<keywords>" --per-page=20 2>&1 | cat
 
 - **Open match** → an issue already exists, so this is just `gi` on that
   number: invoke the `gi` skill from its claim step onward (claim → check
-  history → branch → implement → PR → ARDI). Skip the rest of `st` — you don't
-  need to file anything.
+  history → branch → open draft PR → implement → mark ready → ARDI). Skip the
+  rest of `st` — you don't need to file anything.
 - **Closed match** → surface it ("looks like #N already covered this and was
   closed") and confirm with the user before re-doing the work.
 
@@ -94,7 +94,7 @@ glab issue create --title "<concise title>" --description "<what & why>
 Invoke `check-history` before implementing — review merged/closed MRs that
 touched the same area so you don't undo past progress.
 
-### 5. Branch → implement → PR → ARDI
+### 5. Branch → open draft PR → implement → ready → ARDI
 
 From here the tail is identical to `gi`:
 
@@ -103,16 +103,21 @@ git fetch origin main
 git checkout -b <type>/<slug> origin/main   # fix/ feat/ docs/ refactor/
 ```
 
-- Implement (code, tests, docs), run the repo's standard checks, commit
-  referencing the issue (`fix: … (closes #N)`).
-- Push and open the PR with `Closes #N` in the body, then request `d-morrison`
-  as reviewer (`request-pr-review`):
+- **Open the draft PR now**, before implementing — an empty commit gives the
+  branch a diff to open against, kept as a draft so the review bot doesn't run
+  on an empty diff (see [`pr-on-claim`](../../shared/workflow/pr-on-claim.md)):
   ```bash
+  git commit --allow-empty -m "start: <title> (closes #<N>)"
   git push -u origin <type>/<slug>
-  gh pr create --title "<title>" --body "Closes #<N>
+  gh pr create --draft --title "<title>" --body "Closes #<N>
 
-  <what was done and why>"
+  WIP — opened up front to claim the issue; implementing now."
   ```
+- Implement (code, tests, docs), run the repo's standard checks, and push the
+  implementation onto the PR, committing with a message referencing the issue
+  (`fix: … (closes #N)`).
+- **Mark the PR ready for review** (`gh pr ready <N>`) and request `d-morrison`
+  as reviewer (`request-pr-review`).
 - **ARDI** the PR to a clean verdict (`ardi`). Don't merge unless asked.
 
 ### 6. Report
@@ -124,8 +129,9 @@ Linked issue + PR, ARDI round count, and any deferred follow-up issues.
 - **`gi`** — once the issue exists, the implement → PR → ARDI tail is the same;
   `st` is "`gi`, but you write the issue first."
 - **`defer-issue`** — same issue-creation mechanics, for sub-tasks that emerge.
-- **`check-history`**, **`claim-pr`**, **`request-pr-review`**, **`ardi`**,
-  **`split-concerns`** — invoked along the way.
+- **`check-history`**, **`claim-pr`**, **`pr-on-claim`**,
+  **`request-pr-review`**, **`ardi`**, **`split-concerns`** — invoked along the
+  way (`pr-on-claim` is the "open the draft PR before implementing" step).
 - **`post-merge`** — closes the lifecycle that `st` opens, once the PR lands.
 
 ## Anti-patterns

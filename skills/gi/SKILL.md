@@ -136,7 +136,33 @@ Branch naming:
 - Docs → `docs/<issue-slug>`
 - Refactor → `refactor/<issue-slug>`
 
-### 8. Implement
+### 8. Open the PR now — draft, from an empty commit
+
+Open the PR **immediately, before implementing**, so the open-PR signal that
+step 4 relies on fires right away and other sessions can see the issue is being
+worked (see [`pr-on-claim`](../../shared/workflow/pr-on-claim.md)). Give the
+branch a diff with an empty commit, push, and open a **draft** PR:
+
+```bash
+git commit --allow-empty -m "start: <issue title> (closes #<N>)"
+git push -u origin fix/<slug>
+
+# GitHub — draft PR
+gh pr create --draft --title "<title>" --body "Closes #<N>
+
+WIP — opened up front to claim the issue; implementing now."
+
+# GitLab — draft MR
+glab mr create --draft --title "<title>" --description "Closes #<N>
+
+WIP — opened up front to claim the issue; implementing now." --assignee <your-gitlab-username>  # default: demorrison
+```
+
+Keep it a draft: a draft doesn't trigger the `@claude` review bot, so no review
+round is wasted on an empty diff. Include `Closes #N` to auto-close the issue on
+merge.
+
+### 9. Implement
 
 - Read the issue description carefully — understand "done" criteria
 - Make the changes (code, tests, docs as needed)
@@ -144,32 +170,23 @@ Branch naming:
 - Commit with a message referencing the issue:
   `fix: handle auth timeout on slow networks (closes #12)`
 
-### 9. Push and open MR/PR
+### 10. Push and mark the PR ready for review
 
 ```bash
-git push -u origin fix/<slug>
+git push origin fix/<slug>   # push the implementation onto the draft PR from step 8
+gh pr ready <N>              # GitHub — flip draft → ready, which kicks off review
+# GitLab: glab mr update <N> --ready
 ```
 
-```bash
-# GitHub
-gh pr create --title "<title>" --body "Closes #<N>
+The PR already exists (step 8), so there's nothing new to create — pushing the
+implementation and marking it ready for review is what starts ARDI.
 
-<description of what was done and why>"
+### 11. ARDI to clean
 
-# GitLab
-glab mr create --title "<title>" --description "Closes #<N>
+Invoke the `ardi` skill on the MR/PR. Drive it through review rounds until the
+verdict is clean (zero findings).
 
-<description>" --assignee <your-gitlab-username>  # default: demorrison
-```
-
-Include `Closes #N` in the description to auto-close the issue on merge.
-
-### 10. ARDI to clean
-
-Invoke the `ardi` skill on the newly opened MR/PR. Drive it through
-review rounds until the verdict is clean (zero findings).
-
-### 11. Report
+### 12. Report
 
 When ARDI completes clean, report:
 - Issue number + link
@@ -209,8 +226,10 @@ dependency, needs design decision, upstream bug):
 ## Relationship to other skills
 
 - **`check-history`** — invoked in step 5 to avoid undoing past work
-- **`ardi`** — invoked in step 10 to drive the MR/PR to clean
+- **`ardi`** — invoked in step 11 to drive the MR/PR to clean
 - **`claim-pr`** — the issue claim in step 6 follows the same pattern
+- **`pr-on-claim`** — the rule behind step 8: open the draft PR up front so the
+  work is visible to other sessions before you implement
 - **`split-concerns`** — if the implementation grows too large, offer to split
 - **`defer-issue`** — if sub-tasks emerge during implementation, defer them
 
@@ -222,6 +241,8 @@ dependency, needs design decision, upstream bug):
 - ❌ Picking a huge issue that can't be completed in one session without
   discussing scope with the user first
 - ❌ Implementing without understanding "done" criteria from the issue
+- ❌ Opening the PR only after implementing — open a draft PR up front (step 8)
+  so the work is visible and a parallel session doesn't grab the same issue
 - ❌ Forgetting `Closes #N` in the MR/PR description
 - ❌ Merging without re-checking that a concurrent session's PR hasn't already
   closed the issue (resolve a surprise merge conflict by reading the diff, not

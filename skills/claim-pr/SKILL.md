@@ -90,7 +90,11 @@ gh issue comment <N> --body "Done with my local session — unclaiming."
   before your PR shows up. (This exact collision produced a duplicate PR in one
   session; the claim, or a fast linked PR, makes the sweep skip it. The
   reciprocal check is `check-history` step 0 — look for an already-open PR
-  before implementing.)
+  before implementing.) The strongest form of this is to **open the PR
+  immediately** — before implementing, from an empty commit, as a draft — so
+  the open-PR signal fires right away; see
+  [`pr-on-claim`](../../shared/workflow/pr-on-claim.md), which `gi`/`gii`/`gip`/`st`
+  operationalize.
 - If `@claude` agent runs are in flight on the branch, wait for them before
   pushing or polling — don't edit while the bot is mid-session.
 - **Detecting an already-active parallel session** (so you don't collide):

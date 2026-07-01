@@ -40,9 +40,11 @@ Run the full GI procedure:
 3. Check history
 4. Claim the issue
 5. Create a branch
-6. Implement
-7. Push and open MR/PR
-8. ARDI to clean
+6. Open the draft PR up front, from an empty commit, before implementing —
+   see [`pr-on-claim`](../../shared/workflow/pr-on-claim.md)
+7. Implement
+8. Push and mark the PR ready for review
+9. ARDI to clean
 
 #### b. Record the result
 
@@ -140,6 +142,8 @@ When the loop ends, print a summary:
   out and works it concurrently in worktree-isolated subagents instead of
   serially. This loop stays serial for everything `gip` can't prove independent.
 - **`gi`** — the inner loop; each iteration is a full GI invocation
+- **`pr-on-claim`** — each iteration opens its draft PR up front (step 6) so the
+  in-flight issue is visible before implementing
 - **`ardi`** — drives each MR/PR to clean review within GI
 - **`check-history`** — invoked per-issue to avoid undoing past work
 - **`split-concerns`** — if an issue's implementation grows too large, split

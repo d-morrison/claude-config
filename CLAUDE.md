@@ -87,6 +87,16 @@ contributors who only see the PR thread.
 The `claim-pr` skill operationalizes this (the exact claim wording, when it
 applies, and the closing/unclaim comment).
 
+## Open a PR immediately after claiming an issue
+
+@shared/workflow/pr-on-claim.md
+
+The strong form of the claim: after claiming an issue you're about to work,
+open the PR right away — before implementing — from an empty commit, kept as a
+draft until the implementation lands. An open PR is the visible in-flight
+signal other sessions check, so opening it up front stops parallel duplicates.
+The `gi`, `gii`, `gip`, and `st` skills operationalize this.
+
 ## Use the existing PR branch, not the harness-specified branch
 
 The Claude Code on the web harness injects a "Git Development Branch
