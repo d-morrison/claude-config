@@ -29,7 +29,8 @@
   first, just drive it to clean. (Still don't merge unless asked; "always ardi" means
   always drive to clean, not always merge.)
 - "Fully clean" (the ARDI/iterate terminal state) means BOTH: (1) all CI workflows green
-  (every required check, not just the review job), AND (2) the latest review is totally
+  (every workflow — not just required checks, not just the review job; includes non-gating
+  checks like Coverage/codecov), AND (2) the latest review is totally
   clean — no nits, and every item not directly Addressed is either Deferred to a tracked
   issue or Rebutted with a rebuttal that actually CONVINCED the reviewer (they didn't
   re-raise it). A rebuttal the reviewer still disputes does NOT count as clean. At
@@ -56,23 +57,27 @@
   mean fire questions and barrel ahead. Still reserve questions for genuine decisions their answer
   would change, and still hold for truly irreversible or high-stakes actions. For the ordinary
   "which of these reasonable options" case, pick the best after a short wait and keep moving.
+  (Learned on sparta 2026-07-01, during a high-throughput parallel-PR run where the user was
+  away for stretches and didn't want progress to stall on unanswered questions.)
 - Operate as a COORDINATOR, not an implementer. Delegate all hands-on implementation to subagents
   (Agent tool, worktree isolation) — even core, high-stakes, architecturally-significant changes.
-  Stay at the birds-eye level: decide WHAT to build and in what order, write precise specs,
+  Stay at the bird's-eye level: decide WHAT to build and in what order, write precise specs,
   launch/direct agents, sequence merges, verify results, surface decisions to the user, and relay
   feedback to the right agent. Don't drop into editing files, running the suite, or resolving merge
   conflicts by hand when an agent can. What stays mine: the merge button, decisions the user must
   weigh in on, and relaying user feedback — NOT the implementation. Keep the pipeline full; delegate
-  broadly and in parallel. (Learned on sparta 2026-07-01: "always delegate; stay at a birds-eye level.")
+  broadly and in parallel. (Learned on sparta 2026-07-01: "always delegate; stay at a bird's-eye level.")
 - Delegating implementation does NOT mean trusting an agent's "CLEAN, ready to merge" report blind.
   Before merging (or reporting a PR clean), the coordinator double-checks the agent's work against
   ground truth: re-verify CI myself (`gh pr checks <N>` / `gh pr view <N> --json mergeable,mergeStateStatus`
   — a flaky check may have passed by luck, or main may have moved); read the diff on anything
   load-bearing (CI/workflow files, security-relevant code, conflict resolutions — an agent can
   merge-resolve semantically but silently drop one side, so spot-check both features survived); and
-  read verification artifacts myself. ESPECIALLY when the bot review self-skipped (the PR edits
-  `claude-code-review.yml`/`claude.yml`, so the action only runs after merge) or was quota-skipped —
-  then my own diff read is the ONLY review. The merge gate is MY independent check, not the agent's word.
+  read verification artifacts myself. ESPECIALLY when the bot review self-skipped (a PR that edits
+  the review workflow itself — the reusable `claude-code-review` workflow in `d-morrison/gha`, or the
+  repo's own caller that invokes it, whatever it's named in that repo — makes the `@claude` bot
+  self-skip: it 401s from a PR ref and only runs after merge) or was quota-skipped — then my own diff
+  read is the ONLY review. The merge gate is MY independent check, not the agent's word.
 - A verification artifact (state transcript, frame/state dump) is worthless unless something actually
   READS it. Put it where the reviewer looks: the `@claude` review bot reviews only the checked-out PR
   tree plus the diff, so a JSON linked by raw URL on a side/media branch is invisible to it — inline a

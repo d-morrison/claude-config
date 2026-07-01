@@ -1,8 +1,12 @@
 "Fully clean" is the terminal state the ARDI review loop drives toward.
 A PR/MR is **fully clean** when **both** of these hold:
 
-1. **All CI workflows are green.** Every required check passes --- not just the
-   review job.
+1. **All CI workflows are green.** Every workflow passes --- not just the required
+   checks and not just the review job. This includes non-gating checks like the
+   Coverage / codecov job: don't merge around a red Coverage run just because it
+   isn't a required check, unless there's a specific, stated reason for that merge
+   (the project wants to maintain decent coverage, so a red Coverage job is a real
+   signal to fix, not to ignore).
 2. **The latest review is totally clean:** no nits, and every item that wasn't
    directly **Addressed** is either **Deferred** to a tracked follow-up issue,
    or **Rebutted with a rebuttal that actually convinced the reviewer** --- i.e.
