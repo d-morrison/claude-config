@@ -126,6 +126,18 @@ allowed-tools:               # real skill: list its tools. alias: mirror the can
 - **No registry to update.** Skills are auto-discovered from `skills/` (the
   bootstrap symlink and the plugin root both read the directory) — adding the
   directory is enough.
+- **Register any new tool the skill names.** Discovery needs no registry, but
+  tool *references* do. If the procedure names a **GitHub MCP tool or `gh`/`git`
+  operation not already in `tool-mappings.yml`** (grep it to check), verify the
+  tool is real first (`ToolSearch` for it in a live session), then add it there
+  — `id`, `description`, `cli` (the CLI fallback), and `github_mcp` (the MCP
+  tool) — and rerun `scripts/sync-codex-skill-wrappers.py` so the Codex wrappers
+  can translate it.
+  Skip this and the `@claude` reviewer flags the unregistered name
+  as a *possible hallucination* — it can't tell a real-but-undocumented tool from
+  an invented one. (`push-memory` #311 hit this: `mcp__github__create_branch` and
+  `mcp__github__push_files` were real but unregistered, and the first review round
+  flagged both.)
 - **Use `<angle-bracket>` placeholders in command blocks — never bare ALLCAPS.**
   Identifiers like `PATH`, `URL`, `TARGET` look like shell env vars; bare `PATH`
   looks like the `$PATH` env var, and `path` is a zsh special that mirrors
@@ -249,6 +261,9 @@ Then, as their own explicit steps (don't leave them buried in a comment):
   this skill's text — it doesn't; restate every needed discipline in the prompt.
 - ❌ `name:` not matching the directory name.
 - ❌ Encoding a standing rule in the skill but not in `preferences.md`.
+- ❌ Naming a GitHub MCP tool (or `gh`/`git` operation) the skill uses without
+  registering it in `tool-mappings.yml` — the reviewer flags the unregistered
+  name as a possible hallucination (`push-memory` #311).
 - ❌ Leaving the new skill as a local-only uncommitted file (or pushing direct to main).
 - ❌ In a worktree session, writing the skill files to the `rev-parse --show-toplevel`
   path — it resolves to the main checkout (via the `~/.claude/skills` symlink), not
