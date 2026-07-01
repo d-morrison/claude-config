@@ -44,6 +44,14 @@ each PR number a markdown link to the PR URL —
 forces the user to copy/paste; the linked form lets them open the PR in
 one click.
 
+## Title Claude sessions with the PR/issue number
+
+Name each Claude Code session (the title shown in the web/app session
+sidebar) `#NNN brief description` — the number of the PR or issue the session
+is working, then a short description. Don't prefix it with "PR" or "Issue";
+just the bare `#NNN`. So `#316 session title convention`, not
+`PR #316 session title convention` or `PR session title convention`.
+
 ## Re-check for latest review findings before reporting PR status
 
 **Before** reporting status on a PR (especially "clean" / "ready to merge"),
