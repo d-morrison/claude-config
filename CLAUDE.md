@@ -253,7 +253,7 @@ fragment also sets the default direction for the age factor: among several
 open PRs, take the **older** one first unless you have more specific
 instructions.
 
-## Auto-orchestration: let heavy skills choose Workflows
+## Auto-orchestration: always look for Workflow opportunities
 
 The heavy, parallelizable skills (`ardia`, `ardiaei`, `gia`, `gip`,
 `grade-work`, `opposition-research`, `find-overlap`) decide on their own whether
