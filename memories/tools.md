@@ -146,11 +146,9 @@
   their base branch to the merged pull request's base branch."
 - In practice (Lacaedemon/sparta, 2026-07-01), `gh pr merge <N> --squash
   --delete-branch` did NOT retarget a stacked PR onto the new base — it
-  auto-**closed** the stacked PR instead, because GitHub closes a PR outright
-  when its base branch no longer exists rather than retargeting, at least via
-  this code path. Root cause unconfirmed (possibly a timing/API-path
-  difference between `gh`'s post-merge branch deletion and the web UI's
-  "Delete branch" button the docs describe) — but the failure mode is
+  auto-**closed** the stacked PR instead. Root cause unconfirmed (possibly a
+  timing/API-path difference between `gh`'s post-merge branch deletion and the
+  web UI's "Delete branch" button the docs describe) — but the failure mode is
   reproducible enough to plan around regardless of cause.
 - **Before running `gh pr merge <N> --delete-branch`**, check whether another
   open PR uses that branch as its base: `gh pr list --base <branch-name>`. If
