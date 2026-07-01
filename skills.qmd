@@ -55,6 +55,7 @@ Most skills also respond to plain-English triggers listed in their `description`
 |-------|---------|--------------|
 | [`ums`](skills/ums/SKILL.md) | `update-memories-and-skills` | Capture learnings from the session into memory files and skill definitions |
 | [`memorize`](skills/memorize/SKILL.md) | `remember`, `always` | Save a specific fact or preference to memory |
+| [`push-memory`](skills/push-memory/SKILL.md) | | Push a general-purpose memory into ai-config from a session working in another repo — on a branch + PR |
 | [`record-learnings`](skills/record-learnings/SKILL.md) | | Structured post-mortem: extract lessons from a completed task |
 | [`consolidate-memory`](skills/consolidate-memory/SKILL.md) | | Merge or deduplicate memory files that have drifted |
 
