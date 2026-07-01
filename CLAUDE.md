@@ -253,7 +253,7 @@ fragment also sets the default direction for the age factor: among several
 open PRs, take the **older** one first unless you have more specific
 instructions.
 
-## Auto-orchestration: let heavy skills choose Workflows
+## Auto-orchestration: always look for Workflow opportunities
 
 The heavy, parallelizable skills (`ardia`, `ardiaei`, `gia`, `gip`,
 `grade-work`, `opposition-research`, `find-overlap`) decide on their own whether
@@ -264,6 +264,13 @@ directly when an opt-in signal is already present (`ultracode`, a `+Nk` budget,
 or "use a workflow"), otherwise propose one with a one-line cost estimate and
 wait. The PR/issue-iteration skills stay serial where pushes collide on shared
 review runners (see the fragment's shared-runner exception).
+
+More generally --- not just inside the named heavy skills --- always look for
+opportunities to automate work via the `Workflow` tool. When a task turns out
+to be workflow-shaped (decomposable, verification-bearing, and at a scale that
+earns it --- see the fragment's criteria), say so and propose a workflow even
+if no skill mandated one. The same opt-in gate still applies: propose with a
+cost estimate and wait unless an opt-in signal is already present.
 
 <!-- Shared with the lab manual; edit shared/workflow/when-to-orchestrate.md, not here. -->
 @shared/workflow/when-to-orchestrate.md
