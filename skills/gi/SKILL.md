@@ -136,7 +136,30 @@ Branch naming:
 - Docs → `docs/<issue-slug>`
 - Refactor → `refactor/<issue-slug>`
 
-### 8. Implement
+### 8. Open a draft PR immediately
+
+Before implementing, make an empty commit, push the branch, and open a
+**draft** PR. An open PR is the strongest "in-flight" signal — it appears in
+`gh pr list` and in the issue's cross-referenced timeline, and is what other
+sessions check (step 4) before starting duplicate work.
+
+```bash
+git commit --allow-empty -m "chore: claim #<N> [skip ci]"
+git push -u origin fix/<slug>
+
+# GitHub
+gh pr create --draft \
+  --title "<title>" \
+  --body "Closes #<N>
+
+Draft --- work in progress."
+```
+
+Keep it draft until implementation is done — a draft does not trigger the
+`@claude` review bot. See
+[`pr-on-claim`](../../shared/workflow/pr-on-claim.md) for the principle.
+
+### 9. Implement
 
 - Read the issue description carefully — understand "done" criteria
 - Make the changes (code, tests, docs as needed)
@@ -144,32 +167,31 @@ Branch naming:
 - Commit with a message referencing the issue:
   `fix: handle auth timeout on slow networks (closes #12)`
 
-### 9. Push and open MR/PR
+### 10. Push and mark PR ready for review
+
+Push the implementation commits:
 
 ```bash
-git push -u origin fix/<slug>
+git push
 ```
+
+Then convert the draft to ready-for-review (triggers the `@claude` review
+bot):
 
 ```bash
 # GitHub
-gh pr create --title "<title>" --body "Closes #<N>
+gh pr ready <PR-number>
 
-<description of what was done and why>"
-
-# GitLab
-glab mr create --title "<title>" --description "Closes #<N>
-
-<description>" --assignee <your-gitlab-username>  # default: demorrison
+# GitLab — drafts use "Draft:" prefix; remove it with:
+glab mr update <MR-number> --remove-draft
 ```
 
-Include `Closes #N` in the description to auto-close the issue on merge.
-
-### 10. ARDI to clean
+### 11. ARDI to clean
 
 Invoke the `ardi` skill on the newly opened MR/PR. Drive it through
 review rounds until the verdict is clean (zero findings).
 
-### 11. Report
+### 12. Report
 
 When ARDI completes clean, report:
 - Issue number + link
@@ -209,8 +231,9 @@ dependency, needs design decision, upstream bug):
 ## Relationship to other skills
 
 - **`check-history`** — invoked in step 5 to avoid undoing past work
-- **`ardi`** — invoked in step 10 to drive the MR/PR to clean
+- **`ardi`** — invoked in step 11 to drive the MR/PR to clean
 - **`claim-pr`** — the issue claim in step 6 follows the same pattern
+- **`pr-on-claim`** — the draft PR opened in step 8 follows this fragment
 - **`split-concerns`** — if the implementation grows too large, offer to split
 - **`defer-issue`** — if sub-tasks emerge during implementation, defer them
 

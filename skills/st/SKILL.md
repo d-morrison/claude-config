@@ -94,7 +94,7 @@ glab issue create --title "<concise title>" --description "<what & why>
 Invoke `check-history` before implementing — review merged/closed MRs that
 touched the same area so you don't undo past progress.
 
-### 5. Branch → implement → PR → ARDI
+### 5. Branch → draft PR → implement → mark ready → ARDI
 
 From here the tail is identical to `gi`:
 
@@ -103,15 +103,27 @@ git fetch origin main
 git checkout -b <type>/<slug> origin/main   # fix/ feat/ docs/ refactor/
 ```
 
-- Implement (code, tests, docs), run the repo's standard checks, commit
-  referencing the issue (`fix: … (closes #N)`).
-- Push and open the PR with `Closes #N` in the body, then request `d-morrison`
-  as reviewer (`request-pr-review`):
+- Open a **draft PR immediately** before implementing — make an empty commit,
+  push the branch, and open a draft PR referencing `Closes #N`. This is the
+  strongest "in-flight" signal and lets other sessions see the work before
+  any code lands. See [`pr-on-claim`](../../shared/workflow/pr-on-claim.md).
   ```bash
+  git commit --allow-empty -m "chore: claim #<N> [skip ci]"
   git push -u origin <type>/<slug>
-  gh pr create --title "<title>" --body "Closes #<N>
+  gh pr create --draft \
+    --title "<title>" \
+    --body "Closes #<N>
 
-  <what was done and why>"
+  Draft --- work in progress."
+  ```
+- Implement (code, tests, docs), run the repo's standard checks, commit
+  referencing the issue (`fix: … (closes #N)`), and push:
+  ```bash
+  git push
+  ```
+- Convert the draft to ready-for-review (triggers the `@claude` review bot):
+  ```bash
+  gh pr ready <PR-number>
   ```
 - **ARDI** the PR to a clean verdict (`ardi`). Don't merge unless asked.
 

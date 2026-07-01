@@ -40,9 +40,10 @@ Run the full GI procedure:
 3. Check history
 4. Claim the issue
 5. Create a branch
-6. Implement
-7. Push and open MR/PR
-8. ARDI to clean
+6. Open a draft PR immediately (before implementing)
+7. Implement
+8. Push and mark PR ready for review
+9. ARDI to clean
 
 #### b. Record the result
 

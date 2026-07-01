@@ -125,16 +125,22 @@ and the default branch for each issue:
 > 3. **Branch from current `<default-branch>`**: `git fetch origin
 >    <default-branch> -q && git checkout -b <slug> origin/<default-branch>`.
 >    Use a descriptive `<slug>`.
-> 4. **Implement** the change. Keep the diff focused on this issue only —
+> 4. **Open a draft PR immediately** (before implementing): make an empty
+>    commit, push the branch, and open a draft PR referencing `Closes #<N>`.
+>    This makes the in-flight work visible right away.
+>    `git commit --allow-empty -m "chore: claim #<N> [skip ci]"
+>    && git push -u origin HEAD`, then open a draft PR with
+>    `gh pr create --draft --title "<title>" --body "Closes #<N>\n\nDraft --- work in progress."`.
+> 5. **Implement** the change. Keep the diff focused on this issue only ---
 >    do **not** touch files another issue owns. Follow the repo's conventions
 >    (its `CLAUDE.md` / lab manual). Run the repo's pre-commit checks
 >    (render / lint / spell / tests) and fix what they flag.
-> 5. **Commit** with a clear message that references the issue
+> 6. **Commit** with a clear message that references the issue
 >    (`Closes #<N>` so the PR auto-closes it).
-> 6. **Push** `git push -u origin HEAD` (retry with backoff on a network error)
->    and **open a PR** into `<default-branch>` as ready-for-review (not draft),
->    body referencing `Closes #<N>`.
-> 7. **ARDI to clean** — drive the PR to a clean review verdict: read the
+> 7. **Push** `git push` (retry with backoff on a network error), then
+>    **mark the PR ready** (`gh pr ready <PR-number>`) to convert from draft
+>    and trigger the `@claude` review bot.
+> 8. **ARDI to clean** --- drive the PR to a clean review verdict: read the
 >    LATEST review, Address every finding / Rebut what's wrong / Defer
 >    out-of-scope items to a tracked issue, push, re-request review, repeat
 >    until zero findings and CI is green. Don't stop at "review-clean, needs

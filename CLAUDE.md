@@ -87,6 +87,14 @@ contributors who only see the PR thread.
 The `claim-pr` skill operationalizes this (the exact claim wording, when it
 applies, and the closing/unclaim comment).
 
+## Open a draft PR immediately after claiming an issue
+
+<!-- Shared with the lab manual; edit shared/workflow/pr-on-claim.md, not here. -->
+@shared/workflow/pr-on-claim.md
+
+The `gi`/`gii`/`gip`/`st` skills operationalize this; see those skills for
+the exact command sequence.
+
 ## Use the existing PR branch, not the harness-specified branch
 
 The Claude Code on the web harness injects a "Git Development Branch
