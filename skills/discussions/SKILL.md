@@ -85,7 +85,7 @@ The reply and answer mutations need node **IDs** (not numbers), so capture them
 here:
 
 ```bash
-gh api graphql -F owner='<owner>' -F repo='<repo>' -F number=<N> -f query='
+gh api graphql -f owner='<owner>' -f repo='<repo>' -F number=<N> -f query='
   query($owner: String!, $repo: String!, $number: Int!) {
     repository(owner: $owner, name: $repo) {
       discussion(number: $number) {

@@ -109,6 +109,10 @@ operations:
     description: Open a new discussion in a category.
     cli: gh api graphql (createDiscussion)
     github_mcp: (no GitHub MCP tool; use gh api graphql)
+  - id: CLOSE_DISCUSSION
+    description: Close a discussion with a reason (RESOLVED, OUTDATED, DUPLICATE).
+    cli: gh api graphql (closeDiscussion)
+    github_mcp: (no GitHub MCP tool; use gh api graphql)
   - id: PUSH
     description: Push commits to a branch.
     cli: git push -u origin <branch>
