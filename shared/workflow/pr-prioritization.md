@@ -16,3 +16,12 @@ blocking relationships, age, and size still rank above it. Apply it only when
 two candidates are otherwise close — don't reorder a queue around it when a
 feature PR or issue is clearly more urgent (a labeled `P0`, something
 blocking other work, or something the user flagged directly).
+
+**Default to the older PR.** When managing several open PRs at once — a review
+queue, an `ardia` sweep, or just picking which to take up next — prefer the
+**older** PR over the newer one by default, unless you have more specific
+instructions. An older PR has waited longest and drifts further from `main` the
+longer it sits, so clearing it first keeps the queue moving. This default
+outranks the infrastructure tie-breaker above, but still yields to a more
+specific signal: an explicit priority label, a blocking relationship, a PR the
+user flagged, or a direct instruction to take a particular one first.
