@@ -152,7 +152,9 @@ When the loop ends, print a summary:
 If the user says "just go", "do all", "work through everything", or similar:
 - Skip the per-issue confirmation ("I'd grab #12 — proceed?")
 - Still pause at the max-issues checkpoint
-- Still pause if an issue looks ambiguous or blocked
+- Surface and **bypass** a blocked or ambiguous issue — note it and skip to the
+  next rather than halting; stop only if no independent issues remain (per the
+  stopping conditions above)
 
 ## Anti-patterns
 
