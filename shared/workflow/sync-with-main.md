@@ -26,6 +26,19 @@ If the merge has conflicts, resolve them, run the project's standard pre-commit
 checks (render / lint / spell / tests), commit, then push. Don't push a
 half-resolved merge.
 
+**After merging main, re-check version parity.** In R packages with a
+`version-check` CI job, the branch's `DESCRIPTION` `Version:` must *exceed*
+main's. A conflict-free merge can silently put them at parity — main advanced
+(e.g. another PR merged between when you last bumped and now). After every merge
+of main, compare versions:
+
+```bash
+git show origin/main:DESCRIPTION | grep ^Version
+grep ^Version DESCRIPTION
+```
+
+If they match, bump the branch's `Version:` by one patch level before pushing.
+
 **A conflict-free merge does not mean derived artifacts are in sync.** If your
 branch regenerates a generated tree (e.g. `codex-skills/`, a lockfile, rendered
 docs) and `main` added a new *source* input the generator consumes (a new
