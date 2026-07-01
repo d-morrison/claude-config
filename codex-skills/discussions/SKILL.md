@@ -1,17 +1,17 @@
 ---
-name: "dc"
-description: "Codex wrapper for the ai-config Claude skill `dc`. Alias for `ardi` (\"drive to clean\"). ARD + Iterate on a single PR/MR until the review verdict is clean: read the latest review, Address/Rebut/Defer every finding, push, re-request review, repeat until zero findings. Use when asked to 'dc', 'drive to clean', or 'drive this PR to clean'. Use when Codex is asked to use `dc`, `/dc`, or the corresponding ai-config/Claude skill workflow."
+name: "discussions"
+description: "Codex wrapper for the ai-config Claude skill `discussions`. Read and respond to GitHub Discussions forum topics \u2014 list a repo's discussions, read a topic and its comments, draft and post a reply, and mark an answer on Q&A discussions. Discussions are GraphQL-only (no `gh discussion` subcommand, no GitHub MCP tool), so this skill runs `gh api graphql`. Use when asked to 'read the discussions', 'respond to this discussion', 'answer the discussion topic', 'reply to the forum', 'triage the discussion board', or 'check GitHub Discussions'. Use when Codex is asked to use `discussions`, `/discussions`, or the corresponding ai-config/Claude skill workflow."
 ---
 
-# dc (Codex wrapper)
+# discussions (Codex wrapper)
 
 This is a generated Codex wrapper around the canonical ai-config Claude skill.
 
-Source: [skills/dc/SKILL.md](../../skills/dc/SKILL.md)
+Source: [skills/discussions/SKILL.md](../../skills/discussions/SKILL.md)
 
 Before acting, read the source skill completely and follow its workflow, adapting it to Codex.
 
-The source lives at `skills/dc/SKILL.md` in the same ai-config checkout as this wrapper. If this wrapper was loaded through `${CODEX_HOME:-$HOME/.codex}/skills/dc`, resolve the symlink target for this wrapper directory first, then read `../../skills/dc/SKILL.md` relative to that real directory. Do not resolve that relative path from inside `${CODEX_HOME:-$HOME/.codex}/skills`, because it points back at the wrapper tree.
+The source lives at `skills/discussions/SKILL.md` in the same ai-config checkout as this wrapper. If this wrapper was loaded through `${CODEX_HOME:-$HOME/.codex}/skills/discussions`, resolve the symlink target for this wrapper directory first, then read `../../skills/discussions/SKILL.md` relative to that real directory. Do not resolve that relative path from inside `${CODEX_HOME:-$HOME/.codex}/skills`, because it points back at the wrapper tree.
 
 - Treat `user-invocable` and `allowed-tools` as Claude metadata, not Codex permissions.
 - Use the tools available in this Codex session for equivalent operations.
@@ -50,6 +50,3 @@ run the CLI command. Full per-model reference: [tool-mappings.md](../../tool-map
 | `COMMIT` | Record staged changes as a commit. | `git commit -m "..."` | (use git; mcp__github__create_or_update_file commits a single file) |
 | `FETCH` | Fetch refs from the remote. | `git fetch origin <branch>` | (use git; no GitHub MCP equivalent) |
 | `MERGE_BRANCH` | Merge a branch into the current one. | `git merge origin/<branch>` | (use git; no GitHub MCP equivalent) |
-| `CREATE_BRANCH` | Create a new branch (e.g. off the default branch). | `git switch -c <branch> origin/<base>` | `mcp__github__create_branch` |
-| `READ_FILE` | Read a file's contents from the repo. | `gh api repos/<owner>/<repo>/contents/<path>` | `mcp__github__get_file_contents` |
-| `WRITE_FILE` | Create or update file(s) on a branch in a single commit. | `git add <path> && git commit -m "..." && git push` | `mcp__github__create_or_update_file (one file) / mcp__github__push_files (multiple)` |
