@@ -105,3 +105,15 @@ operations:
     description: Merge a branch into the current one.
     cli: git merge origin/<branch>
     github_mcp: (use git; no GitHub MCP equivalent)
+  - id: CREATE_BRANCH
+    description: Create a new branch (e.g. off the default branch).
+    cli: git switch -c <branch> origin/<base>
+    github_mcp: mcp__github__create_branch
+  - id: READ_FILE
+    description: Read a file's contents from the repo.
+    cli: gh api repos/<owner>/<repo>/contents/<path>
+    github_mcp: mcp__github__get_file_contents
+  - id: WRITE_FILE
+    description: Create or update file(s) on a branch in a single commit.
+    cli: git add <path> && git commit -m "..." && git push
+    github_mcp: mcp__github__create_or_update_file (one file) / mcp__github__push_files (multiple)
