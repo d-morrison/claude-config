@@ -46,8 +46,8 @@ Exclude:
 
 ## Step 2 — Restate them as a single list
 
-Present the surviving questions together, most-recent-first is fine, but
-group by topic if several relate to the same task. For each item, give enough
+List in reverse chronological order (most recent first), but group by topic
+when several questions share the same task. For each item, give enough
 context to answer cold — don't just repeat the bare question if the
 surrounding detail (options, why it matters, what's blocked on it) got lost
 upstream.
