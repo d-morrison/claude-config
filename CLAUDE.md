@@ -328,6 +328,14 @@ cross-reference id and caption. The div id (`#fig-`/`#tbl-`) carries the
 cross-reference; the chunk `label` stays a plain code label. This keeps figures
 consistent with tables, which already use div syntax.
 
+## Challenge ambiguous phrasing and terminology in review
+
+<!-- Shared with the lab manual; edit shared/workflow/challenge-ambiguous-terminology.md, not here. -->
+@shared/workflow/challenge-ambiguous-terminology.md
+
+The `ard`/`ardi` skill family and `use-preferred-style`/`find-ai-tells`
+operationalize this in their respective review contexts.
+
 ## Writing style: scan for AI tells
 
 The detector counterpart to the plain-prose guide above.
