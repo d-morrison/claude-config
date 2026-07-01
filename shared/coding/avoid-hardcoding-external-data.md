@@ -11,9 +11,9 @@ from that source instead of copying a snapshot into the codebase:
   should be produced by querying that system, not maintained by hand
   alongside it.
 - **Cross-file duplication.** When the same fact must appear in two places
-  (a caller stub and a reference doc, a schema and its example), generate the
-  second from the first, or have CI check they agree, rather than trusting
-  two hand-edited copies to stay in sync.
+  (a usage example and a reference doc, a schema and its example), generate
+  the second from the first, or have CI check they agree, rather than
+  trusting two hand-edited copies to stay in sync.
 
 This is conditioned on the external source being **reliably available** ---
 don't add a network fetch or a fragile dependency where a static value would
