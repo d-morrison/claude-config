@@ -128,11 +128,12 @@ allowed-tools:               # real skill: list its tools. alias: mirror the can
   directory is enough.
 - **Register any new tool the skill names.** Discovery needs no registry, but
   tool *references* do. If the procedure names a **GitHub MCP tool or `gh`/`git`
-  operation not already in `tool-mappings.yml`** (grep it to check), add it there
-  — `id`, `description`, CLI fallback, and MCP tool — then rerun
-  `scripts/sync-codex-skill-wrappers.py` so the Codex wrappers can translate it.
-  Verify the tool is real first (`ToolSearch` for it in a live session), then
-  register it. Skip this and the `@claude` reviewer flags the unregistered name
+  operation not already in `tool-mappings.yml`** (grep it to check), verify the
+  tool is real first (`ToolSearch` for it in a live session), then add it there
+  — `id`, `description`, `cli` (the CLI fallback), and `github_mcp` (the MCP
+  tool) — and rerun `scripts/sync-codex-skill-wrappers.py` so the Codex wrappers
+  can translate it.
+  Skip this and the `@claude` reviewer flags the unregistered name
   as a *possible hallucination* — it can't tell a real-but-undocumented tool from
   an invented one. (`push-memory` #311 hit this: `mcp__github__create_branch` and
   `mcp__github__push_files` were real but unregistered, and the first review round
