@@ -78,6 +78,17 @@ finding → push → post summary → re-request review → repeat until clean.
    rebase/squash a published branch — a merge commit matches GitHub's "Update
    branch" button. (The `sync-pr-branch` skill does exactly this.)
 
+   **Resolve inline threads as you go — including outdated ones.** After
+   pushing fixes for a round, resolve the corresponding inline review threads
+   immediately via `mcp__github__pull_request_review_write` with
+   `method: resolve_thread` and the `threadId` (returned by
+   `mcp__github__pull_request_read` with `method: get_review_comments`). Don't
+   wait until fully-clean to do thread
+   housekeeping. For threads marked *outdated* in GitHub (the underlying code
+   changed), confirm the fix is in the current tree, then resolve. Threads
+   whose fixes are already in the tree but were never resolved still block the
+   "fully clean" check — clear them as soon as you confirm the code is right.
+
    **Opportunistic conflict sweep.** After pushing (or after any round where
    all findings were Rebutted/Deferred with no push), scan other open PRs in
    the same repo for merge conflicts:
