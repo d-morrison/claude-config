@@ -25,6 +25,13 @@ the base branch:
 - **Depends on a clean-but-unmerged PR** --- branch from that PR's tip, and
   stack.
 
-The only real stops are the queue running dry, a genuinely blocked or ambiguous
-item, or a skill's own checkpoint (e.g. GII's 5-issue pause) --- never merely
-because a finished PR is still waiting on a human merge.
+A genuinely blocked or ambiguous item is **not** a stop either --- surface it
+and bypass it, working the rest of the queue around it. It halts the loop only
+when every remaining item (PR or issue) depends on it, so no independent work is
+left to move on to.
+
+So the loop stops only when the queue runs dry (or collapses to items all
+blocked on one stuck item), or a skill's own checkpoint fires (e.g. GII's
+5-issue pause) --- never because an item is blocked while independent work
+remains, and never merely because a finished PR is still waiting on a human
+merge.

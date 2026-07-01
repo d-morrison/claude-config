@@ -114,7 +114,10 @@ stacks on it.
   bare "clean up the PRs"), stop after Phase 1 and check in before starting
   Phase 2.
 - Honor GII's 5-issue checkpoint in Phase 2 (ask before continuing).
-- Stop if a PR or issue is blocked and surface it rather than spinning.
+- If a PR or issue is blocked or ambiguous, **bypass** it — surface it and move
+  on to the next item rather than halting the sweep. Stop only when every
+  remaining item depends on that blocked one, so no independent work is left
+  (see [`stack-dont-pause`](../../shared/workflow/stack-dont-pause.md)).
 - If Phase 1's reviewer keeps emitting new nits each round on the same PR
   (asymptotic noise after 3–4 rounds), surface it and ask whether to continue.
 

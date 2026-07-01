@@ -81,7 +81,8 @@ Stop the loop when:
 - User interrupts or says "stop" / "that's enough"
 - A configurable max is reached (default: 5 issues per session, to avoid
   unbounded runs — ask the user to continue if hit)
-- An issue is blocked and no other unblocked issues remain
+- An issue is blocked and no other unblocked issues remain — otherwise
+  **bypass** the blocked issue (surface it) and keep going with the rest
 
 If stopping due to max-issues, ask:
 > "Completed 5 issues — want me to keep going, or stop here?"
