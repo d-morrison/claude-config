@@ -314,8 +314,8 @@ consistent with tables, which already use div syntax.
 <!-- Shared with the lab manual; edit shared/workflow/challenge-ambiguous-terminology.md, not here. -->
 @shared/workflow/challenge-ambiguous-terminology.md
 
-Applies whenever reviewing code or prose --- PR/MR review (`ard`/`ardi`), prose
-review (`use-preferred-style`, `find-ai-tells`), or issue/spec review.
+The `ard`/`ardi` skill family and `use-preferred-style`/`find-ai-tells`
+operationalize this in their respective review contexts.
 
 ## Writing style: scan for AI tells
 

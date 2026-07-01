@@ -10,8 +10,7 @@ This catches more than typos: a reviewer who accepts ambiguous terminology at
 face value can let a factually wrong claim through unchallenged --- for
 example, documentation that cites a named constant or enum value that doesn't
 exist in the code, because the term sounded plausible and nobody checked it
-against the actual source
-(<https://github.com/Lacaedemon/sparta/pull/527#discussion_r3508945004>).
+against the actual source.
 
 Applies everywhere review already happens: PR/MR code review (`ard`/`ardi`),
 prose and doc review (`use-preferred-style`, `find-ai-tells`), and issue/spec
