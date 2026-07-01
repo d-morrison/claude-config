@@ -299,8 +299,26 @@ PSW chapter links, and a filler/jargon swap table; the `find-ai-tells` skill
 
 When editing existing `.qmd` prose, preserve the original line breaks exactly —
 don't reflow to single long lines or a different wrap width. When writing new
-`.qmd` prose, add line breaks at major phrase and sentence boundaries (one
-`.qmd` prose, break at sentence boundaries; one clause per line works well.
+`.qmd` prose, add line breaks at major phrase and sentence boundaries; one
+clause per line works well, targeting roughly 60 to 80 characters per line.
+
+**When a review flags semantic-line-break violations, fix every over-length
+line in the touched section in one pass — not just the specifically-flagged
+ones.** The `@claude` / Copilot review bots re-scan on each push and flag the
+next batch of adjacent borderline lines the prior round left alone, so fixing
+only what was named drags the PR through round after round of the same finding
+(asymptotic noise; UCD-SERG/lab-manual#297 took five review rounds this way).
+
+**URL-inflation exception:** a line that runs long *only* because of an embedded
+`[{pkg}](long-url)` link — where the visible prose before the link is well
+under about 40 characters — is accepted as-is. Don't force an awkward mid-clause
+break just to shorten the raw line; the bots themselves classify these as
+borderline / not-required.
+
+**Link packages up front.** Package names in `.qmd` prose take the
+`[{pkg}](url)` link form on first mention in a section (e.g.
+`[{dplyr}](https://dplyr.tidyverse.org/)`). Add those links as you write the
+section — the review bots flag every unlinked package name, one round at a time.
 
 ## Quarto: div syntax for figure/table labels and captions
 
