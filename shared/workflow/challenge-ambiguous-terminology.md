@@ -21,7 +21,6 @@ intent, ask rather than assume.
 **Cross-repo citations have a merge-order trap.** Citing a specific file path
 or construct in another repo is itself unverifiable --- and will 404 a link
 checker --- if the PR that adds it hasn't merged yet. Name the repo generically
-until the referenced PR merges, then tighten the citation to the specific path
-once it resolves. (Caught by this very guideline, twice, while adding it to
-gha#151 --- the file it pointed at only existed on this fragment's own
-not-yet-merged PR.)
+until the referenced PR merges, then tighten the citation to the specific path.
+(Caught by this very guideline, twice, while adding it to gha#151 --- the file
+it pointed at only existed on this fragment's own not-yet-merged PR.)
