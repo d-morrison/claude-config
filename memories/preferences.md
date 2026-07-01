@@ -380,6 +380,18 @@
   for our own team and repos. (ai-config#246: the PR body `@`-mentioned `mcanouil` and the
   commit used `quarto-dev/quarto-cli#NNNNN`, both pinging the very upstream repo the PR was
   meant not to disturb.)
+- When writing prose (a PR/issue comment, commit message, chat reply) that references an
+  issue or PR in a DIFFERENT repo than the one you're posting in, always disambiguate with
+  the full `owner/repo#N` form — never a bare `#N`. GitHub silently resolves a bare `#N` to
+  the CURRENT repo, so `#156` typed in an ai-config PR comment links to ai-config#156 even
+  when you meant a different repo's #156. This is a correctness bug (a dead or misleading
+  link), distinct from the notification-etiquette rule above (which governs whether
+  `owner/repo#N` is appropriate to use AT ALL for a given repo, e.g. avoid it for external
+  repos you shouldn't ping). Once you've established that a cross-repo reference is
+  otherwise fine to make, still spell out `owner/repo#N` in full — don't drop to the bare
+  form just because it reads shorter. (ai-config#304: `fxtas#156`/`fxtas#157` written as
+  bare `#156`/`#157` in an ai-config PR comment auto-linked to ai-config#156 instead of
+  ucdavis/fxtas#156.)
 - While I'm iterating a PR, the `@claude` bot (triggered by an `@claude` comment — including
   one I or the user posts mid-loop) runs its OWN ARD and pushes fix commits to the
   SAME PR branch. Before every edit/push during a PR loop, `git fetch` and reconcile

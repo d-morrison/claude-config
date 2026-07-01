@@ -438,6 +438,18 @@ closed-issue references in multiple PR bodies, and stacking conflicts mid-ARDI.
   nits. Reconcile BOTH before calling a PR clean; the agent post-step tends to
   drip 1–2 pre-existing cosmetic nits per round (asymptotic).
 
+## Claude Code on the web: CI monitoring toggles have no default setting
+- The per-PR "CI monitoring" panel (web session sidebar) shows two toggles,
+  **Auto-fix CI & address comments** and **Auto-merge when ready**. There is
+  **no account-, org-, repo-, or environment-level setting to default these on**
+  — confirmed against https://code.claude.com/docs/en/claude-code-on-the-web.
+  Each new PR/session starts with both off and they must be toggled manually.
+- Closest workaround: run `/autofix-pr` from the CLI on a PR's branch — it
+  spawns a web session with **Auto-fix CI & address comments** already on for
+  that PR. There's no CLI shortcut for **Auto-merge when ready**; that one
+  always needs a manual toggle. A true default would require a feature
+  request via `/feedback`.
+
 ## @claude CI action (d-morrison/gha `claude.yml`)
 - The reusable `claude.yml@v1` agent workflow restores config files (`CLAUDE.md`,
   `.claude/**`) to `origin/main` during its run (`restoreConfigFromBase`), so a
