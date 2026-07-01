@@ -327,6 +327,24 @@ closed-issue references in multiple PR bodies, and stacking conflicts mid-ARDI.
   Bypass: `R --no-save --no-restore --no-site-file --no-init-file` skips
   `.Rprofile` entirely. Install needed packages from P3M into the user library
   and proceed. (Observed on ucdavis/bcs cloud sessions.)
+- **To check whether a CRAN package is archived, query the PPM JSON API, not
+  WebFetch against the CRAN HTML page — and check `is_archived`, NOT
+  `tran_archive`.**
+  `curl -s https://packagemanager.posit.co/__api__/repos/cran/packages/<pkg>`
+  returns a top-level boolean `"is_archived": true|false` — that's the
+  authoritative field. `tran_archive` is a decoy: it's present in the same
+  response but stays `null` even for a package that **is** archived (verified
+  directly — `pryr`'s response has `"tran_archive": null` alongside
+  `"is_archived": true`), so checking it gives a false "not archived" on every
+  query. Confirmed by curling both packages live: `pryr` and `veccompare` each
+  return `"is_archived": true`. WebFetch summarizing
+  `cran.r-project.org/package=<pkg>` can also return confident-sounding but
+  unverified specifics (an "Archival Date" / "Reason" framing CRAN's actual
+  archived-package page doesn't present that way) — cross-check against the
+  PPM API's `is_archived` field before citing a date or reason as fact.
+  (Surfaced on ucdavis/fxtas#157: pak failed to resolve `pryr` +
+  `veccompare` from the PPM snapshot; the repo owner verified via this
+  endpoint before concluding they were genuinely archived.)
 - **`snapr` is not on CRAN or P3M**: install from the GitHub tarball.
   `curl -L https://codeload.github.com/d-morrison/snapr/tar.gz/refs/heads/main -o /tmp/snapr.tar.gz`
   then in R, install `readr` first (a direct `snapr` `Imports:` dependency):
@@ -749,6 +767,27 @@ common patterns.
   negotiation succeeds, but the real push 403s on the ref update). So you cannot
   cut tags from such a session — hand the exact `git tag` + `git push` commands to
   the user instead. Don't retry the 403 (policy denial, not transient).
+- **A session can be fully READ-ONLY on a repo — even the harness-assigned
+  branch can be unwritable.** Beyond the tag-push case above, some sessions
+  403 on every write path to a given repo: `git push` to the assigned branch
+  itself (not just other branches — and `git ls-remote` may show the assigned
+  branch doesn't even exist on the remote yet, so the push 403s trying to
+  create it), plus every GitHub MCP write tool — `push_files`/branch creation,
+  `create_or_update_file` (contents API), and `add_issue_comment` — all
+  returning `403 Resource not accessible by integration`. Confirm this
+  conclusively by testing 2-3 *distinct* write endpoints (not just retrying the
+  same one) before concluding read-only, since a single 403 could be a
+  branch-scope issue (the case above) rather than a repo-wide one. Once
+  confirmed: don't keep retrying — package the diff as a patch
+  (`git format-patch`) and hand it to the user via `SendUserFile` instead of a
+  pasted diff, so it's directly `git am`-able. Because you can't push, watch
+  for the user (or another session) to land an independently-derived fix
+  rather than your literal patch — re-verify the actual merged diff before
+  reporting status rather than assuming your patch was applied as-is. (Hit on
+  ucdavis/fxtas#156: diagnosed a CI-breaking dependency issue, delivered the
+  fix as two patch files since every write 403'd; the user filed their own
+  issue/PR with a different fix for the same root cause and merged that
+  instead.)
 - **`mcp__github__actions_list` / `list_workflow_runs` returns HUGE objects**
   (full repo metadata embedded per run, ~30-60KB even at `per_page: 1`), which
   blows the tool-output cap and gets saved to a file. To read a run's

@@ -229,7 +229,10 @@ main's actual position instead of assuming the branch is current. The
 @shared/workflow/pr-prioritization.md
 
 A tie-breaker for `ardia`'s PR-ordering step and `gi`'s (and `gii`/`gip`'s)
-issue-priority table when candidates are otherwise close in priority.
+issue-priority table when candidates are otherwise close in priority. The
+fragment also sets the default direction for the age factor: among several
+open PRs, take the **older** one first unless you have more specific
+instructions.
 
 ## Auto-orchestration: let heavy skills choose Workflows
 
