@@ -12,6 +12,11 @@ behavior change to an existing one), not every mechanical edit.
 
 ## Unreleased
 
+- **`ums` anti-pattern: check indentation before inserting into a nested
+  memory-file list.** A new top-level bullet dropped mid-list in `tools.md`/
+  `preferences.md` can silently re-parent the sub-bullet that follows it in
+  Markdown. Caught by `@claude` review on ai-config#335.
+
 - **`fact-check-prose` policy refinement: tool/library behavior claims.**
   When prose describes deterministic, cheaply-reproducible tool or library
   behavior (a git merge driver, a shell built-in, a regex engine), verify it

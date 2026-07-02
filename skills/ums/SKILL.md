@@ -157,3 +157,15 @@ new user-invocable skill.
   `~/.claude/projects/<project-path>/memory/` (local project memory, no commit) if the
   repo has no agent-doc infrastructure. See the checklist item above and
   `memories/preferences.md` for the full rule.
+- ❌ Inserting a new bullet into any memory file with nested lists (including
+  `tools.md`, `preferences.md`) without checking the surrounding indentation
+  first. These files mix 0-indent top-level bullets with 2-/4-indent sub-bullets and
+  multi-paragraph continuations; a new top-level bullet dropped in the middle
+  of an existing parent's sub-list re-parents whatever follows it in Markdown
+  (a sibling sub-bullet silently becomes this new bullet's child). Before
+  committing an insertion, re-read the few lines immediately above and below
+  the insertion point and confirm the indentation still matches what it did
+  before — or place the new bullet after the complete enclosing list instead
+  of inside it. (Caught by `@claude` review on ai-config#335: a new 0-indent
+  bullet landed between two sibling sub-bullets of an existing parent,
+  breaking the nesting.)
