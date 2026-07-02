@@ -17,3 +17,9 @@ docs, READMEs, or manuals (e.g. lab-manual chapters).
 This is a default, not an absolute rule: don't let a citation search block a
 plain answer to a simple question, and don't cite something so well-known
 that a link would look padded.
+
+A citation that resolves but doesn't actually back the claim it's attached
+to is still a defect --- the `check-info-quality` (`ciq`) skill's
+misleading/out-of-context check catches that case; run it on content with
+citations alongside `purge-hallucinations` (which only checks the citation
+*exists*).

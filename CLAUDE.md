@@ -164,6 +164,23 @@ as a single clean commit so no sensitive history leaks through), comment on the
 original PR pointing to the replacement, and close the original once the new PR
 merges. Don't retry the 403 --- it's a policy denial, not a transient error.
 
+**Check whether the branch's own PR merged before adding more commits to it.**
+If a PR on this branch merged via **squash** (common in repos that enforce
+it), the branch's old commits are no longer ancestors of `main`'s new tip —
+`git merge-base
+--is-ancestor <old-commit> origin/main` returns false. Committing follow-up
+work on top of that stale branch and pushing looks fine locally, but the
+resulting PR's diff shows the *entire prior PR's changes again* against
+`main`, confusing reviewers and re-litigating already-merged content. Before
+adding commits to a branch you didn't just create, fetch `origin/main` and
+check ancestry first. If the branch's own PR already merged, don't build on
+top of it — start clean: `git checkout -b <branch> origin/main`, then
+`git cherry-pick` only the genuinely new commit(s). If you've already pushed a
+bloated diff, the same fix applies retroactively: rebuild the branch from
+`origin/main` plus a cherry-pick of the new work, then
+`git push --force-with-lease`. (Seen on gha#161 → gha#162 and
+ai-config#344 → ai-config#354, both squash-merged.)
+
 ## Skills that call gh/glab: fall back to tool-mappings.md in remote sessions
 
 Many skills under `skills/` name concrete `gh`/`glab` CLI commands (e.g.
