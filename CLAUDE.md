@@ -363,6 +363,15 @@ against any target text.
 <!-- Shared with the lab manual; edit shared/writing/citations.md, not here. -->
 @shared/writing/citations.md
 
+## Fact-check prose and internal reasoning in review
+
+<!-- Shared with the lab manual; edit shared/writing/fact-check-prose.md, not here. -->
+@shared/writing/fact-check-prose.md
+
+When running `code-review` or the `ard`/`ardi` loop on a diff that touches
+prose, apply this policy in addition to the normal review — those skills
+don't name it internally, but this CLAUDE.md directive governs regardless.
+
 ## Useful prompt formats for coding agents
 
 <!-- Vendored from UCD-SERG/lab-manual; edit there, not here. See README, "Shared content". -->
