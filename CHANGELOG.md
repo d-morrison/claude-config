@@ -22,6 +22,14 @@ behavior change to an existing one), not every mechanical edit.
   duplicate landed on `main` while the branch was in flight, not just a
   line collision --- worth re-running `skill-builder`'s Step 0 judgment at
   merge time, not only at branch start.
+- **`mwc` skill (aliases `merge-when-confident`, `maw`, `merge-at-will`).**
+  New session-scoped exception to the standing "merge is human-gated" rule:
+  when the user explicitly grants it, I may squash-merge any PR I'm driving
+  once it reaches fully clean, without asking per PR, for the rest of that
+  session. The grant is session-scoped by design, not written to
+  `preferences.md` — it's requested fresh each time, not a silent default.
+  `shared/workflow/ardi.md` cross-links it as the one case where baking a
+  self-merge step into a `ScheduleWakeup`/`/loop` prompt is safe.
 - **`configure-gitattributes` skill** (#364). New skill for configuring or
   auditing a repo's `.gitattributes`: union-merge for changelog/news files
   that almost always want both sides kept on conflict, line-ending
