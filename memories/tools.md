@@ -878,6 +878,8 @@ deduplication, two API endpoints carry different content:
   This pattern discriminates review summaries from `@claude` task-handler responses
   (which also post as `claude[bot]` but use "Claude finished…" / "Claude Code is
   working…" headers, not the "### Code Review" heading the review workflow uses).
+  The ai-config `claude-review.yml` (#275) omits this content filter — it was
+  accepted, but task-handler responses can appear in the `prior-reviews` context.
 - **`/repos/{owner}/{repo}/pulls/{n}/comments`** — inline review findings posted
   via the review API. These are already `claude[bot]`-only (the `@claude` task
   handler posts to `/issues/`, not `/pulls/`), so no content filter is needed.
@@ -900,15 +902,6 @@ DELIMITER="eof_$(openssl rand -hex 8)"
 The ai-config `claude-review.yml` (merged in #275) uses a static
 `__REVIEWS_EOF__` delimiter instead — accepted by design but is a known
 divergence from this best practice.
-
-**Content filter for issue-comments endpoint.** When fetching
-`/issues/{n}/comments` for prior reviews, the filter
-`select(.user.login == "claude[bot]")` picks up BOTH review summaries AND
-`@claude` task-handler responses ("Claude finished…" / "Claude Code is
-working…"). Add `and (.body | test("### Code Review"))` to discriminate review
-summaries from task-handler posts. The ai-config `claude-review.yml` (#275)
-omits this content filter — it was accepted, but task-handler responses can
-appear in the `prior-reviews` context.
 
 **`needs.X.result != 'cancelled'` vs `== 'success'`** — when the dependency job
 is non-critical (acceptable to proceed without its output), use

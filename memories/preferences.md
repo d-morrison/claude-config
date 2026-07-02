@@ -137,14 +137,10 @@
 - Before opening a PR, read the repo's own agent/contributor instructions (CLAUDE.md →
   the canonical reference it points to, e.g. `.github/copilot-instructions.md` / CONTRIBUTING)
   and front-load the required pre-PR housekeeping in the FIRST commit instead of discovering it
-  via red CI. For R packages this means a NEWS.md entry AND a DESCRIPTION dev-version bump
-  (`usethis::use_version()`) even for a docs-only / vignette-only change — the changelog-check
-  and version-check jobs fail otherwise (opt-out labels `no changelog` / `no version
-  increment` exist for non-user-visible PRs, but the default is to do the bump). NEWS.md prose is spell-checked too,
-  so keep it to words already in `inst/WORDLIST` or add new terms there. Also re-check the
-  version after merging `main` mid-PR: if a commit on `main` already bumped the version to
-  match the branch, the version-check CI will fail again — run `usethis::use_version("dev")`
-  once more so the branch stays ahead.
+  via red CI. For R packages this means a NEWS.md entry AND a `usethis::use_version()`
+  DESCRIPTION dev-version bump, even for a docs-only / vignette-only change — see
+  `tools.md`'s "R-package PR CI gates" section for the full changelog-check /
+  version-check / spellcheck / opt-out-label details.
 - In the HACtions repo, use the `test.hac` project/group as a test bed (always).
 - After an iterate loop completes, ALWAYS create follow-up issues for every deferred/acknowledged
   item before reporting done. Never leave deferred items untracked.
