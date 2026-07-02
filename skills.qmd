@@ -67,6 +67,7 @@ Most skills also respond to plain-English triggers listed in their `description`
 |-------|---------|--------------|
 | [`use-preferred-style`](skills/use-preferred-style/SKILL.md) | `style` | Apply the plain-prose writing guide to a draft |
 | [`find-ai-tells`](skills/find-ai-tells/SKILL.md) | `ai-tells` | Scan text for AI-sounding patterns and flag them |
+| [`fact-check-prose`](skills/fact-check-prose/SKILL.md) | `fcp` | Check prose claims, reasoning, and computed values against sources and rendered output |
 | [`tidy`](skills/tidy/SKILL.md) | | Clean up code or prose without changing behavior |
 | [`simplify`](skills/simplify/SKILL.md) | | Reduce a file or function to its essential parts |
 
