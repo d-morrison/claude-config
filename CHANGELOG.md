@@ -21,6 +21,37 @@ behavior change to an existing one), not every mechanical edit.
   --write-tree origin/main origin/<branch>` check as ground truth; the three
   cascade-scan call sites now treat `UNKNOWN` as a candidate to verify (not
   skip) and verify before claiming a PR.
+- **`fact-check-prose` policy refinement: tool/library behavior claims.**
+  When prose describes deterministic, cheaply-reproducible tool or library
+  behavior (a git merge driver, a shell built-in, a regex engine), verify it
+  with a live repro rather than relying on memory or half-remembered docs.
+  Prompted by a git union-merge "de-duplicates identical lines" claim in
+  #366 that turned out false — confirmed with a constructed conflict test.
+- **Session-freshness standing rule** (`CLAUDE.md`, #368). New section "Keep
+  ai-config and repo checkouts fresh": in every session, at start and
+  periodically during long ones, (a) put the local ai-config checkout back on
+  `main` (not a leftover work branch) and `git pull --ff-only`; (b) refresh
+  the `~/.claude` consumer copies afterward --- the pull alone suffices only
+  where the children are real symlinks; on Windows, Git Bash `ln -s` falls
+  back to real copies, so changed files must be copy-synced, after
+  reconciling any un-upstreamed local edits; (c) fast-forward the `main`
+  checkout of whatever repo the session is working on.
+- **Windows TZ caveat upstreamed into the timestamp rule** (`CLAUDE.md`,
+  #368). On Windows Git Bash, `TZ=America/Los_Angeles date` silently falls
+  back to GMT; check the `%Z` suffix and use PowerShell's
+  `ConvertTimeBySystemTimeZoneId` when it isn't PDT/PST. Reconciled from an
+  edit made directly in `~/.claude/CLAUDE.md` that had never reached the
+  repo.
+- **`skill-builder` / `sync-with-main`: hallucination and merge-overlap
+  lessons from #349.** `skill-builder` now calls out grep-verifying any
+  `CLAUDE.md`/`shared/` citation or claimed "existing scale" before writing
+  it into new skill prose --- the same discipline `purge-hallucinations`
+  applies to other authors' text applies to your own new content too.
+  `sync-with-main` now notes that a textual conflict inside a skill's
+  `## Relationship to other skills` section can signal a conceptual
+  duplicate landed on `main` while the branch was in flight, not just a
+  line collision --- worth re-running `skill-builder`'s Step 0 judgment at
+  merge time, not only at branch start.
 - **`check-history` skill.** New bullet: on a long-lived or foundational
   issue, the issue text and any design-doc status header can lag the code by
   several PRs, so a mature feature may be partly or mostly implemented even

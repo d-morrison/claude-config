@@ -11,232 +11,173 @@ passes. See README.md, "Shared content".
 
 ## Run UMS before /clear
 
-When the user says "clear", "/clear", or otherwise asks to reset the
-conversation, **first** run the `ums` (Update Memories and Skills) procedure
-to capture any accumulated learnings before context is lost. Then proceed
-with the clear.
+When the user says "clear", "/clear", or otherwise asks to reset the conversation, **first** run the `ums` (Update Memories and Skills) procedure to capture any accumulated learnings before context is lost.
+Then proceed with the clear.
+
+## Keep ai-config and repo checkouts fresh
+
+In every session — at session start, and again periodically during long sessions — refresh the local state that goes stale as PRs merge elsewhere:
+
+1. **The ai-config checkout.** Check that the local ai-config clone is on `main` — not a leftover work branch from an earlier session — and run `git pull --ff-only`.
+   Only switch back to `main` when the working tree is clean; leave a dirty tree or another session's in-flight work alone and flag it instead.
+2. **The `~/.claude` consumer copies.** On symlink-capable systems the children of `~/.claude` (`skills/`, `shared/`, `commands/`, `memories/`) are symlinks into the checkout, so the pull alone refreshes them; rerun `bootstrap.sh` only when the repo gained a new top-level dir.
+   On Windows, Git Bash `ln -s` silently falls back to **real copies**, so a pull does NOT propagate there — copy-sync every file whose repo version changed into `~/.claude`.
+   Before overwriting, check for edits made directly in `~/.claude` (a diff that adds prose the repo lacks) and upstream the genuine ones into the repo first; never clobber an un-upstreamed local edit.
+   Don't rely on mtime to spot local edits — git operations reset mtimes on checkout, so it false-positives right after a `pull`, the case this check most needs to handle correctly.
+3. **The working repo's main checkout.** Fast-forward the `main` checkout of whatever repo the session is working on (`git fetch origin`, then `git pull --ff-only` when `main` is checked out) — it goes stale as the session's own PRs and other sessions' PRs merge.
 
 ## Timestamp recaps in local time
 
-When printing a status recap or summary, include a timestamp in the user's
-local time zone (Pacific Time, `America/Los_Angeles` — get it from
-`TZ=America/Los_Angeles date "+%Y-%m-%d %H:%M %Z"`; the explicit `TZ` enforces
-PT on a machine set to any other zone). This makes "as of when" unambiguous when
-the user reads the recap later.
+When printing a status recap or summary, include a timestamp in the user's local time zone (Pacific Time, `America/Los_Angeles` — get it from `TZ=America/Los_Angeles date "+%Y-%m-%d %H:%M %Z"`; the explicit `TZ` enforces PT on a machine set to any other zone).
+This makes "as of when" unambiguous when the user reads the recap later.
+
+**Check the `%Z` in the output.** On Windows Git Bash the `TZ` override silently falls back to GMT (any IANA zone name does), so the command above prints GMT, not PT.
+If the suffix isn't PDT/PST, fall back to plain `date` when the machine's system zone is already Pacific.
+Otherwise use PowerShell: `[System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId([DateTime]::UtcNow, 'Pacific Standard Time')`.
+Note the output format differs from the bash command — it's a raw `DateTime` with no timezone-abbreviation field, so format it yourself if you need the `PDT`/`PST` suffix or a compact form.
 
 ## Bare queue-command keywords
 
-I maintain a family of slash skills for managing the task queue and amending
-requests: `/also`, `/first`, `/next`, `/before`, `/last`, `/and`, `/remember`,
-and `/always`. When I write one of these keywords **without the leading slash**
-as a directive — e.g. "also fix the test", "remember that ...", "always link
-PRs in tables", "and bold it", "next, run the spellcheck", "first, revert
-that" — interpret it using the corresponding skill's semantics rather than as
-ordinary prose. (`/remember` and `/always` both route to the `memorize` skill.)
-When the word is genuinely just part of a sentence (ambiguous), fall back to
-the plain reading.
+I maintain a family of slash skills for managing the task queue and amending requests: `/also`, `/first`, `/next`, `/before`, `/last`, `/and`, `/remember`, and `/always`.
+When I write one of these keywords **without the leading slash** as a directive — e.g. "also fix the test", "remember that ...", "always link PRs in tables", "and bold it", "next, run the spellcheck", "first, revert that" — interpret it using the corresponding skill's semantics rather than as ordinary prose. (`/remember` and `/always` both route to the `memorize` skill.)
+When the word is genuinely just part of a sentence (ambiguous), fall back to the plain reading.
 
 ## Link PRs in tables
 
-When listing PRs in a table (or anywhere they could be clickable), make
-each PR number a markdown link to the PR URL —
-`[#237](https://github.com/<owner>/<repo>/pull/237)`. The plain text form
-forces the user to copy/paste; the linked form lets them open the PR in
-one click.
+When listing PRs in a table (or anywhere they could be clickable), make each PR number a markdown link to the PR URL — `[#237](https://github.com/<owner>/<repo>/pull/237)`.
+The plain text form forces the user to copy/paste; the linked form lets them open the PR in one click.
 
 ## Title Claude sessions with the PR/issue number
 
-Name each Claude Code session (the title shown in the web/app session
-sidebar) `#NNN brief description` — the number of the PR or issue the session
-is working, then a short description. Don't prefix it with "PR" or "Issue";
-just the bare `#NNN`. So `#316 session title convention`, not
-`PR #316 session title convention` or `PR session title convention`.
+Name each Claude Code session (the title shown in the web/app session sidebar) `#NNN brief description` — the number of the PR or issue the session is working, then a short description.
+Don't prefix it with "PR" or "Issue"; just the bare `#NNN`.
+So `#316 session title convention`, not `PR #316 session title convention` or `PR session title convention`.
 
 ## Re-check for latest review findings before reporting PR status
 
-**Before** reporting status on a PR (especially "clean" / "ready to merge"),
-re-read the **most recent** review comment on the PR. Don't trust an earlier
-"verdict" you've cached — a new review may have been posted since (by the
-@claude bot, by a human, or by a re-trigger), and that newer review may
-contain findings the old one missed.
+**Before** reporting status on a PR (especially "clean" / "ready to merge"), re-read the **most recent** review comment on the PR.
+Don't trust an earlier "verdict" you've cached — a new review may have been posted since (by the @claude bot, by a human, or by a re-trigger), and that newer review may contain findings the old one missed.
 
-Specifically: when scanning checks (`gh pr checks`) shows green or "no
-failures", that's about CI state, **not** review verdict. Always pull the
-latest claude comment (`gh pr view N --json comments --jq
-'[.comments[] | select(.author.login == "claude")] | last | .body'`)
-and parse it for any "Findings", "Issues", "Remaining" sections before
-declaring a PR ready.
+Specifically: when scanning checks (`gh pr checks`) shows green or "no failures", that's about CI state, **not** review verdict.
+Always pull the latest claude comment (`gh pr view N --json comments --jq '[.comments[] | select(.author.login == "claude")] | last | .body'`) and parse it for any "Findings", "Issues", "Remaining" sections before declaring a PR ready.
 
-(A specific case of the standing **never assume; always verify** rule in
-`memories/preferences.md` — confirm the verdict with a fresh query, don't
-recall it.)
+(A specific case of the standing **never assume; always verify** rule in `memories/preferences.md` — confirm the verdict with a fresh query, don't recall it.)
 
 ## Post in-chat feedback to the PR
 
-When the user gives feedback, corrections, or guidance in the CLI or chat
-while working a PR, paraphrase it and post it as a PR comment:
+When the user gives feedback, corrections, or guidance in the CLI or chat while working a PR, paraphrase it and post it as a PR comment:
 
 ```
 gh pr comment <N> --body "..."
 ```
 
-One to three sentences is enough. Don't quote verbatim — paraphrase so it
-reads naturally in the PR thread. Skip trivial acknowledgments or
-conversational exchanges with nothing to act on.
+One to three sentences is enough.
+Don't quote verbatim — paraphrase so it reads naturally in the PR thread.
+Skip trivial acknowledgments or conversational exchanges with nothing to act on.
 
-This makes context visible to future @claude sessions, other reviewers, and
-contributors who only see the PR thread.
+This makes context visible to future @claude sessions, other reviewers, and contributors who only see the PR thread.
 
 ## Claim a GitHub PR/issue before working on it
 
 <!-- Shared with the lab manual; edit shared/workflow/claim-pr.md, not here. -->
 @shared/workflow/claim-pr.md
 
-The `claim-pr` skill operationalizes this (the exact claim wording, when it
-applies, and the closing/unclaim comment).
+The `claim-pr` skill operationalizes this (the exact claim wording, when it applies, and the closing/unclaim comment).
 
 ## Open a PR immediately after claiming an issue
 
 @shared/workflow/pr-on-claim.md
 
-The strong form of the claim: after claiming an issue you're about to work,
-open the PR right away — before implementing — from an empty commit, kept as a
-draft until the implementation lands. An open PR is the visible in-flight
-signal other sessions check, so opening it up front stops parallel duplicates.
+The strong form of the claim: after claiming an issue you're about to work, open the PR right away — before implementing — from an empty commit, kept as a draft until the implementation lands.
+An open PR is the visible in-flight signal other sessions check, so opening it up front stops parallel duplicates.
 The `gi`, `gii`, `gip`, and `st` skills operationalize this.
 
 ## Use the existing PR branch, not the harness-specified branch
 
-The Claude Code on the web harness injects a "Git Development Branch
-Requirements" section that assigns a session-unique branch name (e.g.
-`claude/abc123`) as the default for each repo.
+The Claude Code on the web harness injects a "Git Development Branch Requirements" section that assigns a session-unique branch name (e.g. `claude/abc123`) as the default for each repo.
 **That branch is a fallback for brand-new work with no existing PR.**
 
 When a task involves an existing PR or branch, work on that PR's branch instead:
 
-1. Find the branch name: call `mcp__github__pull_request_read` (`method: get`)
-   or (in CLI sessions) `gh pr view <N> --json headRefName -q .headRefName`.
+1. Find the branch name: call `mcp__github__pull_request_read` (`method: get`) or (in CLI sessions) `gh pr view <N> --json headRefName -q .headRefName`.
 2. Check it out or create a worktree from `origin/<branch>`.
 3. Push back to that branch and update the existing PR --- do not open a new one.
 
-Use the harness-specified branch only when starting work with no existing PR
-and no existing branch to continue.
+Use the harness-specified branch only when starting work with no existing PR and no existing branch to continue.
 
-**Exception --- the session can only push to its own branch.** Some web/remote
-sessions are scoped so the agent proxy allows pushing *only* to the
-harness-assigned branch; a push to any other branch (the existing PR's branch
-included) is rejected with `HTTP 403`. When that happens you cannot follow step
+**Exception --- the session can only push to its own branch.** Some web/remote sessions are scoped so the agent proxy allows pushing *only* to the harness-assigned branch; a push to any other branch (the existing PR's branch included) is rejected with `HTTP 403`.
+When that happens you cannot follow step
 3. Fall back to: push the fix to the assigned branch, open a **new** PR off
-`main` that supersedes the original (say "Supersedes #N" in the body and rebuild
-as a single clean commit so no sensitive history leaks through), comment on the
-original PR pointing to the replacement, and close the original once the new PR
-merges. Don't retry the 403 --- it's a policy denial, not a transient error.
+`main` that supersedes the original (say "Supersedes #N" in the body and rebuild as a single clean commit so no sensitive history leaks through), comment on the original PR pointing to the replacement, and close the original once the new PR merges.
+Don't retry the 403 --- it's a policy denial, not a transient error.
 
-**Check whether the branch's own PR merged before adding more commits to it.**
-If a PR on this branch merged via **squash** (common in repos that enforce
-it), the branch's old commits are no longer ancestors of `main`'s new tip —
-`git merge-base
---is-ancestor <old-commit> origin/main` returns false. Committing follow-up
-work on top of that stale branch and pushing looks fine locally, but the
-resulting PR's diff shows the *entire prior PR's changes again* against
-`main`, confusing reviewers and re-litigating already-merged content. Before
-adding commits to a branch you didn't just create, fetch `origin/main` and
-check ancestry first. If the branch's own PR already merged, don't build on
-top of it — start clean: `git checkout -b <branch> origin/main`, then
-`git cherry-pick` only the genuinely new commit(s). If you've already pushed a
-bloated diff, the same fix applies retroactively: rebuild the branch from
-`origin/main` plus a cherry-pick of the new work, then
-`git push --force-with-lease`. (Seen on gha#161 → gha#162 and
-ai-config#344 → ai-config#354, both squash-merged.)
+**Check whether the branch's own PR merged before adding more commits to it.** If a PR on this branch merged via **squash** (common in repos that enforce it), the branch's old commits are no longer ancestors of `main`'s new tip — `git merge-base --is-ancestor <old-commit> origin/main` returns false.
+Committing follow-up work on top of that stale branch and pushing looks fine locally, but the resulting PR's diff shows the *entire prior PR's changes again* against `main`, confusing reviewers and re-litigating already-merged content.
+Before adding commits to a branch you didn't just create, fetch `origin/main` and check ancestry first.
+If the branch's own PR already merged, don't build on top of it — start clean: `git checkout -b <branch> origin/main`, then `git cherry-pick` only the genuinely new commit(s).
+If you've already pushed a bloated diff, the same fix applies retroactively: rebuild the branch from `origin/main` plus a cherry-pick of the new work, then `git push --force-with-lease`. (Seen on gha#161 → gha#162 and ai-config#344 → ai-config#354, both squash-merged.)
 
 ## Skills that call gh/glab: fall back to tool-mappings.md in remote sessions
 
-Many skills under `skills/` name concrete `gh`/`glab` CLI commands (e.g.
-`gh pr comment`, `gh issue create`). In a remote/web session where `gh`/`glab`
-isn't on `PATH`, substitute the equivalent GitHub MCP tool from
-[`tool-mappings.md`](tool-mappings.md) instead of failing or improvising. That
-registry is the single source of truth for the gh/glab-to-MCP mapping in this
-repo --- don't inline a separate translation table into individual skills;
-point to `tool-mappings.md` and let it stay the one place to update. (GitLab
-operations have no MCP equivalent listed there; `glab` stays CLI-only.)
+Many skills under `skills/` name concrete `gh`/`glab` CLI commands (e.g. `gh pr comment`, `gh issue create`).
+In a remote/web session where `gh`/`glab` isn't on `PATH`, substitute the equivalent GitHub MCP tool from [`tool-mappings.md`](tool-mappings.md) instead of failing or improvising.
+That registry is the single source of truth for the gh/glab-to-MCP mapping in this repo --- don't inline a separate translation table into individual skills; point to `tool-mappings.md` and let it stay the one place to update. (GitLab operations have no MCP equivalent listed there; `glab` stays CLI-only.)
 
 ## File an issue before starting a new task
 
 <!-- Shared with the lab manual; edit shared/workflow/issue-first.md, not here. -->
 @shared/workflow/issue-first.md
 
-The `st` (Start Task) skill operationalizes this; `gi` (Grab Issue) is the path
-when the issue already exists.
+The `st` (Start Task) skill operationalizes this; `gi` (Grab Issue) is the path when the issue already exists.
 
 ## Tracking issues in upstream repos
 
 <!-- Shared with the lab manual; edit shared/workflow/upstream-issues.md, not here. -->
 @shared/workflow/upstream-issues.md
 
-The `sup` / `send-upstream` skill operationalizes steps 1--2 (the PR path, including fork-if-needed, and the issue path) and the link-back. Step 3 (own-repo fallback) is not covered by `sup`; use `gh issue create` in the current repo and ask the user to transfer it.
+The `sup` / `send-upstream` skill operationalizes steps 1--2 (the PR path, including fork-if-needed, and the issue path) and the link-back.
+Step 3 (own-repo fallback) is not covered by `sup`; use `gh issue create` in the current repo and ask the user to transfer it.
 
 ## Wrap up a merged PR with UMS
 
-When a PR/MR you were working on **merges**, run the `post-merge` skill:
-verify the merge actually landed, tidy the local branch (checkout `main`,
-pull, `git branch -d`), confirm any deferred items have follow-up issues, then
-run **UMS** to capture what the PR's review lifecycle taught — recurring review
-findings, corrections, and guidance given along the way. A merge is the natural
-checkpoint to bank lessons before the context is lost.
+When a PR/MR you were working on **merges**, run the `post-merge` skill: verify the merge actually landed, tidy the local branch (checkout `main`, pull, `git branch -d`), confirm any deferred items have follow-up issues, then run **UMS** to capture what the PR's review lifecycle taught — recurring review findings, corrections, and guidance given along the way.
+A merge is the natural checkpoint to bank lessons before the context is lost.
 
-"merge it" / "merge this" / "merge the PR" as bare directives (no slash) trigger
-the `merge-it` skill: when the PR isn't merged yet, it merges the ready PR
-(squash by default) **then** chains straight into `post-merge` (tidy + UMS); when
-the PR is already merged it goes directly to `post-merge`. Either way the
-post-merge wrap-up — including the UMS follow-up PR — runs **automatically,
-without asking**. If the phrase is clearly part of ordinary prose rather than a
-standalone directive, treat it as such.
+"merge it" / "merge this" / "merge the PR" as bare directives (no slash) trigger the `merge-it` skill: when the PR isn't merged yet, it merges the ready PR (squash by default) **then** chains straight into `post-merge` (tidy + UMS); when the PR is already merged it goes directly to `post-merge`.
+Either way the post-merge wrap-up — including the UMS follow-up PR — runs **automatically, without asking**.
+If the phrase is clearly part of ordinary prose rather than a standalone directive, treat it as such.
 
 ## What "fully clean" means
 
 <!-- Shared with the lab manual; edit shared/workflow/fully-clean.md, not here. -->
 @shared/workflow/fully-clean.md
 
-Escalate a deadlock via the `request-pr-review` skill (human reviewer
-`d-morrison`, or `gh pr edit <N> --add-reviewer d-morrison`), and surface the
-open item to me.
+Escalate a deadlock via the `request-pr-review` skill (human reviewer `d-morrison`, or `gh pr edit <N> --add-reviewer d-morrison`), and surface the open item to me.
 
 ## Always run ARDI on PRs you touch
 
 <!-- Shared with the lab manual; edit shared/workflow/ardi.md, not here. -->
 @shared/workflow/ardi.md
 
-The `ardi` / `iterate` skill family runs this loop. (See *What "fully clean"
-means* above; the mechanics for each step are in the sections around here.)
+The `ardi` / `iterate` skill family runs this loop. (See *What "fully clean" means* above; the mechanics for each step are in the sections around here.)
 
 ## Do the review yourself when the @claude workflow is quota-skipped
 
-When a PR you're managing has its `@claude` review workflow **skipped because
-of a quota** (the review job never runs, so no bot review lands), don't stall
-the ARDI loop waiting for it — **do the review yourself and post it** as a PR
-comment. Apply the same review standards the bot would (the SERG lab manual and
-d-morrison's modular/idiomatic priorities), then keep iterating to fully-clean
-on your own findings. A quota-skipped review leaves the PR unreviewed; it is
-not an approval.
+When a PR you're managing has its `@claude` review workflow **skipped because of a quota** (the review job never runs, so no bot review lands), don't stall the ARDI loop waiting for it — **do the review yourself and post it** as a PR comment.
+Apply the same review standards the bot would (the SERG lab manual and d-morrison's modular/idiomatic priorities), then keep iterating to fully-clean on your own findings.
+A quota-skipped review leaves the PR unreviewed; it is not an approval.
 
-The skip surfaces as a bot comment — either `Claude review skipped — API quota
-exhausted` (the review workflow) or `You've hit your org's monthly spend limit`
-(the `@claude` agent workflow). Both mean no bot will respond on this run, so
-don't wait on it; do the review yourself and keep driving. Re-running the
-workflow only helps once the quota actually resets.
+The skip surfaces as a bot comment — either `Claude review skipped — API quota exhausted` (the review workflow) or `You've hit your org's monthly spend limit` (the `@claude` agent workflow).
+Both mean no bot will respond on this run, so don't wait on it; do the review yourself and keep driving.
+Re-running the workflow only helps once the quota actually resets.
 
 ## Watch and ARDI every PR you touch — don't ask first
 
-When you open (or are handed) a PR/MR in **any** repo, subscribe to its activity
-and run the ARDI loop to clean **automatically** — never ask "should I watch
-this?" or "should I iterate it?" first. That answer is a standing yes across all
-PRs and all repos. Subscribe with the `subscribe_pr_activity` tool (provided by
-the GitHub MCP server in remote/web sessions) or babysit locally, drive every
-review round to fully-clean, and re-arm a periodic check-in since webhooks don't
-deliver CI-success or merge-conflict transitions.
+When you open (or are handed) a PR/MR in **any** repo, subscribe to its activity and run the ARDI loop to clean **automatically** — never ask "should I watch this?" or "should I iterate it?" first.
+That answer is a standing yes across all PRs and all repos.
+Subscribe with the `subscribe_pr_activity` tool (provided by the GitHub MCP server in remote/web sessions) or babysit locally, drive every review round to fully-clean, and re-arm a periodic check-in since webhooks don't deliver CI-success or merge-conflict transitions.
 
-Surface to me only when an item is ambiguous, architecturally significant, or
-deadlocked (the escalation rule above still applies), or when the PR is clean.
+Surface to me only when an item is ambiguous, architecturally significant, or deadlocked (the escalation rule above still applies), or when the PR is clean.
 Stop watching only when the PR merges or closes, or I tell you to back off.
 
 ## Address every in-scope review comment, even non-blockers
@@ -244,58 +185,41 @@ Stop watching only when the PR merges or closes, or I tell you to back off.
 <!-- Shared with the lab manual; edit shared/workflow/address-every-comment.md, not here. -->
 @shared/workflow/address-every-comment.md
 
-If you and the reviewer reach an impasse on a single item (your rebuttal didn't
-convince them and their re-raise didn't convince you), escalate that item to a
-**human reviewer** — request `d-morrison` via the `request-pr-review` skill (or
-`gh pr edit <N> --add-reviewer d-morrison`) and `@`-mention them with the
-impasse — for the final call rather than looping.
+If you and the reviewer reach an impasse on a single item (your rebuttal didn't convince them and their re-raise didn't convince you), escalate that item to a **human reviewer** — request `d-morrison` via the `request-pr-review` skill (or `gh pr edit <N> --add-reviewer d-morrison`) and `@`-mention them with the impasse — for the final call rather than looping.
 
 ## Keep PR branches synced with main
 
 <!-- Shared with the lab manual; edit shared/workflow/sync-with-main.md, not here. -->
 @shared/workflow/sync-with-main.md
 
-(Another instance of **never assume; always verify** — `git fetch` to check
-main's actual position instead of assuming the branch is current. The
-`sync-pr-branch` / `merge-main` skill runs this.)
+(Another instance of **never assume; always verify** — `git fetch` to check main's actual position instead of assuming the branch is current.
+The `sync-pr-branch` / `merge-main` skill runs this.)
 
 ## Prioritize internal infrastructure work slightly over feature work
 
 <!-- Shared with the lab manual; edit shared/workflow/pr-prioritization.md, not here. -->
 @shared/workflow/pr-prioritization.md
 
-A tie-breaker for `ardia`'s PR-ordering step and `gi`'s (and `gii`/`gip`'s)
-issue-priority table when candidates are otherwise close in priority. The
-fragment also sets the default direction for the age factor: among several
-open PRs, take the **older** one first unless you have more specific
-instructions.
+A tie-breaker for `ardia`'s PR-ordering step and `gi`'s (and `gii`/`gip`'s) issue-priority table when candidates are otherwise close in priority.
+The fragment also sets the default direction for the age factor: among several open PRs, take the **older** one first unless you have more specific instructions.
 
 ## Auto-orchestration: always look for Workflow opportunities
 
-The heavy, parallelizable skills (`ardia`, `ardiaei`, `gia`, `gip`,
-`grade-work`, `opposition-research`, `find-overlap`) decide on their own whether
-a task warrants multi-agent orchestration via the `Workflow` tool --- so I don't
-have to type `ultracode` every time. The `Workflow` tool stays opt-in-gated for
-bare prompts; an invoked skill is itself the sanctioned opt-in. Launch a workflow
-directly when an opt-in signal is already present (`ultracode`, a `+Nk` budget,
-or "use a workflow"), otherwise propose one with a one-line cost estimate and
-wait. The PR/issue-iteration skills stay serial where pushes collide on shared
-review runners (see the fragment's shared-runner exception).
+The heavy, parallelizable skills (`ardia`, `ardiaei`, `gia`, `gip`, `grade-work`, `opposition-research`, `find-overlap`) decide on their own whether a task warrants multi-agent orchestration via the `Workflow` tool --- so I don't have to type `ultracode` every time.
+The `Workflow` tool stays opt-in-gated for bare prompts; an invoked skill is itself the sanctioned opt-in.
+Launch a workflow directly when an opt-in signal is already present (`ultracode`, a `+Nk` budget, or "use a workflow"), otherwise propose one with a one-line cost estimate and wait.
+The PR/issue-iteration skills stay serial where pushes collide on shared review runners (see the fragment's shared-runner exception).
 
-More generally --- not just inside the named heavy skills --- always look for
-opportunities to automate work via the `Workflow` tool. When a task turns out
-to be workflow-shaped (decomposable, verification-bearing, and at a scale that
-earns it --- see the fragment's criteria), say so and propose a workflow even
-if no skill mandated one. The same opt-in gate still applies: propose with a
-cost estimate and wait unless an opt-in signal is already present.
+More generally --- not just inside the named heavy skills --- always look for opportunities to automate work via the `Workflow` tool.
+When a task turns out to be workflow-shaped (decomposable, verification-bearing, and at a scale that earns it --- see the fragment's criteria), say so and propose a workflow even if no skill mandated one.
+The same opt-in gate still applies: propose with a cost estimate and wait unless an opt-in signal is already present.
 
 <!-- Shared with the lab manual; edit shared/workflow/when-to-orchestrate.md, not here. -->
 @shared/workflow/when-to-orchestrate.md
 
 ## Coding style: avoid nesting; follow the lab manual
 
-Follow the SERG lab manual (https://ucd-serg.github.io/lab-manual/) for coding
-and collaboration conventions.
+Follow the SERG lab manual (https://ucd-serg.github.io/lab-manual/) for coding and collaboration conventions.
 
 <!-- Shared with the lab manual; edit shared/coding/avoid-nesting.md, not here. -->
 @shared/coding/avoid-nesting.md
@@ -320,23 +244,17 @@ and collaboration conventions.
 <!-- Shared with the lab manual; edit shared/writing/plain-prose.md, not here. -->
 @shared/writing/plain-prose.md
 
-The `use-preferred-style` skill (alias `style`) spells out the procedure, the
-PSW chapter links, and a filler/jargon swap table; the `find-ai-tells` skill
-(alias `ai-tells`) is the scan-after detector counterpart.
+The `use-preferred-style` skill (alias `style`) spells out the procedure, the PSW chapter links, and a filler/jargon swap table; the `find-ai-tells` skill (alias `ai-tells`) is the scan-after detector counterpart.
 
 ## Writing style: line breaks in .qmd prose
 
-When editing existing `.qmd` prose, preserve the original line breaks exactly —
-don't reflow to single long lines or a different wrap width. When writing new
-`.qmd` prose, add line breaks at major phrase and sentence boundaries (one
-`.qmd` prose, break at sentence boundaries; one clause per line works well.
+When editing existing `.qmd` prose, preserve the original line breaks exactly — don't reflow to single long lines or a different wrap width.
+When writing new `.qmd` prose, add line breaks at major phrase and sentence boundaries (one clause per line works well).
 
 ## Quarto: div syntax for figure/table labels and captions
 
-In Quarto `.qmd` files, label and caption figures and tables with **div
-syntax**, not chunk-option syntax. Wrap the code chunk in a
-`::: {#fig-...}` / `::: {#tbl-...}` fenced div and put the caption as the last
-line before the closing `:::`:
+In Quarto `.qmd` files, label and caption figures and tables with **div syntax**, not chunk-option syntax.
+Wrap the code chunk in a `::: {#fig-...}` / `::: {#tbl-...}` fenced div and put the caption as the last line before the closing `:::`:
 
 ```
 ::: {#fig-stage-at-dx}
@@ -352,18 +270,16 @@ Stage at diagnosis by screening frequency
 :::
 ```
 
-Don't use the chunk options `#| label: fig-...` / `#| fig-cap: "..."` for the
-cross-reference id and caption. The div id (`#fig-`/`#tbl-`) carries the
-cross-reference; the chunk `label` stays a plain code label. This keeps figures
-consistent with tables, which already use div syntax.
+Don't use the chunk options `#| label: fig-...` / `#| fig-cap: "..."` for the cross-reference id and caption.
+The div id (`#fig-`/`#tbl-`) carries the cross-reference; the chunk `label` stays a plain code label.
+This keeps figures consistent with tables, which already use div syntax.
 
 ## Challenge ambiguous phrasing and terminology in review
 
 <!-- Shared with the lab manual; edit shared/workflow/challenge-ambiguous-terminology.md, not here. -->
 @shared/workflow/challenge-ambiguous-terminology.md
 
-The `ard`/`ardi` skill family and `use-preferred-style`/`find-ai-tells`
-operationalize this in their respective review contexts.
+The `ard`/`ardi` skill family and `use-preferred-style`/`find-ai-tells` operationalize this in their respective review contexts.
 
 ## Writing style: scan for AI tells
 
@@ -372,8 +288,7 @@ The detector counterpart to the plain-prose guide above.
 <!-- Shared with the lab manual; edit shared/writing/ai-tells.md, not here. -->
 @shared/writing/ai-tells.md
 
-The `find-ai-tells` skill (alias `ai-tells`) runs this same catalog on demand
-against any target text.
+The `find-ai-tells` skill (alias `ai-tells`) runs this same catalog on demand against any target text.
 
 ## Writing style: cite sources thoroughly
 
@@ -385,9 +300,7 @@ against any target text.
 <!-- Shared with the lab manual; edit shared/writing/fact-check-prose.md, not here. -->
 @shared/writing/fact-check-prose.md
 
-When running `code-review` or the `ard`/`ardi` loop on a diff that touches
-prose, apply this policy in addition to the normal review — those skills
-don't name it internally, but this CLAUDE.md directive governs regardless.
+When running `code-review` or the `ard`/`ardi` loop on a diff that touches prose, apply this policy in addition to the normal review — those skills don't name it internally, but this CLAUDE.md directive governs regardless.
 
 ## Useful prompt formats for coding agents
 
@@ -396,11 +309,8 @@ don't name it internally, but this CLAUDE.md directive governs regardless.
 
 ## Review with Copilot before requesting human review
 
-This is shared lab guidance on getting an automated review before asking a human
-reviewer. When *I* iterate a PR, the ARDI loop above is the mechanism — it
-already addresses whatever the `@claude` or Copilot reviewer flags — so read this
-as the lab-member-facing statement of the same principle, not a second loop to
-run.
+This is shared lab guidance on getting an automated review before asking a human reviewer.
+When *I* iterate a PR, the ARDI loop above is the mechanism — it already addresses whatever the `@claude` or Copilot reviewer flags — so read this as the lab-member-facing statement of the same principle, not a second loop to run.
 
 <!-- Vendored from UCD-SERG/lab-manual; edit there, not here. See README, "Shared content". -->
 @shared/vendored/copilot-review-before-human.md
@@ -412,17 +322,10 @@ run.
 
 ## Keep CHANGELOG.md current
 
-Every PR that adds or changes a skill, agent, or shared policy needs a
-`CHANGELOG.md` entry under `## Unreleased`; `require-changelog.yml` enforces
-this (via `d-morrison/gha`'s `check-news.yml`) and is skippable per-PR with
-the `no changelog` label for changes with nothing to log (typo fixes,
-internal refactors with no user-visible effect).
+Every PR that adds or changes a skill, agent, or shared policy needs a `CHANGELOG.md` entry under `## Unreleased`; `require-changelog.yml` enforces this (via `d-morrison/gha`'s `check-news.yml`) and is skippable per-PR with the `no changelog` label for changes with nothing to log (typo fixes, internal refactors with no user-visible effect).
 
 ## Encoding reusable feedback into ai-config
 
-When the user gives feedback, corrections, or guidance that applies beyond the
-current session (a standing rule, style preference, workflow change, or
-behavioral note), decide on your own how to encode it --- don't ask. Choose the
-right form (memory bullet in CLAUDE.md, update to a shared fragment in
-`shared/`, new or revised skill, etc.) and commit the change. Only surface the
-choice if it's ambiguous or touches something architecturally significant.
+When the user gives feedback, corrections, or guidance that applies beyond the current session (a standing rule, style preference, workflow change, or behavioral note), decide on your own how to encode it --- don't ask.
+Choose the right form (memory bullet in CLAUDE.md, update to a shared fragment in `shared/`, new or revised skill, etc.) and commit the change.
+Only surface the choice if it's ambiguous or touches something architecturally significant.
