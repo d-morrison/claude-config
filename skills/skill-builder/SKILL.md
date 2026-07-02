@@ -130,6 +130,11 @@ allowed-tools:               # real skill: list its tools. alias: mirror the can
 - **No registry to update.** Skills are auto-discovered from `skills/` (the
   bootstrap symlink and the plugin root both read the directory) — adding the
   directory is enough.
+- **List it in `skills.qmd` if it belongs in one of the category tables**, and
+  bump the "All N+ canonical skills" count at the bottom to the **actual**
+  directory count (`ls -d skills/*/ | wc -l`), not a manual +1 — `main` often
+  gains other skills while your PR is in review, so a hand-incremented count
+  drifts and reads as stale by the time you merge (ai-config#347).
 - **Register any new tool the skill names.** Discovery needs no registry, but
   tool *references* do. If the procedure names a **GitHub MCP tool or `gh`/`git`
   operation not already in `tool-mappings.yml`** (grep it to check), verify the
@@ -284,7 +289,10 @@ Then, as their own explicit steps (don't leave them buried in a comment):
 - ❌ Encoding a standing rule in the skill but not in `preferences.md`.
 - ❌ Naming a GitHub MCP tool (or `gh`/`git` operation) the skill uses without
   registering it in `tool-mappings.yml` — the reviewer flags the unregistered
-  name as a possible hallucination (`push-memory` #311).
+  name as a possible hallucination (`push-memory` #311, `resolve-pr-threads` #347).
+- ❌ Bumping `skills.qmd`'s skill count by a manual +1 instead of re-deriving it
+  from `ls -d skills/*/ | wc -l` — it drifts whenever `main` gains other skills
+  mid-review (`resolve-pr-threads` #347).
 - ❌ Leaving the new skill as a local-only uncommitted file (or pushing direct to main).
 - ❌ In a worktree session, writing the skill files to the `rev-parse --show-toplevel`
   path — it resolves to the main checkout (via the `~/.claude/skills` symlink), not

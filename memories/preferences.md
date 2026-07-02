@@ -472,6 +472,13 @@
   extending (a new alias/section/trigger) over a near-duplicate skill; if another branch is
   already building it, continue that work rather than opening a colliding branch. (see the
   `skill-builder` skill.)
+- Invoke the `skill-builder` skill itself when creating a new `SKILL.md`, rather than
+  hand-authoring the file directly. It encodes checklist items (registering a cited MCP
+  tool in `tool-mappings.yml`, updating `skills.qmd`'s count from the real directory
+  count, cross-linking) that a hand-rolled skill otherwise skips and only catches in
+  review. `resolve-pr-threads` (ai-config#347) was hand-authored and needed a review
+  round to catch a `tool-mappings.yml` gap that `skill-builder` already documented from
+  a near-identical miss in `push-memory` (#311).
 - "slide <tag>" means force-move a floating Git tag to current main HEAD (delete + recreate + push).
   Common for repos with floating major-version tags that consumers reference.
 - Use the `session-lock` skill (alias `deconflict-sessions`) as the detection/recovery layer
