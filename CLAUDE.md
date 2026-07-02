@@ -106,10 +106,19 @@ When a task involves an existing PR or branch, work on that PR's branch instead:
 Use the harness-specified branch only when starting work with no existing PR and no existing branch to continue.
 
 **Exception --- the session can only push to its own branch.** Some web/remote sessions are scoped so the agent proxy allows pushing *only* to the harness-assigned branch; a push to any other branch (the existing PR's branch included) is rejected with `HTTP 403`.
-When that happens you cannot follow step
-3. Fall back to: push the fix to the assigned branch, open a **new** PR off
-`main` that supersedes the original (say "Supersedes #N" in the body and rebuild as a single clean commit so no sensitive history leaks through), comment on the original PR pointing to the replacement, and close the original once the new PR merges.
+When that happens you cannot follow step 3.
+Fall back to: push the fix to the assigned branch, open a **new** PR off `main` that supersedes the original (say "Supersedes #N" in the body and rebuild as a single clean commit so no sensitive history leaks through), comment on the original PR pointing to the replacement, and close the original once the new PR merges.
 Don't retry the 403 --- it's a policy denial, not a transient error.
+
+**Rebuilding the single clean commit: diff against `main`, don't cherry-pick from the write-protected branch.** `main` usually doesn't yet contain the original PR's changes, so cherry-picking just your incremental fix commit conflicts --- it was written against the PR branch's state, not `main`'s.
+Instead, diff the whole file set and apply it fresh:
+```bash
+git diff origin/main <old-branch> -- <changed-files> > /tmp/rebuild.diff
+git checkout -B <assigned-branch> origin/main
+git apply /tmp/rebuild.diff
+git add <changed-files> && git commit -m "..." && git push -u origin <assigned-branch>
+```
+(Seen on ai-config#372 → #380: the assigned branch could push, `sync-freshness-rule` could not.)
 
 **Check whether the branch's own PR merged before adding more commits to it.** If a PR on this branch merged via **squash** (common in repos that enforce it), the branch's old commits are no longer ancestors of `main`'s new tip — `git merge-base --is-ancestor <old-commit> origin/main` returns false.
 Committing follow-up work on top of that stale branch and pushing looks fine locally, but the resulting PR's diff shows the *entire prior PR's changes again* against `main`, confusing reviewers and re-litigating already-merged content.
