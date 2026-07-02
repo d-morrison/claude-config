@@ -1058,6 +1058,24 @@ not block `claude-review`.)
   to achieve a green baseline with zero corpus churn. Re-enable rules incrementally after
   targeted fix passes. This prevents flooding CI with hundreds of pre-existing violations.
 
+## Custom subagents (`.claude/agents/*.md`) — Bash is a write-access loophole
+
+The `tools:` frontmatter field (comma-separated, e.g. `tools: Bash, Read,
+Grep, Glob`) is the correct, harness-enforced way to restrict a custom
+subagent — confirmed against the real docs
+(<https://code.claude.com/docs/en/sub-agents>). But blocking `Edit` and
+`Write` does **not** make an agent read-only if it still has `Bash`: shell
+commands (`sed -i`, `echo >`, `git commit`, `renv::update()` without
+`check = TRUE`) write to the filesystem regardless of which Claude tools are
+in the allowlist. Only an agent with *no* `Bash` (e.g. `WebSearch, WebFetch,
+Read, Grep, Glob`) gets a genuine harness-enforced read-only guarantee.
+When an agent needs `Bash` for read-only shell checks (`grep`, `gh api`,
+`git status`), describe the isolation honestly as "no Edit/Write tool use;
+avoiding write-capable shell commands is instruction-level discipline" —
+don't claim an unconditional "nothing can be modified" guarantee. (Caught
+across three review rounds on ai-config#341, `hallucination-detector` and
+`dependency-auditor`.)
+
 ## Office Open XML (.docx / .xlsx) — editing committed content
 - `.docx`/`.xlsx` are zip archives. To strip or edit content (e.g. remove a sensitive
   link from a committed Word doc): `unzip` the file, edit `word/document.xml` for body
