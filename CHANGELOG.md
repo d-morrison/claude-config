@@ -12,6 +12,10 @@ behavior change to an existing one), not every mechanical edit.
 
 ## Unreleased
 
+- **`memories/tools.md`: watch for the bot's `Claude finished` marker** (#367).
+  A watcher polling for the @claude bot's verdict must match the completion
+  marker (`**Claude finished`), not the absence of an in-progress placeholder
+  --- placeholder wording varies between runs, so exclusion filters fire early.
 - **`wrap-up` skill: closing-signal guidance.** Step 4 now spells out how the
   final reply should end: an explicit "this session is at a good stopping
   point" (or similar) when nothing is waiting on the user, or --- when
