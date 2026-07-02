@@ -71,3 +71,19 @@ empty-commit draft PR failed `validate` on a stale `codex-skills/` generated
 tree, and the `require-changelog` job on a newly-added `CHANGELOG.md`
 requirement from PR #354 --- both were `main` having advanced past a
 checkout that predated the session, not a defect in the new skill.)
+
+**A textual conflict in a skill file can be the symptom of a conceptual
+duplicate, not just competing edits to the same line.** When merging `main`
+into a branch that's authoring a new skill, if the conflict lands in a
+`## Relationship to other skills` section (or `main` added an entirely new
+skill in the same territory), that's a signal to re-run `skill-builder`'s
+Step 0 judgment --- not just resolve the diff mechanically. Compare the new
+skill against whatever landed on `main`: are they the same concern (fold
+into one, redirect), or genuinely distinct (cross-link both directions so
+neither reads as an unexplained near-duplicate)? `skill-builder`'s
+in-flight-work scan only runs once, at the start; `main` can grow a
+colliding skill in the time a PR is open, so the check has to be repeated
+at merge time too. (PR #352's `check-info-quality` landed alongside `#344`'s
+independently-authored `fact-check-prose` this way --- distinct enough to
+keep both, resolved by adding an explicit boundary in each skill's
+Relationship section rather than consolidating.)

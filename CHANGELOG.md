@@ -12,6 +12,16 @@ behavior change to an existing one), not every mechanical edit.
 
 ## Unreleased
 
+- **`skill-builder` / `sync-with-main`: hallucination and merge-overlap
+  lessons from #349.** `skill-builder` now calls out grep-verifying any
+  `CLAUDE.md`/`shared/` citation or claimed "existing scale" before writing
+  it into new skill prose --- the same discipline `purge-hallucinations`
+  applies to other authors' text applies to your own new content too.
+  `sync-with-main` now notes that a textual conflict inside a skill's
+  `## Relationship to other skills` section can signal a conceptual
+  duplicate landed on `main` while the branch was in flight, not just a
+  line collision --- worth re-running `skill-builder`'s Step 0 judgment at
+  merge time, not only at branch start.
 - **`check-history` skill.** New bullet: on a long-lived or foundational
   issue, the issue text and any design-doc status header can lag the code by
   several PRs, so a mature feature may be partly or mostly implemented even
