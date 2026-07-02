@@ -183,7 +183,7 @@ bot):
 gh pr ready <PR-number>
 
 # GitLab — drafts use "Draft:" prefix; remove it with:
-glab mr update <MR-number> --remove-draft
+glab mr update <MR-number> --ready
 ```
 
 ### 11. ARDI to clean

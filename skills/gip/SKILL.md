@@ -128,9 +128,16 @@ and the default branch for each issue:
 > 4. **Open a draft PR immediately** (before implementing): make an empty
 >    commit, push the branch, and open a draft PR referencing `Closes #<N>`.
 >    This makes the in-flight work visible right away.
->    `git commit --allow-empty -m "chore: claim #<N> [skip ci]"
->    && git push -u origin HEAD`, then open a draft PR with
->    `gh pr create --draft --title "<title>" --body "Closes #<N>\n\nDraft --- work in progress."`.
+>    `git commit --allow-empty -m "chore: claim #<N> [skip ci]" && git push -u origin HEAD`,
+>    then open a draft PR with a real embedded newline in `--body` (not a
+>    literal `\n`, which bash won't expand in a double-quoted string):
+>    ```bash
+>    gh pr create --draft \
+>      --title "<title>" \
+>      --body "Closes #<N>
+>
+>    Draft --- work in progress."
+>    ```
 > 5. **Implement** the change. Keep the diff focused on this issue only ---
 >    do **not** touch files another issue owns. Follow the repo's conventions
 >    (its `CLAUDE.md` / lab manual). Run the repo's pre-commit checks
