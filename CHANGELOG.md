@@ -18,6 +18,13 @@ behavior change to an existing one), not every mechanical edit.
   broken in one spot, fix every recurrence in the same file in one pass
   instead of letting the reviewer flag each occurrence separately. Lessons
   from PR #353's review lifecycle.
+- **`wrap-up` skill: closing-signal guidance.** Step 4 now spells out how the
+  final reply should end: an explicit "this session is at a good stopping
+  point" (or similar) when nothing is waiting on the user, or --- when
+  something is open (an ambiguous item, a deadlock, a choice only the user
+  can make) --- the open question(s) last and clearly visible, rather than
+  burying them earlier in a long recap, so the last thing the user reads is
+  the open question, not a trailing summary.
 - **Growth-mindset shared policy** (`shared/workflow/growth-mindset.md`, #353).
   New standing rule: treat a current limitation (missing tool, manual
   workaround, insufficient model) as a starting point to resolve — via
