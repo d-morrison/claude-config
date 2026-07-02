@@ -1,6 +1,6 @@
 ---
 name: dependency-auditor
-description: Read-only audit pass for check-dependency-updates (cdu) --- surveys pinned GitHub Actions tags/SHAs, renv.lock package versions, pre-commit revs, Quarto/tool versions in CI, and submodules for available upgrades, reads changelogs, and reports what each bump would buy. Has no Edit or Write access, so it cannot touch a lockfile or pin; branching, PR, and ARDI happen afterward in the main session on the user's go-ahead. Use when check-dependency-updates needs its audit phase run with a hard guarantee that nothing is modified before the report is reviewed.
+description: Read-only audit pass for check-dependency-updates (cdu) --- surveys pinned GitHub Actions tags/SHAs, renv.lock package versions, pre-commit revs, Quarto/tool versions in CI, and submodules for available upgrades, reads changelogs, and reports what each bump would buy. Has no Edit or Write tool access, so it cannot touch a lockfile or pin through those tools; branching, PR, and ARDI happen afterward in the main session on the user's go-ahead. This agent retains Bash for read-only shell checks (grep, gh api, git submodule status), so avoiding any write-capable shell command (e.g. running pre-commit autoupdate or renv::update() without check=TRUE) is instruction-level discipline, not a harness-enforced restriction the way Edit/Write are.
 tools: Bash, Read, Grep, Glob, WebFetch
 ---
 
@@ -15,8 +15,10 @@ Check whichever of these apply to the repo:
 2. **renv lockfile** (`renv.lock`) --- `renv::status()` then
    `renv::update(check = TRUE)` to preview upgrades without installing
    anything.
-3. **pre-commit hooks** (`.pre-commit-config.yaml`) --- what `pre-commit
-   autoupdate` would change (report the diff; do not run it here).
+3. **pre-commit hooks** (`.pre-commit-config.yaml`) --- compare each hook's
+   `rev:` against its upstream's latest tag via `gh api`, and report what
+   would change if `pre-commit autoupdate` were run.
+   Do not run `pre-commit autoupdate` directly; it rewrites the config file.
 4. **Quarto / other tool versions pinned in CI** --- compare against the
    latest upstream release.
 5. **Git submodules** --- `git submodule status`, then check each submodule's
@@ -29,6 +31,9 @@ so you can say what the update buys and flag breaking changes or security
 fixes. Report one row per dependency: current pin, latest available, what
 the update buys, changelog link, and whether it's a security fix.
 
-Return the report only. You have no Edit or Write access, so you cannot bump
-a lockfile, pin, or workflow file --- the calling session files the tracking
-issue and applies the chosen bumps on a branch afterward.
+Return the report only. Do not run any command that writes --- `renv::update()`
+without `check = TRUE`, `pre-commit autoupdate`, `npm update`, or an editor
+redirect --- even though `Bash` would technically allow it; only your Edit
+and Write *tool* access is harness-blocked, so avoiding shell-based writes is
+on you. The calling session files the tracking issue and applies the chosen
+bumps on a branch afterward.
