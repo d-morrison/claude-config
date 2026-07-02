@@ -1,6 +1,6 @@
 ---
 name: "skill-builder"
-description: "Codex wrapper for the ai-config Claude skill `skill-builder`. Build a new skill for the ai-config repo the right way \u2014 FIRST check whether an existing skill should be extended instead (search skills/ AND scan every branch for in-flight similar work), and only then scaffold skills/<name>/SKILL.md with proper frontmatter, a discoverable trigger-rich description, a spelled-out/short alias as appropriate, cross-links, and (if it encodes a standing rule) matching preferences.md / CLAUDE.md updates \u2014 shipped via branch + PR, reviewer requested, ARDI'd to clean. Use when asked to 'build a skill', 'create a skill', 'make a new skill', 'add a skill', or 'skill-builder'. Use when Codex is asked to use `skill-builder`, `/skill-builder`, or the corresponding ai-config/Claude skill workflow."
+description: "Codex wrapper for the ai-config Claude skill `skill-builder`. Build a new skill for the ai-config repo the right way \u2014 FIRST check whether an existing skill should be extended instead (search skills/, scan every branch for in-flight similar work, AND check open PRs for in-progress drafts to redirect to instead of duplicating), and only then scaffold skills/<name>/SKILL.md with proper frontmatter, a discoverable trigger-rich description, a spelled-out/short alias as appropriate, cross-links, and (if it encodes a standing rule) matching preferences.md / CLAUDE.md updates \u2014 shipped via branch + PR, reviewer requested, ARDI'd to clean. Use when asked to 'build a skill', 'create a skill', 'make a new skill', 'add a skill', or 'skill-builder'. Use when Codex is asked to use `skill-builder`, `/skill-builder`, or the corresponding ai-config/Claude skill workflow."
 ---
 
 # skill-builder (Codex wrapper)
@@ -28,6 +28,7 @@ run the CLI command. Full per-model reference: [tool-mappings.md](../../tool-map
 | --- | --- | --- | --- |
 | `VIEW_PR` | Read a pull request's details and metadata. | `gh pr view <N>` | `mcp__github__pull_request_read (method=get)` |
 | `LIST_PRS` | List pull requests. | `gh pr list` | `mcp__github__list_pull_requests` |
+| `SEARCH_PRS` | Search pull requests by keyword / query string. | `gh pr list --search "<query>"` | `mcp__github__search_pull_requests` |
 | `DIFF_PR` | Read a pull request's diff. | `gh pr diff <N>` | `mcp__github__pull_request_read (method=get_diff)` |
 | `PR_CHECKS` | Read a pull request's CI check / status results. | `gh pr checks <N>` | `mcp__github__pull_request_read (method=get_check_runs)` |
 | `CREATE_PR` | Open a new pull request. | `gh pr create` | `mcp__github__create_pull_request` |

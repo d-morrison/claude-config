@@ -1,0 +1,16 @@
+# Enforces a CHANGELOG.md entry on every PR, via d-morrison/gha's reusable
+# check-news.yml (wraps UCD-SERG/changelog-check-action). Opt out of a
+# specific PR with the "no changelog" label (hardcoded by the action).
+name: Require Changelog Entry
+
+on:
+  pull_request:
+    types: [assigned, opened, synchronize, reopened, labeled, unlabeled]
+    branches:
+      - main
+
+jobs:
+  check:
+    uses: d-morrison/gha/.github/workflows/check-news.yml@v1
+    with:
+      changelog: CHANGELOG.md

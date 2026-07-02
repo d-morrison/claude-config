@@ -1,6 +1,6 @@
 ---
 name: agent-builder
-description: "Build a new read-only fan-out subagent under `.claude/agents/<name>.md` for a skill that needs one — FIRST check whether an existing agent (dependency-auditor, hallucination-detector, community-demand-scout) should be reused or extended instead, and only then scaffold a new agent definition with a tight `tools:` list, a role-scoped system prompt, and an explicit read-only/no-mutate boundary, paired with exactly one skill that spawns it. Use when asked to 'build an agent', 'create a subagent', 'make a new agent', 'add an agent', 'agent-builder', or when a heavy skill's fan-out step needs a dedicated worker persona instead of an inline Agent() prompt."
+description: "Build a new read-only fan-out subagent under `.claude/agents/<name>.md` for a skill that needs one — FIRST check whether an existing agent (dependency-auditor, hallucination-detector, community-demand-scout) should be reused or extended instead, or an open PR is already building one to redirect to, and only then scaffold a new agent definition with a tight `tools:` list, a role-scoped system prompt, and an explicit read-only/no-mutate boundary, paired with exactly one skill that spawns it. Use when asked to 'build an agent', 'create a subagent', 'make a new agent', 'add an agent', 'agent-builder', or when a heavy skill's fan-out step needs a dedicated worker persona instead of an inline Agent() prompt."
 user-invocable: true
 allowed-tools:
   - Bash
@@ -50,7 +50,10 @@ enough.
    persona, or (b) the harness-enforced tool restriction is itself load-bearing
    — e.g. guaranteeing a detection pass *can't* accidentally write, which an
    inline prompt can't guarantee (the calling skill's own tools still apply).
-3. **State explicitly: reuse, extend, or new** — and why — before writing a line.
+3. **Check open PRs too** — another session may already have an in-progress
+   draft agent that never landed as a local branch you'd see. See
+   [`check-open-prs-before-duplicating`](../../shared/workflow/check-open-prs-before-duplicating.md).
+4. **State explicitly: reuse, extend, or new** — and why — before writing a line.
 
 ## Anatomy of an agent definition
 
@@ -197,6 +200,8 @@ Then, as explicit steps:
 
 - ❌ Creating a new agent when an existing persona, parameterized differently,
   would do.
+- ❌ Not checking open PRs → building a second draft of an agent someone
+  already pushed and opened a PR for, instead of redirecting to it.
 - ❌ Giving a read-only fan-out worker `Edit`/`Write` "just in case."
 - ❌ Writing the agent's system prompt assuming it inherits the calling
   skill's text — restate every needed discipline explicitly.

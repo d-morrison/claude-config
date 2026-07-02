@@ -1,6 +1,6 @@
 ---
 name: skill-builder
-description: "Build a new skill for the ai-config repo the right way — FIRST check whether an existing skill should be extended instead (search skills/ AND scan every branch for in-flight similar work), and only then scaffold skills/<name>/SKILL.md with proper frontmatter, a discoverable trigger-rich description, a spelled-out/short alias as appropriate, cross-links, and (if it encodes a standing rule) matching preferences.md / CLAUDE.md updates — shipped via branch + PR, reviewer requested, ARDI'd to clean. Use when asked to 'build a skill', 'create a skill', 'make a new skill', 'add a skill', or 'skill-builder'."
+description: "Build a new skill for the ai-config repo the right way — FIRST check whether an existing skill should be extended instead (search skills/, scan every branch for in-flight similar work, AND check open PRs for in-progress drafts to redirect to instead of duplicating), and only then scaffold skills/<name>/SKILL.md with proper frontmatter, a discoverable trigger-rich description, a spelled-out/short alias as appropriate, cross-links, and (if it encodes a standing rule) matching preferences.md / CLAUDE.md updates — shipped via branch + PR, reviewer requested, ARDI'd to clean. Use when asked to 'build a skill', 'create a skill', 'make a new skill', 'add a skill', or 'skill-builder'."
 user-invocable: true
 allowed-tools:
   - Bash
@@ -62,7 +62,11 @@ Rule out extending an existing skill *before* scaffolding anything:
    If a branch or worktree is already building it, **continue that work** (check
    it out / extend its PR) instead of opening a colliding parallel branch.
 
-3. **Decide explicitly: extend (preferred) or new.** State which and why before
+3. **Check open PRs too** — a branch scan misses work already pushed and
+   opened as a PR if you never fetched it. See
+   [`check-open-prs-before-duplicating`](../../shared/workflow/check-open-prs-before-duplicating.md).
+
+4. **Decide explicitly: extend (preferred) or new.** State which and why before
    writing a line. A new alias or section almost always beats a whole new skill.
 
 ## Anatomy of a skill
@@ -270,6 +274,8 @@ Then, as their own explicit steps (don't leave them buried in a comment):
 
 - ❌ Creating a new skill when an existing one should be extended (skipping step 0).
 - ❌ Not scanning other branches → colliding parallel work / duplicate skills.
+- ❌ Not checking open PRs → building a second draft of a skill someone already
+  pushed and opened a PR for, instead of redirecting to it.
 - ❌ Duplicating canonical content across alias files (aliases must only redirect).
 - ❌ A thin description with no trigger phrases — the skill never gets discovered.
 - ❌ In a subagent-fanning skill, writing the subagent prompt as if it inherits

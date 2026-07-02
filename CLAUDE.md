@@ -393,6 +393,14 @@ run.
 <!-- Edit shared/workflow/growth-mindset.md, not here. -->
 @shared/workflow/growth-mindset.md
 
+## Keep CHANGELOG.md current
+
+Every PR that adds or changes a skill, agent, or shared policy needs a
+`CHANGELOG.md` entry under `## Unreleased`; `require-changelog.yml` enforces
+this (via `d-morrison/gha`'s `check-news.yml`) and is skippable per-PR with
+the `no changelog` label for changes with nothing to log (typo fixes,
+internal refactors with no user-visible effect).
+
 ## Encoding reusable feedback into ai-config
 
 When the user gives feedback, corrections, or guidance that applies beyond the

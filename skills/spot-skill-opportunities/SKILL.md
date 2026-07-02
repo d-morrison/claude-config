@@ -43,13 +43,16 @@ a **dedicated, read-only fan-out worker** a heavy skill's per-item step needs
    or users of this config — or is it specific to this single task? Only
    the former is worth a skill. When in doubt, lean toward surfacing it
    anyway and let the user decide (see step 4).
-3. **Check it isn't already covered.** Search for an existing skill or an
-   in-flight branch before proposing a new one:
+3. **Check it isn't already covered.** Search for an existing skill, an
+   in-flight branch, or an **open PR** before proposing a new one:
    ```bash
    grep -ril "<keywords>" skills/*/SKILL.md
    ```
-   If something already owns this concern, suggest extending it instead of a
-   new skill.
+   (see
+   [`check-open-prs-before-duplicating`](../../shared/workflow/check-open-prs-before-duplicating.md)
+   for the PR check). If something already owns this concern, suggest
+   extending it — or, if a PR is already building it, redirect to that PR —
+   instead of proposing a new skill.
 4. **Surface the suggestion — don't build silently.** Per the standing
    preference, *propose* creating the skill (or agent); don't scaffold one
    unasked mid-task (that would derail the task at hand). The exception: when
