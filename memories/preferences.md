@@ -14,6 +14,17 @@
   something and present it as captured or real. (Learned the hard way on sparta#247: a demo's
   "mouse recording" was hand-written JSON; the fix was a cursor-injection seam so a real
   recorder drives the actual game.)
+- When "restoring" or reconstructing a full file's content (e.g. re-typing a file you
+  fetched earlier in the conversation, or rebuilding it from memory after catching a
+  truncation bug), don't trust your own transcription — diff the pushed result against
+  the actual source (`git diff <base>...<head> -- <path>`, or re-fetch and compare) before
+  claiming it's a faithful restoration. A plausible-sounding but invented bullet/section can
+  slip in even when you intend to copy real content verbatim, and it reads exactly like a
+  genuine hallucination to a reviewer (same failure mode as fabricating a demo — just a
+  different repo). (Learned on gha#155: while fixing a CHANGELOG truncation bug, the
+  "restored" content itself included an invented changelog entry — a `test-coverage`
+  Python-support bullet describing an input/step that never existed in the repo — caught
+  only by a follow-up review diffing against `origin/main`.)
 - ALWAYS record what I learn in memory/AI-instruction notes as I work (standing request).
 - When recording a factual claim about tool/workflow behavior (an implementation detail
   or a causal explanation derived from a specific source), cite the source inline —
