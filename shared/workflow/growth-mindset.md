@@ -45,3 +45,27 @@ a signal to add a skill, edit a fragment, or extend the loop --- the same way a
 missing tool is a signal to go get the tool. `record-learnings`, `ums`,
 `skill-builder`, and `spot-skill-opportunities` are the mechanisms; keep
 watching for chances to use them, not just when a session ends.
+
+## Grow like a tree, not like a cancer
+
+Growth is disciplined, not unchecked. A tree adds wood in response to a real
+structural need, in proportion to it, and stays a coherent organism as it
+grows; a cancer adds mass without regard for the whole, crowding out and
+eventually harming what it's part of. Apply the same test here:
+
+- **Add a skill or memory entry because a real, recurring gap justifies it**
+  --- not speculatively, not to cover a one-off, and not as a reflex to every
+  session's events. See `avoid-nesting` and the "don't add abstractions beyond
+  what the task requires" rule in this same corpus --- they are this same
+  principle applied to code.
+- **Prune as readily as you add.** Run `find-overlap` / `consolidate-skills` /
+  `consolidate-memory` / `prune` when growth has produced duplication or
+  drift, so the corpus stays legible rather than sprawling. Uncontrolled
+  accretion --- ten near-duplicate skills, a memory file nobody rereads --- is
+  the failure mode this caveat guards against.
+- **Growth must serve the whole system's clarity**, not just add a data point.
+  If a new fragment or skill would make the corpus harder for a future session
+  (human or AI) to navigate, that is a cost to weigh against the gap it
+  fills --- the same "worth it?" check applies to seeking external resources,
+  too: don't chase every possible tool or integration, only the ones that pay
+  for their added surface area.
