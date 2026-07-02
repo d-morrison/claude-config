@@ -372,6 +372,24 @@ closed-issue references in multiple PR bodies, and stacking conflicts mid-ARDI.
     with the autoloader off:
     `RENV_CONFIG_AUTOLOADER_ENABLED=FALSE Rscript -e 'lintr::lint("path/to/file.qmd")'`.
     (Used to lint the changed files for rme #873 when lintr wasn't in the renv lib.)
+- **When the container's R is a brand-new release P3M hasn't built binaries for
+  yet** (e.g. R 4.6.1 in mid-2026), `install.packages()` from P3M silently falls
+  back to **source**, and heavy pkgs (DT → sass, etc.) fail or time out — so a
+  full HTML `quarto render` (needs knitr/DT/rmarkdown) isn't feasible locally.
+  Two mitigations: (1) replicate just the **build-breaking check in base R**
+  (e.g. a Quarto page's `stop()`-on-missing-data guard) — base R needs no
+  install; (2) `quarto install tinytex` **does** work, so validate the LaTeX/PDF
+  paths locally with lualatex (`quarto render <f>.qmd --to pdf`) even when the
+  HTML render is blocked. Let CI do the authoritative HTML render. (macros#71:
+  DT/knitr uninstallable, but a base-R interpretation-completeness check + a
+  lualatex PDF render of the new macros validated the change before push.)
+- **R in these containers defaults to the `C` locale**, so
+  `read.delim(..., fileEncoding="UTF-8")` (or any read) of a file with multibyte
+  chars (π, μ, ℓ, …) **silently truncates at the first non-ASCII byte**, emitting
+  only an `invalid input found on input connection` warning — you get a few rows,
+  not all, and a completeness check then reports bogus "missing" rows. Run R with
+  `LANG=C.UTF-8 LC_ALL=C.UTF-8 Rscript …` to read UTF-8 data files correctly.
+  (CI runners are UTF-8, so this bites only locally.)
 - **renv activation failure when a GitHub remote is blocked**: if `DESCRIPTION`
   lists a GitHub `Remotes:` entry the proxy can't reach (e.g. bcs's
   `d-morrison/altdoc@recursive-qmd-search`), renv activation (via `.Rprofile`)
@@ -601,6 +619,15 @@ closed-issue references in multiple PR bodies, and stacking conflicts mid-ARDI.
     The guard step fails the check ❌. The prior clean review on the same diff is still
     valid. Fix: push a trivial commit to trigger a fresh review. Observed on gha#92 run
     #28034977099.
+- **A review job with `conclusion: success` but NO posted comment is NOT
+  automatically "unreviewed."** It is either (a) a quota/auth skip (see above:
+  `total_cost_usd=0`, `num_turns=1`) or (b) a genuinely **clean review that found
+  nothing to flag**. Tell them apart from the job log: a clean review shows a
+  full agent run (`"subtype":"success"`, `"is_error":false`, high `num_turns`,
+  `total_cost_usd` > 0) followed by `No buffered inline comments` in the
+  post-comments step — the bot reviewed and posted nothing because it had nothing
+  to say. Don't treat that as a missing review or re-trigger it. (macros#71:
+  `claude-review` ran 21 turns at $0.88 and buffered 0 comments = clean.)
 - **Reading the hidden error behind a failed `claude-code-review`.** The action prints
   `Running Claude Code via SDK (full output hidden for security)…` and suppresses the real
   API error. The reusable `claude-code-review.yml` now accepts a **`show-full-output`** input
