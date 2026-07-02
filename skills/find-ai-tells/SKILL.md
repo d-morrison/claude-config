@@ -149,6 +149,9 @@ paragraphs; reads strongly AI. Recommend a rewrite pass,"* vs. *"One stray
 - **`find-overlap`** — the sibling read-only scanner: this skill scans prose for
   AI tells; `find-overlap` scans a corpus for duplicated/redundant content. Same
   detect-and-report posture, different signal.
+- **`fact-check-prose`** — the accuracy-side sibling: this skill flags prose
+  that *reads* as machine-generated; `fact-check-prose` checks whether prose
+  claims and reasoning are actually *true*. Run both on a review pass.
 
 ## Anti-patterns
 

@@ -114,6 +114,21 @@ read-only** (its tools grant no git push/commit, so it never pushes a fix and
 can't self-cancel). A review workflow that can push fixes must guard against
 cancelling its own triggered run — see d-morrison/rme#817.
 
+### 7. Optional: install a computer algebra system when math verification would help
+
+`apt-packages` / `pip-packages` inputs on `claude-code-review.yml` mirror the
+inputs `claude.yml` already had (both empty by default) and let a repo's
+review job install system/pip packages before the review runs — most usefully a CAS (`apt-packages: maxima`, `pip-packages:
+sympy`) so the reviewer's Bash tool can symbolically check a derivation
+instead of eyeballing the algebra. Set these only for repos with substantial
+math-heavy prose (e.g. rme's textbook chapters); most repos need neither.
+Pair with a `prompt-addendum` telling the reviewer to actually use the
+installed CAS for derivations/proofs, and — when the repo has a PR-preview
+deploy — to check any computed value or figure the prose describes against
+the rendered output rather than trusting the prose's own description (see
+`d-morrison/ai-config`'s `shared/writing/fact-check-prose.md` and the
+`fact-check-prose` skill for the full policy this operationalizes).
+
 ## Setting up in a new repo
 
 1. Confirm `CLAUDE_CODE_OAUTH_TOKEN` secret exists (`gh secret list`).
