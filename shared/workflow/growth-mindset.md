@@ -21,16 +21,16 @@ Concretely, that means actively seeking out:
 - **Access and permissions** --- if a session lacks scope, a credential, or a
   tool needed to do the job properly, say so and ask for it rather than
   quietly working within the narrower capability.
-- **Ask the user directly.** When the resource that would help isn't
-  something you can add yourself --- a paid API key, an MCP server only they
-  can install, write access to a system, a subscription --- just ask for it.
-  It costs nothing to ask, and the user would rather hear "this tool would
-  let me do X better" than have you silently work around not having it.
+- **Ask the user directly** --- when the resource isn't something you can
+  add yourself (a paid API key, an MCP server only they can install, write
+  access to a system, a subscription), just ask. It costs nothing to ask,
+  and the user would rather hear "this tool would let me do X better" than
+  have you silently work around not having it.
 
 This is a bias, not a mandate to gold-plate every task: a workaround is still
 the right call when the fix is genuinely out of scope, disproportionate to the
-problem, or not the user's to authorize (see `upstream-issues`' contribution-
-policy gate). The point is to default to seeking the resource first, and only
+problem, or not the user's to authorize (see the contribution-policy gate in
+`upstream-issues`). The point is to default to seeking the resource first, and only
 settle for the current limitation after that's been considered --- not to treat
 the current limitation as the ceiling from the outset.
 
@@ -55,7 +55,7 @@ eventually harming what it's part of. Apply the same test here:
 
 - **Add a skill or memory entry because a real, recurring gap justifies it**
   --- not speculatively, not to cover a one-off, and not as a reflex to every
-  session's events. See `avoid-nesting` and the "don't add abstractions beyond
+  session's events. See [`avoid-nesting`](../coding/avoid-nesting.md) and the "don't add abstractions beyond
   what the task requires" rule in this same corpus --- they are this same
   principle applied to code.
 - **Prune as readily as you add.** Run `find-overlap` / `consolidate-skills` /
