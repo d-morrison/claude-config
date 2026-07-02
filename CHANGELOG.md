@@ -12,6 +12,15 @@ behavior change to an existing one), not every mechanical edit.
 
 ## Unreleased
 
+- **`resolve-conflicts` / `post-merge` / `ardi` / `wrap-up`: verify mergeability
+  before acting on it, and catch `UNKNOWN` state** (#378). Cascade conflict
+  scans previously filtered only `mergeable == "CONFLICTING"`, missing PRs
+  stuck in `UNKNOWN` while GitHub finishes computing mergeability, and trusted
+  the flag even when it was stale against a since-advanced `main`.
+  `resolve-conflicts` now documents a non-destructive `git merge-tree
+  --write-tree origin/main origin/<branch>` check as ground truth; the three
+  cascade-scan call sites now treat `UNKNOWN` as a candidate to verify (not
+  skip) and verify before claiming a PR.
 - **`check-history` skill.** New bullet: on a long-lived or foundational
   issue, the issue text and any design-doc status header can lag the code by
   several PRs, so a mature feature may be partly or mostly implemented even

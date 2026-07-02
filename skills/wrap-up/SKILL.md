@@ -49,11 +49,15 @@ git log --oneline -5 origin/main           # what actually landed on main
   check those too — `gh pr list --repo <owner>/<repo> --state open
   --json number,title,headRefName,author,mergeable,mergeStateStatus,comments`.
 - **Merge conflict sweep.** Before closing out, check every open PR's
-  `mergeable` field. For each PR with `mergeable == "CONFLICTING"`, check its
-  claim status (most recent comment) and fix unclaimed ones using the cascade
-  procedure in `post-merge` step 1.5 (claim → isolated worktree → merge main →
-  `resolve-conflicts` skill → push → unclaim). Don't leave conflicting PRs
-  behind when wrapping up — they block whoever works the queue next.
+  `mergeable` field. For each PR with `mergeable == "CONFLICTING"` **or
+  `"UNKNOWN"`** (see `resolve-conflicts`, "Verify before you act" —
+  `UNKNOWN` can mean GitHub hasn't finished computing yet), verify with
+  `git merge-tree --write-tree origin/main origin/<branch>` before acting,
+  then check claim status (most recent comment) and fix confirmed conflicts
+  using the cascade procedure in `post-merge` step 1.5 (claim → isolated
+  worktree → merge main → `resolve-conflicts` skill → push → unclaim). Don't
+  leave conflicting PRs behind when wrapping up — they block whoever works
+  the queue next.
 
 ### 2. Surface anything still open or dangling
 

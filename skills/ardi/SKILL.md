@@ -95,12 +95,16 @@ finding → push → post summary → re-request review → repeat until clean.
    ```bash
    gh pr list --state open --json number,title,headRefName,mergeable,mergeStateStatus,comments
    ```
-   For each PR where `mergeable == "CONFLICTING"`, check claim status (most
-   recent comment) and fix unclaimed ones — same cascade procedure as
-   `post-merge` step 1.5 (claim → isolated worktree → fetch main → merge →
-   `resolve-conflicts` skill → push → unclaim). A merge to `main` during your
-   ARDI loop can create new conflicts in sibling PRs; clearing them while
-   waiting for the next verdict is better than letting them pile up.
+   For each PR where `mergeable == "CONFLICTING"` **or `"UNKNOWN"`** (see
+   `resolve-conflicts`, "Verify before you act" — `UNKNOWN` can mean GitHub
+   hasn't finished computing yet, not that there's no conflict), verify with
+   `git merge-tree --write-tree origin/main origin/<branch>` before acting,
+   then check claim status (most recent comment) and fix unclaimed ones —
+   same cascade procedure as `post-merge` step 1.5 (claim → isolated worktree
+   → fetch main → merge → `resolve-conflicts` skill → push → unclaim). A
+   merge to `main` during your ARDI loop can create new conflicts in sibling
+   PRs; clearing them while waiting for the next verdict is better than
+   letting them pile up.
 
 5. **Post the ARD summary** as a comment on the MR/PR (table format per the
    ARD skill).
@@ -154,12 +158,15 @@ finding → push → post summary → re-request review → repeat until clean.
    runs). Poll every few minutes with `/loop` or a manual re-check:
    ```bash
    gh pr list --state open --json number,title,headRefName,mergeable,mergeStateStatus,comments \
-     --jq '.[] | select(.mergeable == "CONFLICTING")'
+     --jq '.[] | select(.mergeable == "CONFLICTING" or .mergeable == "UNKNOWN")'
    ```
-   Claim and fix any unclaimed conflicts using the cascade procedure in
-   `post-merge` step 1.5. Re-check after each resolution — new ones can
-   appear at any time. This turns idle wait time into productive conflict
-   prevention.
+   Verify each candidate with `git merge-tree --write-tree origin/main
+   origin/<branch>` (see `resolve-conflicts`, "Verify before you act") before
+   claiming — `UNKNOWN` isn't proof of a real conflict, and `CONFLICTING` can
+   be stale if a sibling PR merged since GitHub last computed it. Claim and
+   fix confirmed conflicts using the cascade procedure in `post-merge` step
+   1.5. Re-check after each resolution — new ones can appear at any time.
+   This turns idle wait time into productive conflict prevention.
 
 7. **Repeat from step 2** until the PR/MR is **fully clean** (see *The bar:
    "fully clean"* below — zero findings **and** all CI workflows green **and**

@@ -31,6 +31,39 @@ floor. Don't. **Consolidate, don't choose.**
   conflicts fully"), `clean-branches`' rebase-onto-main step, or a stacked
   `gii` MR. When one of those stops on a conflict, run this.
 
+## Verify before you act — don't trust `mergeable` alone
+
+Before claiming and fixing a PR flagged by a cascade conflict scan
+(`post-merge` step 1.5, `ardi`'s opportunistic sweeps, `wrap-up` step 1), get
+ground truth locally instead of acting on the API field directly:
+
+```bash
+git fetch origin main <branch> -q
+git merge-tree --write-tree origin/main origin/<branch>   # git >=2.38; no worktree/checkout needed
+echo "exit: $?"   # 0 = clean merge (no action needed), nonzero = real conflict, output shows the markers
+```
+
+Two failure modes this catches:
+
+- **`mergeable == "UNKNOWN"` is not "no conflict."** GitHub returns `UNKNOWN`
+  right after a push or a sibling PR's merge, while it's still computing —
+  sometimes for minutes. A cascade scan that filters only
+  `mergeable == "CONFLICTING"` silently skips a PR stuck in `UNKNOWN` even
+  when it's genuinely conflicting. Treat `UNKNOWN` the same as
+  `CONFLICTING`: a candidate to verify, not a PR to skip.
+- **`mergeable == "CONFLICTING"` (or a `dirty` mergeable_state) can itself be
+  stale.** GitHub computes it against whatever `main` snapshot it last saw —
+  if a sibling PR merged since, the flag may still say conflicting even
+  though a fresh merge against current `main` is clean. Acting on a stale
+  flag risks wasted resolution effort. (Seen on ai-config#372: flagged
+  `dirty`, but `git merge-tree` against current `main` came back clean —
+  no manual resolution was needed, just a `git merge` + push.)
+
+If `git merge-tree` exits clean, there's nothing to resolve — skip the PR (or,
+if you want the branch to reflect the now-current `main`, do a plain
+`git merge origin/main && git push`, no conflict markers involved). Only
+proceed to the consolidation procedure below when it reports a real conflict.
+
 ## Core principle: consolidate the best of both branches
 
 Each conflict hunk has three inputs — the common **base**, **our** side, and
