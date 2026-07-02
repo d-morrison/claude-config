@@ -39,6 +39,14 @@ grep ^Version DESCRIPTION
 
 If they match, bump the branch's `Version:` by one patch level before pushing.
 
+**Re-check `main` again right before the final push, not just at the start of
+a merge.** Resolving a conflict (rerunning generators, fixing prose, updating
+a CHANGELOG entry) can take long enough for `main` to advance a second time.
+A `git fetch origin main` immediately before `git push` --- after conflict
+resolution is done, not only before it started --- catches that case; an
+earlier CI failure on a commit you thought was current is a symptom of
+skipping this second check.
+
 **A conflict-free merge does not mean derived artifacts are in sync.** If your
 branch regenerates a generated tree (e.g. `codex-skills/`, a lockfile, rendered
 docs) and `main` added a new *source* input the generator consumes (a new
