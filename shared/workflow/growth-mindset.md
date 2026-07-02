@@ -58,7 +58,7 @@ eventually harming what it's part of. Apply the same test here:
   session's events. See [`avoid-nesting`](../coding/avoid-nesting.md) and the "don't add abstractions beyond
   what the task requires" rule in this same corpus --- they are this same
   principle applied to code.
-- **Prune as readily as you add.** Run `find-overlap` / `consolidate-skills` /
+- **Prune as readily as you add** --- run `find-overlap` / `consolidate-skills` /
   `consolidate-memory` / `prune` when growth has produced duplication or
   drift, so the corpus stays legible rather than sprawling. Uncontrolled
   accretion --- ten near-duplicate skills, a memory file nobody rereads --- is
