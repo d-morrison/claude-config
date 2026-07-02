@@ -17,7 +17,9 @@
 - When "restoring" or reconstructing a full file's content (e.g. re-typing a file you
   fetched earlier in the conversation, or rebuilding it from memory after catching a
   truncation bug), don't trust your own transcription — diff the pushed result against
-  the actual source (`git diff <base>...<head> -- <path>`, or re-fetch and compare) before
+  the actual source (`git diff <base> <head> -- <path>` — two-dot, not three-dot,
+  so it diffs against the branch tip rather than the merge-base — or re-fetch and
+  compare) before
   claiming it's a faithful restoration. A plausible-sounding but invented bullet/section can
   slip in even when you intend to copy real content verbatim, and it reads exactly like a
   genuine hallucination to a reviewer (same failure mode as fabricating a demo — just a
