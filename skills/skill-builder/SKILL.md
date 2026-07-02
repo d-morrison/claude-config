@@ -148,6 +148,21 @@ allowed-tools:               # real skill: list its tools. alias: mirror the can
   `$PATH`. A reader who copies the command without substituting the placeholder
   runs something wrong. Use `<path>`, `<url>`, `<target>` instead. (See
   `memories/tools.md` → "Skill command blocks".)
+- **Every procedural step needs a runnable command, not just prose.** If
+  sibling steps in the same skill show a bash snippet, a step that only
+  describes the action in prose ("rebase to drop the commits") reads as
+  incomplete and invites a reviewer finding. This matters most for a
+  destructive or history-rewriting step that already requires explicit user
+  approval — the user needs to see exactly what they're approving, not infer
+  it. (`stack-prs` #359 round 1: the one step without a concrete command was
+  the abandoned-base-PR rebase.)
+- **Verify a cross-skill claim against the referenced skill's actual
+  mechanics before writing it — don't infer from what would be plausible.**
+  A claim like "skill X uses signal Y to detect Z" needs to be checked against
+  X's real procedure, not assumed from what sounds reasonable. (`stack-prs`
+  #359 round 1: claimed `ardia`'s stacked-PR detection reads the PR body,
+  when `ardia/SKILL.md` actually matches `baseRefName` against `headRefName`
+  — the body note only helps a human scanning the list.)
 
 ## If the skill fans out to subagents
 

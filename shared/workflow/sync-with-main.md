@@ -57,3 +57,16 @@ generator and commit the result whenever main touched the generator's inputs ---
 don't trust the absence of conflicts. (Concretely: merge the PR that adds the
 new skill *first*, then sync the wrapper-regenerating branch and rerun
 `scripts/sync-codex-skill-wrappers.py` before merging it.)
+
+**A CI failure on a brand-new PR's very first commit (e.g. the empty
+claim-commit from `pr-on-claim`) is a signal to check `main`'s position
+before debugging the failure itself.** A local checkout that sat around since
+before the session started can already be many commits behind `main` --- the
+failure (a stale generated-tree check, a requirement `main` since dropped)
+often isn't a real problem with your change at all, just `main` having moved.
+`git fetch origin main && git log --oneline ..origin/main` first; if `main`
+is ahead, merge it in and re-run the checks before treating the failure as
+something to fix in the diff. (`stack-prs` #359: an empty-commit draft PR
+failed `validate` on a stale `codex-skills/` generated tree and a
+since-removed `CHANGELOG.md` requirement --- both were `main` having advanced
+past a checkout that predated the session, not a defect in the new skill.)
