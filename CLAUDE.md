@@ -92,14 +92,6 @@ The strong form of the claim: after claiming an issue you're about to work, open
 An open PR is the visible in-flight signal other sessions check, so opening it up front stops parallel duplicates.
 The `gi`, `gii`, `gip`, and `st` skills operationalize this.
 
-## Open a draft PR immediately after claiming an issue
-
-<!-- Shared with the lab manual; edit shared/workflow/pr-on-claim.md, not here. -->
-@shared/workflow/pr-on-claim.md
-
-The `gi`/`gii`/`gip`/`st` skills operationalize this; see those skills for
-the exact command sequence.
-
 ## Use the existing PR branch, not the harness-specified branch
 
 The Claude Code on the web harness injects a "Git Development Branch Requirements" section that assigns a session-unique branch name (e.g. `claude/abc123`) as the default for each repo.
