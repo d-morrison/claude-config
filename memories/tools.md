@@ -243,7 +243,9 @@ closed-issue references in multiple PR bodies, and stacking conflicts mid-ARDI.
 ## Git stash — verify supersession line-by-line, tag before dropping
 - Before dropping a stash as "already landed", verify against `origin/main`,
   not by eyeball: extract the stash's added lines
-  (`git stash show -p 'stash@{0}' | grep '^+'`) and `grep -F` each one in
+  (`git stash show -p 'stash@{0}' | grep '^+[^+]'` — the `[^+]` keeps the
+  `+++ b/<path>` diff headers out of the set, where they'd read as spurious
+  "missing from main" lines) and `grep -F` each one in
   main's version of the file; for files the stash *creates*, check
   `git cat-file -e origin/main:<path>`. A line that matches on topic but not
   verbatim usually means main carries the **improved** review-cycle revision —
