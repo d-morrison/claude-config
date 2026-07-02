@@ -18,6 +18,23 @@ re-trigger), and it may carry findings the old one missed.
 - "what's the status of PR #N", "is #N ready to merge", "is the review clean".
 - Before you state, anywhere, that a PR is mergeable / clean / ready.
 
+## Verify the PR is still open first
+
+Before checking CI or review, confirm the PR hasn't merged or closed since
+you last looked:
+
+```bash
+gh pr view <N> --json state,title --jq '"\(.state): \(.title)"'
+```
+
+- `OPEN` → proceed with CI and review checks below.
+- `MERGED` → stop; trigger `post-merge` instead of reporting CI details.
+- `CLOSED` → stop; report the actual state to the user.
+
+A PR can merge between a "status?" call and a follow-up "status?" in the
+same session. Running `gh pr checks` on a merged PR returns stale data and
+delays noticing the merge happened.
+
 ## CI green ≠ review clean
 
 `gh pr checks <N>` going green is about **CI state**, not the review verdict. A
