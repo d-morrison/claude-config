@@ -12,6 +12,12 @@ behavior change to an existing one), not every mechanical edit.
 
 ## Unreleased
 
+- **Backtick command-substitution gotcha in `-m`/`--body` strings**
+  (`memories/tools.md`, #306). New bullet: backticks inside a double-quoted
+  `git commit -m`/`gh ... --body` string get command-substituted by the
+  shell, silently mangling the message --- use a single-quoted heredoc or
+  `--body-file` instead. Corrects the `gh pr comment` example to use
+  `--body`, since that subcommand has no `-m` flag.
 - **Session-freshness standing rule** (`CLAUDE.md`, #368). New section "Keep
   ai-config and repo checkouts fresh": in every session, at start and
   periodically during long ones, (a) put the local ai-config checkout back on
