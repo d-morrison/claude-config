@@ -78,11 +78,12 @@ For standing instructions that should always be in context:
 5. **If it's a skill (or a dedicated fan-out worker)** — hand off to
    `spot-skill-opportunities` to judge whether the pattern is genuinely
    recurring (not a one-off), then to `skill-builder` to scaffold a new
-   user-invocable workflow in `~/.claude/skills/`, or to `agent-builder` to
-   scaffold a persistent read-only subagent in `.claude/agents/` when the
-   pattern is really a worker persona a heavy skill's fan-out step needs
-   (symlink to the cloned repo; discover the repo path with
-   `git -C ~/.claude/skills/record-learnings rev-parse --show-toplevel`)
+   user-invocable workflow in `~/.claude/skills/` (symlink to the cloned repo;
+   discover the repo path with
+   `git -C ~/.claude/skills/record-learnings rev-parse --show-toplevel`), or to
+   `agent-builder` to scaffold a persistent read-only subagent in
+   `.claude/agents/` when the pattern is really a worker persona a heavy
+   skill's fan-out step needs
 
 ## Sharing with other agents
 

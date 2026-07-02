@@ -85,8 +85,10 @@ and structure of the three existing agents — they read almost as a template.
   agent's entire purpose is to mutate files (rare — none of the three existing
   agents do). If `Bash` is present without `Edit`/`Write`, say explicitly in the
   `description` that `Bash` could still write and that avoiding write-capable
-  shell commands is instruction-level, not harness-enforced — the existing
-  three all carry this caveat verbatim.
+  shell commands is instruction-level, not harness-enforced — `dependency-auditor`
+  and `hallucination-detector` both carry this caveat (they have `Bash`).
+  `community-demand-scout` sidesteps the issue entirely by omitting `Bash` from
+  `tools:` — prefer that when the agent's job doesn't need shell access at all.
 - **Pair 1:1 with the skill that spawns it.** Name that skill in the opening
   clause of `description` ("Read-only audit pass for check-dependency-updates
   (cdu)").
@@ -136,13 +138,28 @@ agent means updating the **one skill** that spawns it:
 ## Ship it
 
 Agent files and skills both live in the ai-config repo — never local-only.
-Branch + PR + ARDI, the same flow as `skill-builder`:
+Branch + PR + ARDI, the same flow as `skill-builder`.
+
+> **In a worktree session, the same hazard applies as in `skill-builder`'s
+> ship-it:** the repo toplevel below is the MAIN checkout, not your worktree.
+> `~/.claude/skills` symlinks into the main `ai-config` checkout, so `git -C
+> ~/.claude/skills/… rev-parse --show-toplevel` returns the main repo root —
+> often on another session's branch. Don't `cd` there and don't pass that path
+> to Write/Edit. Author `.claude/agents/<name>.md` and the calling skill's
+> `SKILL.md` in your **worktree's own** checkout instead, and confirm with
+> `git branch --show-current` before committing. See `skill-builder`'s ship-it
+> section for the full explanation.
 
 ```bash
 cd "$(git -C ~/.claude/skills/agent-builder rev-parse --show-toplevel)"   # ai-config root
 git fetch origin main && git checkout -b add-<name>-agent origin/main
 # write .claude/agents/<name>.md, and update the one calling skill's SKILL.md
+# The `validate` CI job runs these four — run all four locally before pushing,
+# same as skill-builder — since this also touches the calling skill's SKILL.md:
 python3 scripts/validate-skills.py   # sanity-checks skills/, not agents/ yet — still run it
+python3 scripts/check-links.py       # relative links in the updated calling skill
+python3 scripts/check-vendored-drift.py
+npx --yes markdownlint-cli2@0.22.1   # markdown style on the updated skill's SKILL.md
 git add .claude/agents/<name>.md skills/<calling-skill>/SKILL.md   # stage only what you touched
 git commit -m "agents: add <name> — <summary>"
 git push -u origin HEAD && gh pr create --fill
@@ -171,9 +188,10 @@ Then, as explicit steps:
   actually the spawned agent's prompt or tool-scoping (wrong persona, too-loose
   tools), fix the `.claude/agents/*.md` file via this skill's conventions
   rather than editing the calling skill.
-- **`link-skills`** — the cross-link auditor for skills; when it runs, also
-  check that a skill naming a custom agent keeps that reference paired (the
-  agent's `description` names the calling skill back).
+- **`link-skills`** — the cross-link auditor for skills, though it currently
+  scans only `skills/` and doesn't check `.claude/agents/`. Until it's extended
+  to cover agent files, manually verify that a skill naming a custom agent is
+  named back in that agent's `description`.
 
 ## Anti-patterns
 
