@@ -12,6 +12,13 @@ behavior change to an existing one), not every mechanical edit.
 
 ## Unreleased
 
+- **`check-history` skill.** New bullet: on a long-lived or foundational
+  issue, the issue text and any design-doc status header can lag the code by
+  several PRs, so a mature feature may be partly or mostly implemented even
+  when the issue reads as unstarted. Verify the actual implementation state
+  against the code (routing/dispatch site, tests) before scoping new work,
+  and scope only the genuine remaining slice when the issue is partly done.
+  Caught on sparta #164/#240 (nearly rebuilt already-done work).
 - **`mwc` skill (aliases `merge-when-confident`, `maw`, `merge-at-will`).**
   New session-scoped exception to the standing "merge is human-gated" rule:
   when the user explicitly grants it, I may squash-merge any PR I'm driving
