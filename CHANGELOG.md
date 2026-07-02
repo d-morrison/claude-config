@@ -20,6 +20,13 @@ behavior change to an existing one), not every mechanical edit.
   `preferences.md` — it's requested fresh each time, not a silent default.
   `shared/workflow/ardi.md` cross-links it as the one case where baking a
   self-merge step into a `ScheduleWakeup`/`/loop` prompt is safe.
+- **`wrap-up` skill: closing-signal guidance.** Step 4 now spells out how the
+  final reply should end: an explicit "this session is at a good stopping
+  point" (or similar) when nothing is waiting on the user, or --- when
+  something is open (an ambiguous item, a deadlock, a choice only the user
+  can make) --- the open question(s) last and clearly visible, rather than
+  burying them earlier in a long recap, so the last thing the user reads is
+  the open question, not a trailing summary.
 - **Growth-mindset shared policy** (`shared/workflow/growth-mindset.md`, #353).
   New standing rule: treat a current limitation (missing tool, manual
   workaround, insufficient model) as a starting point to resolve — via

@@ -591,6 +591,19 @@
   enough to cover all of them — don't phrase it around only the first skill you
   edit. (Learned on ai-config#297: a "PR" rule had to be broadened to "PR or
   issue" after it turned out to also apply to `gi`'s issue triage.)
+- When a new skill claims a convention holds across "all N" existing examples
+  (e.g. "the existing three agents all carry this caveat"), check each example
+  individually instead of generalizing from a couple you remember reading —
+  member-by-member verification catches the odd one out that a summary
+  glosses over. (Learned on ai-config#343: `agent-builder` claimed all three
+  existing `.claude/agents/*.md` files carried a Bash-caveat that
+  `community-demand-scout` doesn't have.)
+- Don't describe a sibling skill's current behavior as covering a check it
+  doesn't yet perform (e.g. "`link-skills` also checks X"). State what it
+  actually does today, and phrase the gap as a manual step or a named
+  follow-up, not an implied existing guarantee. (Learned on ai-config#343:
+  `agent-builder` implied `link-skills` already audits agent cross-references
+  when it only scans `skills/`.)
 
 - When a request matches "add/build/create a skill" (skill-builder's own trigger
   phrases), invoke the `skill-builder` skill via the Skill tool rather than
