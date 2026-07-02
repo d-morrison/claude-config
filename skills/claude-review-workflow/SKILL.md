@@ -116,9 +116,9 @@ cancelling its own triggered run — see d-morrison/rme#817.
 
 ### 7. Optional: install a computer algebra system when math verification would help
 
-`apt-packages` / `pip-packages` inputs mirror `claude.yml`'s (both empty by
-default) and let a repo's review job install system/pip packages before the
-review runs — most usefully a CAS (`apt-packages: maxima`, `pip-packages:
+`apt-packages` / `pip-packages` inputs on `claude-code-review.yml` mirror the
+inputs `claude.yml` already had (both empty by default) and let a repo's
+review job install system/pip packages before the review runs — most usefully a CAS (`apt-packages: maxima`, `pip-packages:
 sympy`) so the reviewer's Bash tool can symbolically check a derivation
 instead of eyeballing the algebra. Set these only for repos with substantial
 math-heavy prose (e.g. rme's textbook chapters); most repos need neither.
