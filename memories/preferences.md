@@ -574,6 +574,17 @@
   shared/<dir>/<name>.md, not here. -->` comment on the line immediately before
   the `@shared/...` directive, matching every sibling include. Missing it was
   flagged as a review nit. (Learned on ai-config#297.)
+- The `<!-- Shared with the lab manual -->` comment is aspirational, not a
+  guarantee: check whether the fragment is actually transcluded in
+  `lab-manual`'s matching `.qmd` chapter before asserting it is. On ai-config#336,
+  two of three existing `shared/coding/*.md` fragments carried the comment but
+  were never added to `coding-style.qmd` (only `avoid-nesting.md` was) — the
+  gap survived because the tracking issue (UCD-SERG/lab-manual#328) was closed
+  "completed" with an unchecked follow-up box. Don't let a new PR's scope grow
+  to fix an unrelated pre-existing gap like this; file a follow-up issue
+  instead (UCD-SERG/lab-manual#377) and note it in the PR thread. Also: before closing
+  a checklist-style issue as completed, verify no boxes are left unchecked —
+  an unchecked box under a "completed" issue is invisible to future sweeps.
 - When writing a new shared standing-preference fragment that's wired into more
   than one skill (e.g. a tie-breaker used by both PR-ordering and issue-triage),
   check all the consuming skills first and write the fragment's prose generically
