@@ -580,6 +580,18 @@
   enough to cover all of them — don't phrase it around only the first skill you
   edit. (Learned on ai-config#297: a "PR" rule had to be broadened to "PR or
   issue" after it turned out to also apply to `gi`'s issue triage.)
+- When a new skill claims a convention holds across "all N" existing examples
+  (e.g. "the existing three agents all carry this caveat"), check each example
+  individually instead of generalizing from a couple you remember reading —
+  member-by-member verification catches the odd one out that a summary
+  glosses over. Also don't describe a sibling skill's current behavior as
+  covering a check it doesn't yet perform ("`link-skills` also checks X") —
+  state what it actually does today and phrase the gap as a manual step or a
+  named follow-up, not an implied existing guarantee. (Learned on ai-config#343:
+  `agent-builder` claimed all three existing `.claude/agents/*.md` files carried
+  a Bash-caveat that `community-demand-scout` doesn't have, and separately
+  implied `link-skills` already audits agent cross-references when it only
+  scans `skills/`.)
 
 ## Git author mapping
 - Commits by `dem-extra1` to repos owned by `d-morrison`, `ucd-serg`, or `ucdavis` → the true author is `d-morrison` (demorrison@ucdavis.edu); set `--author="Douglas Morrison <demorrison@ucdavis.edu>"` (or amend) when the committing identity is `dem-extra1`.
