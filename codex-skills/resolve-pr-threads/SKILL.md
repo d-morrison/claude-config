@@ -1,17 +1,17 @@
 ---
-name: "sync"
-description: "Codex wrapper for the ai-config Claude skill `sync`. Alias for `sync-pr-branch`. Sync the current branch with both `main` and its own remote \u2014 fetch origin, merge origin/main and origin/<current-branch> into local, resolve conflicts, run the repo's pre-commit checks, and push. Use when invoked as `/sync`, or on \"sync\", \"sync the branch\", \"sync up\", or before pushing when main or the remote branch may have moved. Use when Codex is asked to use `sync`, `/sync`, or the corresponding ai-config/Claude skill workflow."
+name: "resolve-pr-threads"
+description: "Codex wrapper for the ai-config Claude skill `resolve-pr-threads`. Sweep a PR/MR's inline review threads and resolve only the ones that are already genuinely settled (Addressed-and-pushed, Defer-with-issue-linked, Acknowledged, or a Rebut the reviewer didn't re-raise), leaving anything else open for a full `ard` pass. Use when asked to 'resolve pr threads', 'clean up the threads', 'resolve stale threads', or before re-requesting review so old threads don't carry over. Does not disposition new findings \u2014 that's `ard`'s job. Use when Codex is asked to use `resolve-pr-threads`, `/resolve-pr-threads`, or the corresponding ai-config/Claude skill workflow."
 ---
 
-# sync (Codex wrapper)
+# resolve-pr-threads (Codex wrapper)
 
 This is a generated Codex wrapper around the canonical ai-config Claude skill.
 
-Source: [skills/sync/SKILL.md](../../skills/sync/SKILL.md)
+Source: [skills/resolve-pr-threads/SKILL.md](../../skills/resolve-pr-threads/SKILL.md)
 
 Before acting, read the source skill completely and follow its workflow, adapting it to Codex.
 
-The source lives at `skills/sync/SKILL.md` in the same ai-config checkout as this wrapper. If this wrapper was loaded through `${CODEX_HOME:-$HOME/.codex}/skills/sync`, resolve the symlink target for this wrapper directory first, then read `../../skills/sync/SKILL.md` relative to that real directory. Do not resolve that relative path from inside `${CODEX_HOME:-$HOME/.codex}/skills`, because it points back at the wrapper tree.
+The source lives at `skills/resolve-pr-threads/SKILL.md` in the same ai-config checkout as this wrapper. If this wrapper was loaded through `${CODEX_HOME:-$HOME/.codex}/skills/resolve-pr-threads`, resolve the symlink target for this wrapper directory first, then read `../../skills/resolve-pr-threads/SKILL.md` relative to that real directory. Do not resolve that relative path from inside `${CODEX_HOME:-$HOME/.codex}/skills`, because it points back at the wrapper tree.
 
 - Treat `user-invocable` and `allowed-tools` as Claude metadata, not Codex permissions.
 - Use the tools available in this Codex session for equivalent operations.
@@ -28,7 +28,6 @@ run the CLI command. Full per-model reference: [tool-mappings.md](../../tool-map
 | --- | --- | --- | --- |
 | `VIEW_PR` | Read a pull request's details and metadata. | `gh pr view <N>` | `mcp__github__pull_request_read (method=get)` |
 | `LIST_PRS` | List pull requests. | `gh pr list` | `mcp__github__list_pull_requests` |
-| `SEARCH_PRS` | Search pull requests by keyword / query string. | `gh pr list --search "<query>"` | `mcp__github__search_pull_requests` |
 | `DIFF_PR` | Read a pull request's diff. | `gh pr diff <N>` | `mcp__github__pull_request_read (method=get_diff)` |
 | `PR_CHECKS` | Read a pull request's CI check / status results. | `gh pr checks <N>` | `mcp__github__pull_request_read (method=get_check_runs)` |
 | `CREATE_PR` | Open a new pull request. | `gh pr create` | `mcp__github__create_pull_request` |

@@ -73,6 +73,10 @@ operations:
     description: Reply to an inline pull-request review comment.
     cli: gh api (reply to review comment)
     github_mcp: mcp__github__add_reply_to_pull_request_comment
+  - id: RESOLVE_REVIEW_THREAD
+    description: Mark an inline pull-request review thread as resolved.
+    cli: gh api graphql (resolveReviewThread)
+    github_mcp: mcp__github__resolve_review_thread
   - id: WATCH_PR
     description: Subscribe to / unsubscribe from a pull request's activity.
     cli: (no CLI equivalent)

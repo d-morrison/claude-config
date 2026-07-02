@@ -25,6 +25,7 @@ Most skills also respond to plain-English triggers listed in their `description`
 |-------|---------|--------------|
 | [`ardi`](skills/ardi/SKILL.md) | `dc`, `drive`, `clean`, `iterate` | Read the latest review, address/rebut/defer every finding, push, re-request review — loop until clean |
 | [`ard`](skills/ard/SKILL.md) | `adr` | Single ARD pass: address, rebut, defer, or acknowledge — without the iterate loop |
+| [`resolve-pr-threads`](skills/resolve-pr-threads/SKILL.md) | | Resolve inline review threads that are already settled, without a full ARD pass |
 | [`claim-pr`](skills/claim-pr/SKILL.md) | | Post a "paws off" comment before a work session; unclaim when done |
 | [`request-pr-review`](skills/request-pr-review/SKILL.md) | | Add a human reviewer and @-mention them with context |
 | [`pr-status`](skills/pr-status/SKILL.md) | | Report the current PR's CI and review state |
@@ -95,4 +96,4 @@ Most skills also respond to plain-English triggers listed in their `description`
 
 ## Full skill list
 
-All 112+ canonical skills are in [`skills/`](https://github.com/d-morrison/ai-config/tree/main/skills) on GitHub. Generated Codex wrappers live in [`codex-skills/`](https://github.com/d-morrison/ai-config/tree/main/codex-skills). Each canonical `SKILL.md` has a `description` field that lists the trigger phrases and a full procedure.
+All 132+ canonical skills are in [`skills/`](https://github.com/d-morrison/ai-config/tree/main/skills) on GitHub. Generated Codex wrappers live in [`codex-skills/`](https://github.com/d-morrison/ai-config/tree/main/codex-skills). Each canonical `SKILL.md` has a `description` field that lists the trigger phrases and a full procedure.
