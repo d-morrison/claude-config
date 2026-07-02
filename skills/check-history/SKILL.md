@@ -46,10 +46,10 @@ checks (skipping them wastes a whole issue-pick):
   implemented even when the issue reads as unstarted. The work can land across
   sibling PRs that never updated this issue or that header. Before scoping
   *new* code, verify the **actual implementation state against the code**:
-  read the routing/dispatch site and the test files for the feature, not just
+  read the key source files implementing the feature and the test files, not just
   the issue body. (Seen on sparta: issue #164 / #240 read as "phase 4b not
   done", but the core feature was already fully implemented and tested across
-  sibling PRs — nearly built already-done work. The right move was to audit,
+  sibling PRs — nearly rebuilt already-completed work. The right move was to audit,
   correct the stale issue/doc status, and pick the genuine next slice.)
 
 If an open PR already covers it, **drive that PR to clean** instead of
