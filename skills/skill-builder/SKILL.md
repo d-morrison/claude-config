@@ -147,6 +147,18 @@ allowed-tools:               # real skill: list its tools. alias: mirror the can
   an invented one. (`push-memory` #311 hit this: `mcp__github__create_branch` and
   `mcp__github__push_files` were real but unregistered, and the first review round
   flagged both.)
+- **Grep-verify any citation to `CLAUDE.md`, a `shared/` fragment, or an
+  "existing convention/scale" before writing it into new skill prose** — not
+  only when auditing someone else's text. A skill being authored is new
+  content too, and the same failure `purge-hallucinations` catches in other
+  authors' text (a citation that reads as authoritative but doesn't resolve)
+  is just as easy to introduce while writing your own. `grep -rn "<exact
+  phrase>" CLAUDE.md shared/` before the sentence ships, especially for
+  "mirrors the scale already used" / "per CLAUDE.md's ..." phrasing — that
+  pattern claims unverified precedent. (`check-info-quality` #349 shipped
+  both: a `CLAUDE.md` section citation that didn't exist, and a claimed
+  "blocking/nit/optional" severity scale the cited doc never defined — both
+  caught by the `@claude` reviewer, not by the skill's author.)
 - **Use `<angle-bracket>` placeholders in command blocks — never bare ALLCAPS.**
   Identifiers like `PATH`, `URL`, `TARGET` look like shell env vars; bare `PATH`
   looks like the `$PATH` env var, and `path` is a zsh special that mirrors
@@ -308,6 +320,9 @@ Then, as their own explicit steps (don't leave them buried in a comment):
 - ❌ Bumping `skills.qmd`'s skill count by a manual +1 instead of re-deriving it
   from `ls -d skills/*/ | wc -l` — it drifts whenever `main` gains other skills
   mid-review (`resolve-pr-threads` #347).
+- ❌ Citing a `CLAUDE.md` section or an "existing scale/convention" in new
+  skill prose without grepping to confirm it actually exists first
+  (`check-info-quality` #349).
 - ❌ Leaving the new skill as a local-only uncommitted file (or pushing direct to main).
 - ❌ In a worktree session, writing the skill files to the `rev-parse --show-toplevel`
   path — it resolves to the main checkout (via the `~/.claude/skills` symlink), not
