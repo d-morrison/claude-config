@@ -69,7 +69,9 @@ each to a clean review verdict in series.
    reason to pause the sweep: merging is human-gated (you don't self-merge), but
    that gates only the merge — move straight to the next PR rather than waiting
    for a human to merge first. See
-   [`stack-dont-pause`](../../shared/workflow/stack-dont-pause.md).
+   [`stack-dont-pause`](../../shared/workflow/stack-dont-pause.md), and use
+   [`stack-prs`](../stack-prs/SKILL.md) for the branch/PR mechanics when the
+   next item needs to stack on a clean-but-unmerged PR.
 
    Drive each to a terminal state:
    - **Clean** — zero flagged items under any heading; post the unclaim

@@ -131,6 +131,12 @@ report first.
 - **`prose-fact-checker` agent** — the read-only, parallelizable version of
   step 2–4 above, for fanning claim-checking out across a `Workflow` when a
   document has many independent claims to verify at once.
+- **`check-info-quality` (`ciq`)** — this skill verdicts a claim
+  **Accurate / Inaccurate**; `ciq`'s check C catches a claim that's accurate
+  by this skill's own standard yet still misleads (missing context,
+  cherry-picking, a citation that only weakly supports it). `ciq` also
+  covers two failure modes this skill doesn't: stale claims (check A) and
+  irrelevant content (check B). Run both.
 
 ## Anti-patterns
 
