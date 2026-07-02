@@ -388,6 +388,11 @@ run.
 <!-- Vendored from UCD-SERG/lab-manual; edit there, not here. See README, "Shared content". -->
 @shared/vendored/copilot-review-before-human.md
 
+## Growth mindset: seek resources rather than accept limitations
+
+<!-- Edit shared/workflow/growth-mindset.md, not here. -->
+@shared/workflow/growth-mindset.md
+
 ## Keep CHANGELOG.md current
 
 Every PR that adds or changes a skill, agent, or shared policy needs a
