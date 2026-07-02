@@ -41,6 +41,10 @@ operations:
     description: List pull requests.
     cli: gh pr list
     github_mcp: mcp__github__list_pull_requests
+  - id: SEARCH_PRS
+    description: Search pull requests by keyword / query string.
+    cli: gh pr list --search "<query>"
+    github_mcp: mcp__github__search_pull_requests
   - id: DIFF_PR
     description: Read a pull request's diff.
     cli: gh pr diff <N>
@@ -69,6 +73,10 @@ operations:
     description: Reply to an inline pull-request review comment.
     cli: gh api (reply to review comment)
     github_mcp: mcp__github__add_reply_to_pull_request_comment
+  - id: RESOLVE_REVIEW_THREAD
+    description: Mark an inline pull-request review thread as resolved.
+    cli: gh api graphql (resolveReviewThread)
+    github_mcp: mcp__github__resolve_review_thread
   - id: WATCH_PR
     description: Subscribe to / unsubscribe from a pull request's activity.
     cli: (no CLI equivalent)

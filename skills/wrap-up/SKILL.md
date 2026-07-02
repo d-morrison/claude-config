@@ -77,18 +77,36 @@ List, don't bury:
   the explicit `TZ` enforces PT on a machine set to any other zone) so "as of
   when" is unambiguous when the user re-reads it later.
 
-### 4. Run a UMS review
+### 4. Run a UMS review, then close with the right signal
 
 Run the full `ums` procedure (invoke the `ums` skill by name): scan the session
-for mistakes-corrected, new user preferences, tool quirks, and skill gaps;
-update the relevant memory files and skill definitions; commit via a **branch +
-PR** (not direct to `main`). If nothing durable emerged, say so explicitly
-rather than manufacturing edits.
+for mistakes-corrected, new user preferences, tool quirks, and skill gaps —
+including whether `spot-skill-opportunities` flagged a recurring pattern
+during the session that's still unbuilt; update the relevant memory files and
+skill definitions; commit via a **branch + PR** (not direct to `main`). If
+nothing durable emerged, say so explicitly rather than manufacturing edits.
+
+**Then close the reply correctly, depending on whether anything is waiting on
+the user:**
+
+- **Nothing open** — end with an explicit stopping-point signal, e.g. "This
+  session is at a good stopping point." A silent trailing summary leaves the
+  user unsure whether you're actually done or just paused.
+- **Something open** — an ambiguous review item, a deadlock needing a human
+  reviewer, a choice only the user can make — do **not** claim a stopping
+  point. End the reply **with the open question(s)**, last and clearly
+  visible, rather than burying them earlier in a long recap. The last thing
+  the user reads should be the thing you need from them.
+
+## Relationship to other skills
+
+- **`record-learnings`** (continuous) and **`ums`** (the learnings checkpoint,
+  which this embeds as step 4) — `wrap-up` is their session-level bookend.
+- **`spot-skill-opportunities`** — step 4's UMS pass checks whether it flagged
+  a recurring pattern during the session that's still unbuilt.
 
 ## Notes
 
 - Wrap-up reports PR/issue state and, where needed, resolves merge conflicts
   in unclaimed conflicting PRs (step 1). It does **not** merge PRs — merging
   stays the user's call unless they ask.
-- This is the session-level bookend to `record-learnings` (continuous) and
-  `ums` (the learnings checkpoint, which this embeds as step 4).

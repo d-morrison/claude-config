@@ -272,3 +272,31 @@ Hit across ucdavis/bcs#264 (the snapr-based `expect_snapshot_data` suite):
   from a zero-risk group at small n. Muffle expected small-sample warnings in
   BOTH the package source (a `suppress_*_warnings()` helper wrapping the fit
   chain) AND the test helper, matching every pattern the fits actually emit.
+
+## A push-to-main-only workflow can't fail a PR — add a static PR guard when you fix one
+A workflow that triggers only on `push:` to `main` (deploy/publish/release jobs)
+never runs on pull requests, so a bug it would catch stays invisible until after
+merge — and then it fails on `main`, where no one is watching a specific PR.
+Hit on d-morrison/rme#966/#967: the Quarto **publish** workflow (push-to-main
+only) went red the moment the concept-map appendix merged and stayed red for two
+days across several later merges, because no PR ever ran the full multi-format
+website render that collides.
+
+When you fix such a post-merge-only failure, don't stop at the fix — add a
+**cheap static check that runs on `pull_request`** so the bug class can't regress
+unnoticed. It needn't reproduce the whole heavy job; a few seconds of parsing
+that asserts the invariant is enough. d-morrison/rme#970 added `check-render-headers`, a
+~120-line Python + PyYAML script that asserts "no two of a render-list page's
+formats resolve to the same output file," runs in ~8s, and would have caught the
+original bug at PR time. Prevention (fix the scaffolder/template that emits the
+bad input) and enforcement (the PR guard) are complementary — ship both.
+
+## Reproduce heavy-tool project bugs minimally
+The Quarto
+`safeMoveSync`/`renderProject` `rename '<stem>.html' -> No such file` collision
+reproduced in an R-free, LaTeX-free two-file website project (`format: {html,
+revealjs}`, one page missing the revealjs `output-file` rename so revealjs and
+html both write `<stem>.html`) in seconds. When a full render/build is too heavy
+to run in the sandbox, strip the failing behavior down to the smallest project
+that still triggers it — it confirms both the diagnosis and the fix far faster
+than the real pipeline, and becomes the negative test for the guard.

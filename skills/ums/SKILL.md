@@ -114,7 +114,12 @@ reflect, and persist.
   without agent-doc infrastructure, fall back to that repo's local Claude project
   memory: `~/.claude/projects/<project-path>/memory/` (write directly; no commit).
 - [ ] Did the user express a new preference? → `/memories/preferences.md`
-- [ ] Did a workflow emerge that could be a new skill? → Create it
+- [ ] Did a workflow emerge that could be a new skill? → run `spot-skill-opportunities`
+  to judge whether it's genuinely recurring, then `skill-builder` to create it
+- [ ] Did a heavy skill's fan-out step need a dedicated read-only worker persona
+  (like `dependency-auditor` / `hallucination-detector` / `community-demand-scout`),
+  rather than just a new skill? → run `agent-builder` to scaffold
+  `.claude/agents/<name>.md`
 - [ ] Are there existing skills that reference outdated info? → Fix them
 - [ ] Did I edit one step's scope without updating sibling steps in the same file? →
   Search the file for all enumerations of the changed category and make them consistent.
@@ -128,6 +133,13 @@ reflect, and persist.
 
 Both write to the same destinations. UMS is for when you forgot to
 record-as-you-go, or when the user wants to ensure nothing was missed.
+
+`spot-skill-opportunities` is the standing, continuous version of this
+skill's "did a workflow emerge that could be a new skill?" checklist item —
+it runs the recognition judgment call live, in the moment, instead of only
+at this checkpoint. `agent-builder` is the sibling construction step for the
+other checklist item above — a recurring fan-out worker persona rather than a
+new user-invocable skill.
 
 ## Anti-patterns
 

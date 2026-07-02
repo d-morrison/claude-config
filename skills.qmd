@@ -25,10 +25,12 @@ Most skills also respond to plain-English triggers listed in their `description`
 |-------|---------|--------------|
 | [`ardi`](skills/ardi/SKILL.md) | `dc`, `drive`, `clean`, `iterate` | Read the latest review, address/rebut/defer every finding, push, re-request review — loop until clean |
 | [`ard`](skills/ard/SKILL.md) | `adr` | Single ARD pass: address, rebut, defer, or acknowledge — without the iterate loop |
+| [`resolve-pr-threads`](skills/resolve-pr-threads/SKILL.md) | | Resolve inline review threads that are already settled, without a full ARD pass |
 | [`claim-pr`](skills/claim-pr/SKILL.md) | | Post a "paws off" comment before a work session; unclaim when done |
 | [`request-pr-review`](skills/request-pr-review/SKILL.md) | | Add a human reviewer and @-mention them with context |
 | [`pr-status`](skills/pr-status/SKILL.md) | | Report the current PR's CI and review state |
 | [`pr-status-all`](skills/pr-status-all/SKILL.md) | | Report status across all open PRs |
+| [`stack-prs`](skills/stack-prs/SKILL.md) | | Branch a new PR off an unmerged base PR, keep it in sync, and re-target it to `main` once the base merges |
 
 ### Issue management
 
@@ -48,6 +50,7 @@ Most skills also respond to plain-English triggers listed in their `description`
 |-------|---------|--------------|
 | [`sync-pr-branch`](skills/sync-pr-branch/SKILL.md) | `sync`, `merge-main`, `resync-branch` | Fetch origin, merge main into the branch, push |
 | [`merge-it`](skills/merge-it/SKILL.md) | `merged` | Squash-merge a ready PR, then run post-merge cleanup |
+| [`mwc`](skills/mwc/SKILL.md) | `merge-when-confident`, `maw`, `merge-at-will` | Grant session-scoped permission to merge fully-clean PRs without asking per PR |
 | [`post-merge`](skills/post-merge/SKILL.md) | | After a merge: checkout main, pull, delete branch, run UMS |
 | [`clean-branches`](skills/clean-branches/SKILL.md) | `prune` | Delete local branches already merged or closed |
 
@@ -67,6 +70,7 @@ Most skills also respond to plain-English triggers listed in their `description`
 |-------|---------|--------------|
 | [`use-preferred-style`](skills/use-preferred-style/SKILL.md) | `style` | Apply the plain-prose writing guide to a draft |
 | [`find-ai-tells`](skills/find-ai-tells/SKILL.md) | `ai-tells` | Scan text for AI-sounding patterns and flag them |
+| [`fact-check-prose`](skills/fact-check-prose/SKILL.md) | `fcp` | Check prose claims, reasoning, and computed values against sources and rendered output |
 | [`tidy`](skills/tidy/SKILL.md) | | Clean up code or prose without changing behavior |
 | [`simplify`](skills/simplify/SKILL.md) | | Reduce a file or function to its essential parts |
 
@@ -89,7 +93,9 @@ Most skills also respond to plain-English triggers listed in their `description`
 | [`session-lock`](skills/session-lock/SKILL.md) | `deconflict-sessions` | Register/deregister this session to prevent parallel clobbering |
 | [`handoff`](skills/handoff/SKILL.md) | `wrap-up` | Summarize context and open items so another session can pick up |
 | [`select-model`](skills/select-model/SKILL.md) | `model-fit`, `assess-model-fit` | Choose the right Claude model for the task at hand |
+| [`prompt-me`](skills/prompt-me/SKILL.md) | `pm` | Surface the single most pressing open question (or top N) waiting on user input |
+| [`prompt-me-all`](skills/prompt-me-all/SKILL.md) | `pma` | Restate every open question still waiting on user input, uncapped |
 
 ## Full skill list
 
-All 112+ canonical skills are in [`skills/`](https://github.com/d-morrison/ai-config/tree/main/skills) on GitHub. Generated Codex wrappers live in [`codex-skills/`](https://github.com/d-morrison/ai-config/tree/main/codex-skills). Each canonical `SKILL.md` has a `description` field that lists the trigger phrases and a full procedure.
+All 132+ canonical skills are in [`skills/`](https://github.com/d-morrison/ai-config/tree/main/skills) on GitHub. Generated Codex wrappers live in [`codex-skills/`](https://github.com/d-morrison/ai-config/tree/main/codex-skills). Each canonical `SKILL.md` has a `description` field that lists the trigger phrases and a full procedure.

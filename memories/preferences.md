@@ -137,14 +137,10 @@
 - Before opening a PR, read the repo's own agent/contributor instructions (CLAUDE.md →
   the canonical reference it points to, e.g. `.github/copilot-instructions.md` / CONTRIBUTING)
   and front-load the required pre-PR housekeeping in the FIRST commit instead of discovering it
-  via red CI. For R packages this means a NEWS.md entry AND a DESCRIPTION dev-version bump
-  (`usethis::use_version()`) even for a docs-only / vignette-only change — the changelog-check
-  and version-check jobs fail otherwise (opt-out labels `no changelog` / `no version
-  increment` exist for non-user-visible PRs, but the default is to do the bump). NEWS.md prose is spell-checked too,
-  so keep it to words already in `inst/WORDLIST` or add new terms there. Also re-check the
-  version after merging `main` mid-PR: if a commit on `main` already bumped the version to
-  match the branch, the version-check CI will fail again — run `usethis::use_version("dev")`
-  once more so the branch stays ahead.
+  via red CI. For R packages this means a NEWS.md entry AND a `usethis::use_version()`
+  DESCRIPTION dev-version bump, even for a docs-only / vignette-only change — see
+  `tools.md`'s "R-package PR CI gates" section for the full changelog-check /
+  version-check / spellcheck / opt-out-label details.
 - In the HACtions repo, use the `test.hac` project/group as a test bed (always).
 - After an iterate loop completes, ALWAYS create follow-up issues for every deferred/acknowledged
   item before reporting done. Never leave deferred items untracked.
@@ -464,6 +460,8 @@
   `handoff` and `wait-for-results` skills.
 - Always look for opportunities to create new reusable skills from multi-step processes.
   When a workflow emerges that could be codified, proactively suggest creating a skill for it.
+  (see the `spot-skill-opportunities` skill — the continuous recognition step that hands off
+  to `skill-builder`.)
 - When asked to build/create a new skill, FIRST check whether an existing skill should be
   extended instead — search `skills/` for an adjacent one AND scan ALL branches (`git ls-tree`
   over every remote branch) for in-flight similar work — before scaffolding a new one. Prefer
@@ -572,12 +570,58 @@
   shared/<dir>/<name>.md, not here. -->` comment on the line immediately before
   the `@shared/...` directive, matching every sibling include. Missing it was
   flagged as a review nit. (Learned on ai-config#297.)
+- The `<!-- Shared with the lab manual -->` comment is aspirational, not a
+  guarantee: check whether the fragment is actually transcluded in
+  `lab-manual`'s matching `.qmd` chapter before asserting it is. On ai-config#336,
+  two of three existing `shared/coding/*.md` fragments carried the comment but
+  were never added to `coding-style.qmd` (only `avoid-nesting.md` was) — the
+  gap survived because the tracking issue (UCD-SERG/lab-manual#328) was closed
+  "completed" with an unchecked follow-up box. Don't let a new PR's scope grow
+  to fix an unrelated pre-existing gap like this; file a follow-up issue
+  instead (UCD-SERG/lab-manual#377) and note it in the PR thread. Also: before closing
+  a checklist-style issue as completed, verify no boxes are left unchecked —
+  an unchecked box under a "completed" issue is invisible to future sweeps.
 - When writing a new shared standing-preference fragment that's wired into more
   than one skill (e.g. a tie-breaker used by both PR-ordering and issue-triage),
   check all the consuming skills first and write the fragment's prose generically
   enough to cover all of them — don't phrase it around only the first skill you
   edit. (Learned on ai-config#297: a "PR" rule had to be broadened to "PR or
   issue" after it turned out to also apply to `gi`'s issue triage.)
+- When a new skill claims a convention holds across "all N" existing examples
+  (e.g. "the existing three agents all carry this caveat"), check each example
+  individually instead of generalizing from a couple you remember reading —
+  member-by-member verification catches the odd one out that a summary
+  glosses over. (Learned on ai-config#343: `agent-builder` claimed all three
+  existing `.claude/agents/*.md` files carried a Bash-caveat that
+  `community-demand-scout` doesn't have.)
+- Don't describe a sibling skill's current behavior as covering a check it
+  doesn't yet perform (e.g. "`link-skills` also checks X"). State what it
+  actually does today, and phrase the gap as a manual step or a named
+  follow-up, not an implied existing guarantee. (Learned on ai-config#343:
+  `agent-builder` implied `link-skills` already audits agent cross-references
+  when it only scans `skills/`.)
+
+- When a request matches "add/build/create a skill" (skill-builder's own trigger
+  phrases), invoke the `skill-builder` skill via the Skill tool rather than
+  freehand-implementing the scaffold-and-ship flow. Skill-builder encodes steps
+  that are easy to skip when done ad hoc: the extend-first check, running the
+  four local validation scripts (`validate-skills.py`, `check-links.py`,
+  `check-vendored-drift.py`, `markdownlint-cli2`) before pushing, registering
+  any cited MCP tool in `tool-mappings.yml`, updating `skills.qmd`'s count from
+  the actual `skills/` directory count (not a manual +1), cross-linking related
+  skills, and explicitly requesting `d-morrison` as reviewer. (Learned on
+  ai-config#338 — the `prompt-me`/`pm` skill was built and shipped without
+  invoking `skill-builder`, so none of those steps ran; CI happened to catch
+  what the scripts would have. Reinforced on ai-config#347 — `resolve-pr-threads`
+  was hand-authored and needed a review round to catch a `tool-mappings.yml`
+  gap `skill-builder` already documented from a near-identical miss in
+  `push-memory` #311.)
+- Claim a PR before pushing iterative commits to it, even when you opened the
+  PR yourself in the same session — this repo's `@claude` review workflow can
+  fire and interleave with an in-flight push. Post the "paws off" comment from
+  `claim-pr` right after opening the PR, not just for PRs you're joining
+  mid-flight. (Missed on ai-config#338: several commits were pushed across an
+  ARDI-style review loop with no claim comment posted.)
 
 ## Git author mapping
 - Commits by `dem-extra1` to repos owned by `d-morrison`, `ucd-serg`, or `ucdavis` → the true author is `d-morrison` (demorrison@ucdavis.edu); set `--author="Douglas Morrison <demorrison@ucdavis.edu>"` (or amend) when the committing identity is `dem-extra1`.

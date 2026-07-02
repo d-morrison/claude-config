@@ -1,6 +1,6 @@
 ---
 name: skill-builder
-description: "Build a new skill for the ai-config repo the right way — FIRST check whether an existing skill should be extended instead (search skills/ AND scan every branch for in-flight similar work), and only then scaffold skills/<name>/SKILL.md with proper frontmatter, a discoverable trigger-rich description, a spelled-out/short alias as appropriate, cross-links, and (if it encodes a standing rule) matching preferences.md / CLAUDE.md updates — shipped via branch + PR, reviewer requested, ARDI'd to clean. Use when asked to 'build a skill', 'create a skill', 'make a new skill', 'add a skill', or 'skill-builder'."
+description: "Build a new skill for the ai-config repo the right way — FIRST check whether an existing skill should be extended instead (search skills/, scan every branch for in-flight similar work, AND check open PRs for in-progress drafts to redirect to instead of duplicating), and only then scaffold skills/<name>/SKILL.md with proper frontmatter, a discoverable trigger-rich description, a spelled-out/short alias as appropriate, cross-links, and (if it encodes a standing rule) matching preferences.md / CLAUDE.md updates — shipped via branch + PR, reviewer requested, ARDI'd to clean. Use when asked to 'build a skill', 'create a skill', 'make a new skill', 'add a skill', or 'skill-builder'."
 user-invocable: true
 allowed-tools:
   - Bash
@@ -62,7 +62,11 @@ Rule out extending an existing skill *before* scaffolding anything:
    If a branch or worktree is already building it, **continue that work** (check
    it out / extend its PR) instead of opening a colliding parallel branch.
 
-3. **Decide explicitly: extend (preferred) or new.** State which and why before
+3. **Check open PRs too** — a branch scan misses work already pushed and
+   opened as a PR if you never fetched it. See
+   [`check-open-prs-before-duplicating`](../../shared/workflow/check-open-prs-before-duplicating.md).
+
+4. **Decide explicitly: extend (preferred) or new.** State which and why before
    writing a line. A new alias or section almost always beats a whole new skill.
 
 ## Anatomy of a skill
@@ -126,6 +130,11 @@ allowed-tools:               # real skill: list its tools. alias: mirror the can
 - **No registry to update.** Skills are auto-discovered from `skills/` (the
   bootstrap symlink and the plugin root both read the directory) — adding the
   directory is enough.
+- **List it in `skills.qmd` if it belongs in one of the category tables**, and
+  bump the "All N+ canonical skills" count at the bottom to the **actual**
+  directory count (`ls -d skills/*/ | wc -l`), not a manual +1 — `main` often
+  gains other skills while your PR is in review, so a hand-incremented count
+  drifts and reads as stale by the time you merge (ai-config#347).
 - **Register any new tool the skill names.** Discovery needs no registry, but
   tool *references* do. If the procedure names a **GitHub MCP tool or `gh`/`git`
   operation not already in `tool-mappings.yml`** (grep it to check), verify the
@@ -138,12 +147,39 @@ allowed-tools:               # real skill: list its tools. alias: mirror the can
   an invented one. (`push-memory` #311 hit this: `mcp__github__create_branch` and
   `mcp__github__push_files` were real but unregistered, and the first review round
   flagged both.)
+- **Grep-verify any citation to `CLAUDE.md`, a `shared/` fragment, or an
+  "existing convention/scale" before writing it into new skill prose** — not
+  only when auditing someone else's text. A skill being authored is new
+  content too, and the same failure `purge-hallucinations` catches in other
+  authors' text (a citation that reads as authoritative but doesn't resolve)
+  is just as easy to introduce while writing your own. `grep -rn "<exact
+  phrase>" CLAUDE.md shared/` before the sentence ships, especially for
+  "mirrors the scale already used" / "per CLAUDE.md's ..." phrasing — that
+  pattern claims unverified precedent. (`check-info-quality` #349 shipped
+  both: a `CLAUDE.md` section citation that didn't exist, and a claimed
+  "blocking/nit/optional" severity scale the cited doc never defined — both
+  caught by the `@claude` reviewer, not by the skill's author.)
 - **Use `<angle-bracket>` placeholders in command blocks — never bare ALLCAPS.**
   Identifiers like `PATH`, `URL`, `TARGET` look like shell env vars; bare `PATH`
   looks like the `$PATH` env var, and `path` is a zsh special that mirrors
   `$PATH`. A reader who copies the command without substituting the placeholder
   runs something wrong. Use `<path>`, `<url>`, `<target>` instead. (See
   `memories/tools.md` → "Skill command blocks".)
+- **Every procedural step needs a runnable command, not just prose.** If
+  sibling steps in the same skill show a bash snippet, a step that only
+  describes the action in prose ("rebase to drop the commits") reads as
+  incomplete and invites a reviewer finding. This matters most for a
+  destructive or history-rewriting step that already requires explicit user
+  approval — the user needs to see exactly what they're approving, not infer
+  it. (`stack-prs` #359 round 1: the one step without a concrete command was
+  the abandoned-base-PR rebase.)
+- **Verify a cross-skill claim against the referenced skill's actual
+  mechanics before writing it — don't infer from what would be plausible.**
+  A claim like "skill X uses signal Y to detect Z" needs to be checked against
+  X's real procedure, not assumed from what sounds reasonable. (`stack-prs`
+  #359 round 1: claimed `ardia`'s stacked-PR detection reads the PR body,
+  when `ardia/SKILL.md` actually matches `baseRefName` against `headRefName`
+  — the body note only helps a human scanning the list.)
 
 ## If the skill fans out to subagents
 
@@ -157,6 +193,13 @@ restated inside the subagent prompt, not assumed inherited. Keep the cheap,
 once-per-run setup in the orchestrator — enumerate the work items there, and pass
 down the per-item data the orchestrator already holds so each subagent doesn't
 re-fetch it. `pr-status-all` is the worked example.
+
+If the same worker persona would be spawned by more than one call site, or the
+fan-out step needs a harness-enforced tool boundary an inline prompt can't
+guarantee (e.g. a detection pass that must never be able to write), promote it
+to a **persistent** `.claude/agents/<name>.md` subagent instead of an inline
+prompt — hand off to `agent-builder` for that. `dependency-auditor`,
+`hallucination-detector`, and `community-demand-scout` are the worked examples.
 
 ## If the skill encodes a standing rule
 
@@ -235,6 +278,10 @@ Then, as their own explicit steps (don't leave them buried in a comment):
 
 ## Relationship to other skills
 
+- **`spot-skill-opportunities`** — the recognition step that runs before this
+  one: it notices, continuously and in the moment, that a pattern is
+  skill-shaped and hands off here to build it. `ums` / `record-learnings`
+  route through it too rather than judging recurrence themselves.
 - **`ums` / `record-learnings`** — when a session reveals a workflow worth
   codifying, they hand off to this skill to build it.
 - **`memorize` / `remember`** — for a one-line fact or preference (not a
@@ -247,6 +294,10 @@ Then, as their own explicit steps (don't leave them buried in a comment):
   them into one canonical skill plus alias stubs.
 - **`heal-skill`** — the repair counterpart: this skill authors a skill,
   `heal-skill` fixes one that misfired after it shipped.
+- **`agent-builder`** — the subagent-file counterpart: this skill authors
+  user-invocable workflows in `skills/`; `agent-builder` authors the
+  persistent, read-only fan-out worker personas a heavy skill's subagent step
+  can promote to `.claude/agents/<name>.md`.
 - **`link-skills`** — this skill cross-links the one skill it authors;
   `link-skills` is the corpus-wide audit that catches cross-reference gaps a
   single authoring pass missed.
@@ -255,6 +306,8 @@ Then, as their own explicit steps (don't leave them buried in a comment):
 
 - ❌ Creating a new skill when an existing one should be extended (skipping step 0).
 - ❌ Not scanning other branches → colliding parallel work / duplicate skills.
+- ❌ Not checking open PRs → building a second draft of a skill someone already
+  pushed and opened a PR for, instead of redirecting to it.
 - ❌ Duplicating canonical content across alias files (aliases must only redirect).
 - ❌ A thin description with no trigger phrases — the skill never gets discovered.
 - ❌ In a subagent-fanning skill, writing the subagent prompt as if it inherits
@@ -263,7 +316,13 @@ Then, as their own explicit steps (don't leave them buried in a comment):
 - ❌ Encoding a standing rule in the skill but not in `preferences.md`.
 - ❌ Naming a GitHub MCP tool (or `gh`/`git` operation) the skill uses without
   registering it in `tool-mappings.yml` — the reviewer flags the unregistered
-  name as a possible hallucination (`push-memory` #311).
+  name as a possible hallucination (`push-memory` #311, `resolve-pr-threads` #347).
+- ❌ Bumping `skills.qmd`'s skill count by a manual +1 instead of re-deriving it
+  from `ls -d skills/*/ | wc -l` — it drifts whenever `main` gains other skills
+  mid-review (`resolve-pr-threads` #347).
+- ❌ Citing a `CLAUDE.md` section or an "existing scale/convention" in new
+  skill prose without grepping to confirm it actually exists first
+  (`check-info-quality` #349).
 - ❌ Leaving the new skill as a local-only uncommitted file (or pushing direct to main).
 - ❌ In a worktree session, writing the skill files to the `rev-parse --show-toplevel`
   path — it resolves to the main checkout (via the `~/.claude/skills` symlink), not

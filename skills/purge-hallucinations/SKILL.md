@@ -133,6 +133,17 @@ Summarize: N references checked → ✅ resolved, ❌ fixed (list before→after
 feature, not a failure — it tells the user exactly what still needs a human
 eyeball.
 
+## Custom agent for the detect phase
+
+Steps 1--3 (resolve target, extract references, verify against ground truth)
+have no need for Edit/Write access. Delegate them to the
+`hallucination-detector` custom agent (`.claude/agents/hallucination-detector.md`)
+for a hard, harness-enforced guarantee against Edit/Write tool use before the
+report in Step 4 is reviewed --- tighter than this skill's own
+instruction-only discipline, though the agent retains `Bash` for read-only
+checks, so avoiding a write-capable shell command is still instruction-level.
+Run Step 4 (propose/apply fixes) in the main session afterward.
+
 ## Relationship to other skills
 
 - **`record-learnings`, `ums`, `memorize` / `remember`** — these *write* the
@@ -149,6 +160,10 @@ eyeball.
   audits *source* references; `crr` scans *rendered* HTML for crossrefs/citations
   that broke at render time and leaked into the page as `?@key`. Hand a `?@key`
   hit here to trace the dangling key back to its source line.
+- **`check-info-quality` / `ciq`** — this skill checks whether a reference
+  **exists**; `ciq`'s check C checks whether an existing, real reference
+  **actually supports** the claim it's attached to. A citation can pass here
+  and still fail `ciq` if it resolves but doesn't say what the text claims.
 
 ## Anti-patterns
 

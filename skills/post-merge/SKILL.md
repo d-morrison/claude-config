@@ -151,7 +151,8 @@ Run the full `ums` procedure (invoke the `ums` skill by name), focused on what
 - **Corrections / guidance the user gave mid-PR** → preference + skill update
   (per "update BOTH skills AND preferences").
 - **Tool / CI quirks** hit during the loop → `tools.md` / `debugging.md`.
-- **A multi-step pattern that emerged** → consider a new skill.
+- **A multi-step pattern that emerged** → run `spot-skill-opportunities` to
+  judge whether it's genuinely recurring, then hand off to `skill-builder`.
 
 This is the "learn from mistakes and guidance along the way" step — a merge is
 the natural checkpoint to bank those lessons before the context is gone. If
@@ -183,6 +184,8 @@ PT on a machine set to any other zone).
   per-PR version: run it each time a PR lands; run `wrap-up` once at session
   end. They share the verify-then-UMS shape.
 - **`ums`** — step 4 invokes it.
+- **`spot-skill-opportunities`** — step 4's "multi-step pattern that emerged"
+  bullet routes here to judge recurrence before handing off to `skill-builder`.
 - **`cb` / `clean-branches`** — for stacked or stale sibling branches.
 - **`clean-worktrees` / `cw`** — if the PR was built in a git worktree, remove
   it during the tidy (step 2); a leftover worktree pins its branch and blocks
