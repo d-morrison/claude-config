@@ -160,6 +160,10 @@ Run Step 4 (propose/apply fixes) in the main session afterward.
   audits *source* references; `crr` scans *rendered* HTML for crossrefs/citations
   that broke at render time and leaked into the page as `?@key`. Hand a `?@key`
   hit here to trace the dangling key back to its source line.
+- **`check-info-quality` / `ciq`** — this skill checks whether a reference
+  **exists**; `ciq`'s check C checks whether an existing, real reference
+  **actually supports** the claim it's attached to. A citation can pass here
+  and still fail `ciq` if it resolves but doesn't say what the text claims.
 
 ## Anti-patterns
 

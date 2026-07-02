@@ -30,6 +30,7 @@ Most skills also respond to plain-English triggers listed in their `description`
 | [`request-pr-review`](skills/request-pr-review/SKILL.md) | | Add a human reviewer and @-mention them with context |
 | [`pr-status`](skills/pr-status/SKILL.md) | | Report the current PR's CI and review state |
 | [`pr-status-all`](skills/pr-status-all/SKILL.md) | | Report status across all open PRs |
+| [`stack-prs`](skills/stack-prs/SKILL.md) | | Branch a new PR off an unmerged base PR, keep it in sync, and re-target it to `main` once the base merges |
 
 ### Issue management
 
@@ -49,6 +50,7 @@ Most skills also respond to plain-English triggers listed in their `description`
 |-------|---------|--------------|
 | [`sync-pr-branch`](skills/sync-pr-branch/SKILL.md) | `sync`, `merge-main`, `resync-branch` | Fetch origin, merge main into the branch, push |
 | [`merge-it`](skills/merge-it/SKILL.md) | `merged` | Squash-merge a ready PR, then run post-merge cleanup |
+| [`mwc`](skills/mwc/SKILL.md) | `merge-when-confident`, `maw`, `merge-at-will` | Grant session-scoped permission to merge fully-clean PRs without asking per PR |
 | [`post-merge`](skills/post-merge/SKILL.md) | | After a merge: checkout main, pull, delete branch, run UMS |
 | [`clean-branches`](skills/clean-branches/SKILL.md) | `prune` | Delete local branches already merged or closed |
 
