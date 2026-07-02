@@ -12,6 +12,13 @@ behavior change to an existing one), not every mechanical edit.
 
 ## Unreleased
 
+- **Sharpened `.qmd` line-break guidance** (`CLAUDE.md`, #330). Three rules
+  learned from driving `UCD-SERG/lab-manual#297` clean over five review
+  rounds: fix every over-length line in a flagged section in one pass, not
+  just the lines a reviewer named; accept a line that's long only because of
+  an embedded `[{pkg}](long-url)` link (visible prose well under 40
+  characters) as-is; and link package names on first mention as you write,
+  rather than waiting for a reviewer to flag each one.
 - **`fact-check-prose` policy refinement: tool/library behavior claims.**
   When prose describes deterministic, cheaply-reproducible tool or library
   behavior (a git merge driver, a shell built-in, a regex engine), verify it
