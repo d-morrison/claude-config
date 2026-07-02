@@ -581,6 +581,22 @@
   edit. (Learned on ai-config#297: a "PR" rule had to be broadened to "PR or
   issue" after it turned out to also apply to `gi`'s issue triage.)
 
+- When a request matches "add/build/create a skill" (skill-builder's own trigger
+  phrases), invoke the `skill-builder` skill via the Skill tool rather than
+  freehand-implementing the scaffold-and-ship flow. Skill-builder encodes steps
+  that are easy to skip when done ad hoc: the extend-first check, running the
+  four local validation scripts (`validate-skills.py`, `check-links.py`,
+  `check-vendored-drift.py`, `markdownlint-cli2`) before pushing, and explicitly
+  requesting `d-morrison` as reviewer. (Learned on ai-config#338 — the
+  `prompt-me`/`pm` skill was built and shipped without invoking `skill-builder`,
+  so none of those steps ran; CI happened to catch what the scripts would have.)
+- Claim a PR before pushing iterative commits to it, even when you opened the
+  PR yourself in the same session — this repo's `@claude` review workflow can
+  fire and interleave with an in-flight push. Post the "paws off" comment from
+  `claim-pr` right after opening the PR, not just for PRs you're joining
+  mid-flight. (Missed on ai-config#338: several commits were pushed across an
+  ARDI-style review loop with no claim comment posted.)
+
 ## Git author mapping
 - Commits by `dem-extra1` to repos owned by `d-morrison`, `ucd-serg`, or `ucdavis` → the true author is `d-morrison` (demorrison@ucdavis.edu); set `--author="Douglas Morrison <demorrison@ucdavis.edu>"` (or amend) when the committing identity is `dem-extra1`.
 - Commits to `sparta` by `d-morrison` → the true author is `dem-extra1` (dougmor@gmail.com); set `--author="dem-extra1 <dougmor@gmail.com>"` when the committing identity is `d-morrison`.
