@@ -19,6 +19,13 @@ behavior change to an existing one), not every mechanical edit.
   can make) --- the open question(s) last and clearly visible, rather than
   burying them earlier in a long recap, so the last thing the user reads is
   the open question, not a trailing summary.
+- **Growth-mindset shared policy** (`shared/workflow/growth-mindset.md`, #353).
+  New standing rule: treat a current limitation (missing tool, manual
+  workaround, insufficient model) as a starting point to resolve — via
+  packages, upstream fixes, better tooling, asking the user directly, or
+  extending the skill/memory corpus itself — rather than a fixed ceiling to
+  route around indefinitely. Growth is disciplined, not unchecked: prune and
+  consolidate as readily as adding.
 - **`fact-check-prose` skill (alias `fcp`) and `prose-fact-checker` agent**
   (#344). New standing policy (`shared/writing/fact-check-prose.md`): when
   reviewing prose, check factual claims against domain knowledge and external
