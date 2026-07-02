@@ -14,6 +14,6 @@ docs, READMEs, or manuals (e.g. lab-manual chapters).
   in the same passage, or when the claim is about this session's own visible
   tool output (nothing external to cite).
 
-This is a default, not a rule that trumps clarity: don't let a citation
-search block a plain answer to a simple question, and don't cite something
-so well-known that a link would look padded.
+This is a default, not an absolute rule: don't let a citation search block a
+plain answer to a simple question, and don't cite something so well-known
+that a link would look padded.
