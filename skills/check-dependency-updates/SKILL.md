@@ -149,6 +149,18 @@ git -C <submodule-path> fetch && git -C <submodule-path> log HEAD..FETCH_HEAD --
   collaborator and CI job installs — treat a lockfile bump like any other code
   change: branch, test, review.
 
+## Custom agent for the audit phase
+
+The "What to audit" and changelog-reading steps have no need for Edit/Write
+access. Delegate them to the `dependency-auditor` custom agent
+(`.claude/agents/dependency-auditor.md`) for a hard, harness-enforced
+guarantee against Edit/Write tool use before the report is reviewed ---
+tighter than this skill's own instruction-only discipline, though the agent
+retains `Bash` for read-only checks, so avoiding a write-capable shell
+command (`renv::update()` without `check = TRUE`, `pre-commit autoupdate`)
+is still instruction-level. Run the "Reporting and follow-through" steps
+(issue, branch, PR, ARDI) in the main session afterward.
+
 ## Relationship to other skills
 
 - **`chores`** — the processing counterpart. This skill *finds* stale pins (and

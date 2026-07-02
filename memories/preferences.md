@@ -29,7 +29,8 @@
   first, just drive it to clean. (Still don't merge unless asked; "always ardi" means
   always drive to clean, not always merge.)
 - "Fully clean" (the ARDI/iterate terminal state) means BOTH: (1) all CI workflows green
-  (every required check, not just the review job), AND (2) the latest review is totally
+  (every workflow — not just required checks, not just the review job; includes non-gating
+  checks like Coverage/codecov), AND (2) the latest review is totally
   clean — no nits, and every item not directly Addressed is either Deferred to a tracked
   issue or Rebutted with a rebuttal that actually CONVINCED the reviewer (they didn't
   re-raise it). A rebuttal the reviewer still disputes does NOT count as clean. At
@@ -44,11 +45,81 @@
   and follow through — autofix CI failures and address review comments per the
   ARD framework — without asking first. Keep following until the PR is merged or
   closed (or I say stop). Don't ask "want me to watch it?"; just do it.
-- **Before grabbing any issue (GI/GII), check that no other session is already on it.** Two signals must BOTH be clear: (1) the issue's most recent comment does NOT contain "Working on this" or equivalent claim; (2) there is NO open PR referencing the issue — by branch name or title, or via a cross-reference event on the issue (which covers most `#N` / `Closes #N` body mentions). If either signal fires, skip that issue — don't open a competing PR or claim it. (Twice grabbed issues already in-flight: sparta#325 had PR #327 open; sparta#292 had PR #329 open. Both required closing a duplicate.)
+- When there's a well-scoped next step — a filed follow-up issue, a sequenced item, an obvious
+  continuation of the current work — just start it; don't pause to ask "want me to keep going?"
+  first. The answer is a standing yes. This removes the extra "should I continue?" pause between
+  already-scoped steps; it does NOT override holding for genuinely ambiguous or architecturally
+  significant decisions. When unsure whether a step is "well-scoped" vs. "needs a decision," lean
+  toward continuing and flag any judgment calls made along the way. (Learned on sparta 2026-07-01.)
+- If I ask the user a question and they don't answer within ~5 minutes, make an informed guess from
+  the conversation, their established preferences, and sensible defaults, then proceed — stating the
+  assumption so they can redirect. This lowers the bar to proceed on my own judgment; it does NOT
+  mean fire questions and barrel ahead. Still reserve questions for genuine decisions their answer
+  would change, and still hold for truly irreversible or high-stakes actions. For the ordinary
+  "which of these reasonable options" case, pick the best after a short wait and keep moving.
+  (Learned on sparta 2026-07-01, during a high-throughput parallel-PR run where the user was
+  away for stretches and didn't want progress to stall on unanswered questions.)
+- Operate as a COORDINATOR, not an implementer. Delegate all hands-on implementation to subagents
+  (Agent tool, worktree isolation) — even core, high-stakes, architecturally-significant changes.
+  Stay at the bird's-eye level: decide WHAT to build and in what order, write precise specs,
+  launch/direct agents, sequence merges, verify results, surface decisions to the user, and relay
+  feedback to the right agent. Don't drop into editing files, running the suite, or resolving merge
+  conflicts by hand when an agent can. What stays mine: the merge button, decisions the user must
+  weigh in on, and relaying user feedback — NOT the implementation. Keep the pipeline full; delegate
+  broadly and in parallel. (Learned on sparta 2026-07-01: "always delegate; stay at a bird's-eye level.")
+- Delegating implementation does NOT mean trusting an agent's "CLEAN, ready to merge" report blind.
+  Before merging (or reporting a PR clean), the coordinator double-checks the agent's work against
+  ground truth: re-verify CI myself (`gh pr checks <N>` / `gh pr view <N> --json mergeable,mergeStateStatus`
+  — a flaky check may have passed by luck, or main may have moved); read the diff on anything
+  load-bearing (CI/workflow files, security-relevant code, conflict resolutions — an agent can
+  merge-resolve semantically but silently drop one side, so spot-check both features survived); and
+  read verification artifacts myself. ESPECIALLY when the bot review self-skipped (a PR that edits
+  the review workflow itself — the reusable `claude-code-review` workflow in `d-morrison/gha`, or the
+  repo's own caller that invokes it, whatever it's named in that repo — makes the `@claude` bot
+  self-skip: it 401s from a PR ref and only runs after merge) or was quota-skipped — then my own diff
+  read is the ONLY review. The merge gate is MY independent check, not the agent's word.
+- A verification artifact (state transcript, frame/state dump) is worthless unless something actually
+  READS it. Put it where the reviewer looks: the `@claude` review bot reviews only the checked-out PR
+  tree plus the diff, so a JSON linked by raw URL on a side/media branch is invisible to it — inline a
+  compact state summary in the PR conversation/diff (and add a line telling the reviewer to use it); a
+  bare link is decoration. And the coordinator must actually read the dumps too — don't build a
+  verification tool and then keep trusting agents' written "I verified tick-by-tick" reports without
+  ever reading a dump. Design for the CONSUMER first (what the review bot / human sees), then durability.
+- Don't merge a PR while ANY of its workflows is red — INCLUDING non-gating checks like the
+  `Test coverage` / codecov job — unless there's a specific, deliberate reason stated for THAT merge.
+  "It's only the non-gating Coverage job" / "it's a pre-existing flake" is not a blanket pass; the
+  project wants to maintain decent coverage, so a red Coverage job is a real signal to fix. If a red
+  check is a genuine flake, the fix is to make it green (sequence the flake-fix PR FIRST so main goes
+  green, then resync the dependent PRs onto green main) — not to merge past it. Refines the fully-clean
+  rule (ALL workflows green, not just the required set). (Learned on sparta 2026-07-01.)
+- During multi-PR autonomous work, keep a live TaskList (one task per claimed issue/PR: issue#, PR#,
+  branch, state — open/review-pending/merged/blocked) and refresh it with fresh `gh pr view` /
+  `gh issue view` queries on any status ask — never recite state from memory (per never-assume/always-verify).
+  A merge/close event or an explicit "status?" ask is the trigger to refresh. This is a session tool;
+  it doesn't survive `/clear`, so don't rely on it across sessions. (Learned on sparta 2026-07-01, after
+  several PRs in flight plus stacked-branch fallout made it easy to lose track.)
+- When several in-flight PRs touch the SAME files, merging any one moves `main` and re-conflicts the
+  rest — so serialize the merges: merge one, wait for the others to recompute (CONFLICTING/DIRTY, or
+  briefly UNKNOWN — re-poll after a few seconds), and merge the next only once it's re-resynced clean.
+  Merge the most-isolated PR (disjoint files) FIRST — it rides through without a re-resync; sequence
+  foundational/big same-file PRs LAST so lighter PRs rebase onto simpler `main`. An agent watching a
+  PR must POLL its own `mergeable`/`mergeStateStatus` on EVERY watch tick (a newly-appearing conflict
+  from someone else's merge is NOT a CI event, so a CI-completion monitor never fires on it), and on
+  catching one immediately `git fetch origin main && git merge origin/main`, resolve, re-run checks,
+  push — staying in the watch loop until the PR is merged or closed (clean regresses to CONFLICTING
+  when main moves). The coordinator's nudge is only a backstop for a genuinely-dead agent. (Learned on
+  sparta 2026-07-01 merging the movement cluster.)
+- **Before grabbing any issue (GI/GII), check that no other session is already on it.** Two signals must BOTH be clear: (1) the issue's most recent comment does NOT contain "Working on this" or equivalent claim; (2) there is NO open PR referencing the issue — by branch name or title, or via a cross-reference event on the issue (which covers most `#N` / `Closes #N` body mentions). If either signal fires, skip that issue — don't open a competing PR or claim it. (Twice grabbed issues already in-flight: sparta#325 had PR #327 open; sparta#292 had PR #329 open. Both required closing a duplicate.) And once both signals are clear, **post your own claim comment the INSTANT you decide to work the issue** — before the investigation phase (reading the body in depth, grepping, designing), not just before branching. The claim flags the issue as actively worked so a parallel session or the `@claude` agent doesn't collide, and that collision risk begins the moment you start investigating. (Learned after investigating sparta#390 fully before claiming, and after fully implementing sparta#404 only to find an unclaimed in-flight PR #405 had already fixed it — a duplicate that had to be closed.)
 - Before starting a new task, always go issue-first: search the tracker for an existing issue;
   if none covers it, FILE one before branching or opening a PR. Never jump straight into a PR
   without a tracking issue behind it. (see the `st` / `start-task` skill — the issue is the
   durable record of intent/scope/"done" and lets the PR auto-close it via `Closes #N`.)
+  Search EVEN when the idea emerged organically mid-conversation (a design discussion, a
+  code-review finding) and feels novel — "I haven't seen it this session" is not evidence
+  it doesn't exist. Always `gh issue list --search "<keywords>" --state all` before every
+  `gh issue create`, regardless of how the idea surfaced. (Learned on sparta: filed #447
+  without searching; the user had already filed #446 with the same core ask minutes earlier,
+  and #447 had to be closed as a duplicate and folded into #446.)
 - When implementing a user instruction that edits a tracked file in the repo (e.g. CLAUDE.md,
   README, a config file), the task is not done at "made the local edit." Go all the way:
   file an issue, commit on a branch, and open a PR — without waiting to be asked. Stopping at
@@ -66,14 +137,10 @@
 - Before opening a PR, read the repo's own agent/contributor instructions (CLAUDE.md →
   the canonical reference it points to, e.g. `.github/copilot-instructions.md` / CONTRIBUTING)
   and front-load the required pre-PR housekeeping in the FIRST commit instead of discovering it
-  via red CI. For R packages this means a NEWS.md entry AND a DESCRIPTION dev-version bump
-  (`usethis::use_version()`) even for a docs-only / vignette-only change — the changelog-check
-  and version-check jobs fail otherwise (opt-out labels `no changelog` / `no version
-  increment` exist for non-user-visible PRs, but the default is to do the bump). NEWS.md prose is spell-checked too,
-  so keep it to words already in `inst/WORDLIST` or add new terms there. Also re-check the
-  version after merging `main` mid-PR: if a commit on `main` already bumped the version to
-  match the branch, the version-check CI will fail again — run `usethis::use_version("dev")`
-  once more so the branch stays ahead.
+  via red CI. For R packages this means a NEWS.md entry AND a `usethis::use_version()`
+  DESCRIPTION dev-version bump, even for a docs-only / vignette-only change — see
+  `tools.md`'s "R-package PR CI gates" section for the full changelog-check /
+  version-check / spellcheck / opt-out-label details.
 - In the HACtions repo, use the `test.hac` project/group as a test bed (always).
 - After an iterate loop completes, ALWAYS create follow-up issues for every deferred/acknowledged
   item before reporting done. Never leave deferred items untracked.
@@ -109,6 +176,13 @@
   explicitly said "do ums after each merge; then keep going." The existing instruction already
   covered this; the gap was execution discipline in a fast multi-merge loop, not missing
   guidance — re-read this bullet at the top of every "pick the next backlog item" cycle.
+  In a multi-AGENT pipeline, UMS runs at BOTH levels: each subagent runs UMS once ITS PR
+  merges (it stops after reporting CLEAN, so the coordinator resumes it post-merge with a
+  "your PR merged, run UMS" nudge — or the agent-launch spec bakes in a final UMS step), and
+  the coordinator runs its own UMS for the cross-PR orchestration learnings no single subagent
+  can see (merge-order sequencing, conflict-cascade handling, pipeline mechanics). Each agent
+  writes its OWN memory file plus one MEMORY.md index line to keep the conflict surface small;
+  avoid rewriting shared memory bodies concurrently. (Learned on sparta 2026-07-01.)
 - Keep it simple. Don't over-explain or ask permission for straightforward fixes — just do them.
 - Don't re-ask a decision that's already settled and built. Once an answer is given and the
   work is implemented to match it (and CI-green), don't reopen it with a fresh AskUserQuestion —
@@ -214,10 +288,27 @@
   most easily drops a qualifier and becomes misleading. (Learned on PR #43: the terse
   pipe-examples bullet dropped the "in R" qualifier that `CLAUDE.md` had, which a reviewer
   flagged as implying `|>` / `%>%` exist in Python/JS.)
+- Before adding a bullet that redefines or narrows an existing term (fully clean, claim-pr,
+  ARDI, etc.), grep the repo for that term's OTHER canonical definitions — not just the
+  twin preferences.md/CLAUDE.md copy above, but any `shared/*.md` fragment, skill doc, or
+  other memory file that states the same rule. If the new rule is a genuine refinement,
+  update the canonical doc itself in the same PR, not just a satellite copy; note in the
+  PR description that the canonical file is touched and why. (Learned on sparta 2026-07-01,
+  PR #318: a new `dont-merge-failing-workflows` bullet expanded "fully clean" CI to mean
+  every workflow green, including non-gating checks — but silently contradicted the
+  canonical `shared/workflow/fully-clean.md` [`@`-included into `CLAUDE.md`], which still
+  said "every required check." The `@claude` bot review caught the drift in round 1.)
 - After adding or updating skills OR memory files in the ai-config repo, always commit
   and push everything to origin (on the current branch if a PR is already open, or
   create a new branch + PR if the change is out of scope). Never leave ANY changes in
   ai-config as local-only uncommitted edits — including memory files.
+- **AI memories, skills, and commands never stay local-only.** When I capture a durable
+  learning, commit it to the right repo via PR — GENERAL/cross-project learnings go to
+  `d-morrison/ai-config` (as bullets in the right `memories/*.md` topic file); PROJECT-SPECIFIC
+  learnings go to that project's own repo (its `CLAUDE.md` / agent docs / `.claude/memories/`).
+  A memory kept only under `~/.claude/projects/<path>/memory/` is invisible to other sessions,
+  machines, and humans, and rots silently — so migrate it. Capturing a learning isn't done until
+  it's committed where the right audience will see it.
 - When committing, stage the SPECIFIC files you touched — NEVER `git add -A`. The working
   tree often holds unrelated in-flight edits (the user's own UMS/skill commits, another
   draft); `git add -A` silently sweeps those into your commit and onto your PR, bloating the
@@ -295,6 +386,18 @@
   for our own team and repos. (ai-config#246: the PR body `@`-mentioned `mcanouil` and the
   commit used `quarto-dev/quarto-cli#NNNNN`, both pinging the very upstream repo the PR was
   meant not to disturb.)
+- When writing prose (a PR/issue comment, commit message, chat reply) that references an
+  issue or PR in a DIFFERENT repo than the one you're posting in, always disambiguate with
+  the full `owner/repo#N` form — never a bare `#N`. GitHub silently resolves a bare `#N` to
+  the CURRENT repo, so `#156` typed in an ai-config PR comment links to ai-config#156 even
+  when you meant a different repo's #156. This is a correctness bug (a dead or misleading
+  link), distinct from the notification-etiquette rule above (which governs whether
+  `owner/repo#N` is appropriate to use AT ALL for a given repo, e.g. avoid it for external
+  repos you shouldn't ping). Once you've established that a cross-repo reference is
+  otherwise fine to make, still spell out `owner/repo#N` in full — don't drop to the bare
+  form just because it reads shorter. (ai-config#304: `fxtas#156`/`fxtas#157` written as
+  bare `#156`/`#157` in an ai-config PR comment auto-linked to ai-config#156 instead of
+  ucdavis/fxtas#156.)
 - While I'm iterating a PR, the `@claude` bot (triggered by an `@claude` comment — including
   one I or the user posts mid-loop) runs its OWN ARD and pushes fix commits to the
   SAME PR branch. Before every edit/push during a PR loop, `git fetch` and reconcile
@@ -367,6 +470,8 @@
   `handoff` and `wait-for-results` skills.
 - Always look for opportunities to create new reusable skills from multi-step processes.
   When a workflow emerges that could be codified, proactively suggest creating a skill for it.
+  (see the `spot-skill-opportunities` skill — the continuous recognition step that hands off
+  to `skill-builder`.)
 - When asked to build/create a new skill, FIRST check whether an existing skill should be
   extended instead — search `skills/` for an adjacent one AND scan ALL branches (`git ls-tree`
   over every remote branch) for in-flight similar work — before scaffolding a new one. Prefer
@@ -475,12 +580,58 @@
   shared/<dir>/<name>.md, not here. -->` comment on the line immediately before
   the `@shared/...` directive, matching every sibling include. Missing it was
   flagged as a review nit. (Learned on ai-config#297.)
+- The `<!-- Shared with the lab manual -->` comment is aspirational, not a
+  guarantee: check whether the fragment is actually transcluded in
+  `lab-manual`'s matching `.qmd` chapter before asserting it is. On ai-config#336,
+  two of three existing `shared/coding/*.md` fragments carried the comment but
+  were never added to `coding-style.qmd` (only `avoid-nesting.md` was) — the
+  gap survived because the tracking issue (UCD-SERG/lab-manual#328) was closed
+  "completed" with an unchecked follow-up box. Don't let a new PR's scope grow
+  to fix an unrelated pre-existing gap like this; file a follow-up issue
+  instead (UCD-SERG/lab-manual#377) and note it in the PR thread. Also: before closing
+  a checklist-style issue as completed, verify no boxes are left unchecked —
+  an unchecked box under a "completed" issue is invisible to future sweeps.
 - When writing a new shared standing-preference fragment that's wired into more
   than one skill (e.g. a tie-breaker used by both PR-ordering and issue-triage),
   check all the consuming skills first and write the fragment's prose generically
   enough to cover all of them — don't phrase it around only the first skill you
   edit. (Learned on ai-config#297: a "PR" rule had to be broadened to "PR or
   issue" after it turned out to also apply to `gi`'s issue triage.)
+- When a new skill claims a convention holds across "all N" existing examples
+  (e.g. "the existing three agents all carry this caveat"), check each example
+  individually instead of generalizing from a couple you remember reading —
+  member-by-member verification catches the odd one out that a summary
+  glosses over. (Learned on ai-config#343: `agent-builder` claimed all three
+  existing `.claude/agents/*.md` files carried a Bash-caveat that
+  `community-demand-scout` doesn't have.)
+- Don't describe a sibling skill's current behavior as covering a check it
+  doesn't yet perform (e.g. "`link-skills` also checks X"). State what it
+  actually does today, and phrase the gap as a manual step or a named
+  follow-up, not an implied existing guarantee. (Learned on ai-config#343:
+  `agent-builder` implied `link-skills` already audits agent cross-references
+  when it only scans `skills/`.)
+
+- When a request matches "add/build/create a skill" (skill-builder's own trigger
+  phrases), invoke the `skill-builder` skill via the Skill tool rather than
+  freehand-implementing the scaffold-and-ship flow. Skill-builder encodes steps
+  that are easy to skip when done ad hoc: the extend-first check, running the
+  four local validation scripts (`validate-skills.py`, `check-links.py`,
+  `check-vendored-drift.py`, `markdownlint-cli2`) before pushing, registering
+  any cited MCP tool in `tool-mappings.yml`, updating `skills.qmd`'s count from
+  the actual `skills/` directory count (not a manual +1), cross-linking related
+  skills, and explicitly requesting `d-morrison` as reviewer. (Learned on
+  ai-config#338 — the `prompt-me`/`pm` skill was built and shipped without
+  invoking `skill-builder`, so none of those steps ran; CI happened to catch
+  what the scripts would have. Reinforced on ai-config#347 — `resolve-pr-threads`
+  was hand-authored and needed a review round to catch a `tool-mappings.yml`
+  gap `skill-builder` already documented from a near-identical miss in
+  `push-memory` #311.)
+- Claim a PR before pushing iterative commits to it, even when you opened the
+  PR yourself in the same session — this repo's `@claude` review workflow can
+  fire and interleave with an in-flight push. Post the "paws off" comment from
+  `claim-pr` right after opening the PR, not just for PRs you're joining
+  mid-flight. (Missed on ai-config#338: several commits were pushed across an
+  ARDI-style review loop with no claim comment posted.)
 
 ## Git author mapping
 - Commits by `dem-extra1` to repos owned by `d-morrison`, `ucd-serg`, or `ucdavis` → the true author is `d-morrison` (demorrison@ucdavis.edu); set `--author="Douglas Morrison <demorrison@ucdavis.edu>"` (or amend) when the committing identity is `dem-extra1`.

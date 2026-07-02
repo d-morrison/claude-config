@@ -41,6 +41,10 @@ operations:
     description: List pull requests.
     cli: gh pr list
     github_mcp: mcp__github__list_pull_requests
+  - id: SEARCH_PRS
+    description: Search pull requests by keyword / query string.
+    cli: gh pr list --search "<query>"
+    github_mcp: mcp__github__search_pull_requests
   - id: DIFF_PR
     description: Read a pull request's diff.
     cli: gh pr diff <N>
@@ -69,6 +73,10 @@ operations:
     description: Reply to an inline pull-request review comment.
     cli: gh api (reply to review comment)
     github_mcp: mcp__github__add_reply_to_pull_request_comment
+  - id: RESOLVE_REVIEW_THREAD
+    description: Mark an inline pull-request review thread as resolved.
+    cli: gh api graphql (resolveReviewThread)
+    github_mcp: mcp__github__resolve_review_thread
   - id: WATCH_PR
     description: Subscribe to / unsubscribe from a pull request's activity.
     cli: (no CLI equivalent)
@@ -89,6 +97,30 @@ operations:
     description: Post a comment on an issue.
     cli: gh issue comment <N> --body "..."
     github_mcp: mcp__github__add_issue_comment
+  - id: LIST_DISCUSSIONS
+    description: List a repository's discussions. Discussions are GraphQL-only.
+    cli: gh api graphql (list discussions)
+    github_mcp: (no GitHub MCP tool; use gh api graphql)
+  - id: VIEW_DISCUSSION
+    description: Read a discussion topic and its comment thread.
+    cli: gh api graphql (read discussion + comments)
+    github_mcp: (no GitHub MCP tool; use gh api graphql)
+  - id: COMMENT_DISCUSSION
+    description: Post a reply on a discussion (top-level or threaded).
+    cli: gh api graphql (addDiscussionComment)
+    github_mcp: (no GitHub MCP tool; use gh api graphql)
+  - id: ANSWER_DISCUSSION
+    description: Mark a comment as the accepted answer on a Q&A discussion.
+    cli: gh api graphql (markDiscussionCommentAsAnswer)
+    github_mcp: (no GitHub MCP tool; use gh api graphql)
+  - id: CREATE_DISCUSSION
+    description: Open a new discussion in a category.
+    cli: gh api graphql (createDiscussion)
+    github_mcp: (no GitHub MCP tool; use gh api graphql)
+  - id: CLOSE_DISCUSSION
+    description: Close a discussion with a reason (RESOLVED, OUTDATED, DUPLICATE).
+    cli: gh api graphql (closeDiscussion)
+    github_mcp: (no GitHub MCP tool; use gh api graphql)
   - id: PUSH
     description: Push commits to a branch.
     cli: git push -u origin <branch>
@@ -105,3 +137,15 @@ operations:
     description: Merge a branch into the current one.
     cli: git merge origin/<branch>
     github_mcp: (use git; no GitHub MCP equivalent)
+  - id: CREATE_BRANCH
+    description: Create a new branch (e.g. off the default branch).
+    cli: git switch -c <branch> origin/<base>
+    github_mcp: mcp__github__create_branch
+  - id: READ_FILE
+    description: Read a file's contents from the repo.
+    cli: gh api repos/<owner>/<repo>/contents/<path>
+    github_mcp: mcp__github__get_file_contents
+  - id: WRITE_FILE
+    description: Create or update file(s) on a branch in a single commit.
+    cli: git add <path> && git commit -m "..." && git push
+    github_mcp: mcp__github__create_or_update_file (one file) / mcp__github__push_files (multiple)

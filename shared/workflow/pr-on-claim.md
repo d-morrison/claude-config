@@ -1,43 +1,41 @@
-After claiming an issue (posting a "paws off" comment), open a **draft PR**
-immediately --- before implementing. An open PR is the strongest "in-flight"
-signal available: it shows in `gh pr list`, appears in the issue's
-cross-referenced timeline via `Closes #N`, and is the check other sessions run
-to avoid double-working the same issue. The claim comment is secondary to this
-check.
+When an agent claims an issue it's about to work — in `gi`, `gii`, `gip`, or
+`st` — open the PR **immediately**, before writing any code, and keep it a
+**draft** until the implementation lands. Don't wait until the work is done to
+open it.
 
-## Mechanics
+**Why up front.** The claim comment on the issue is easy to miss, and it isn't
+what other sessions check. The authoritative in-flight signal is the issue's
+cross-referenced **open PRs** — the check `gi` runs before grabbing an issue.
+Until a PR exists, a parallel issues-sweep can grab the same issue and build a
+duplicate. An open PR closes that window: it shows in `gh pr list` and the
+issue's timeline, and links the issue via `Closes #N`. An open PR is the
+clearest "someone is working this" signal there is — stronger than a comment.
+This is the strong form of the "open and link the PR promptly" note in
+[`claim-pr`](claim-pr.md).
 
-Right after creating the branch, make an empty commit to give the branch a
-commit to open against, push, and open a draft PR:
-
-```bash
-git commit --allow-empty -m "chore: claim #<N> [skip ci]"
-git push -u origin <branch>
-
-# GitHub
-gh pr create --draft \
-  --title "<title>" \
-  --body "Closes #<N>
-
-Draft --- work in progress."
-```
-
-Keep it **draft** until the implementation lands. A draft PR does not trigger
-the `@claude` review bot, so no review round is wasted on an empty or partial
-diff.
-
-## Converting to ready-for-review
-
-Once the implementation is committed and pushed, mark the PR ready:
+**Mechanics.** Branch, then open the PR against an empty commit:
 
 ```bash
-gh pr ready <N>
+git fetch origin main -q
+git checkout -b <type>/<slug> origin/main
+git commit --allow-empty -m "start: <issue title> (closes #<N>)"
+git push -u origin HEAD
+gh pr create --draft --title "<title>" --body "Closes #<N>
+
+WIP — opened up front to claim the issue; implementing now."
 ```
 
-This converts the draft and triggers the `@claude` review bot, which starts
-the ARDI loop.
+The empty commit gives the branch a diff so the PR can open with no code yet.
+In a remote/web session where `gh` is absent, push the empty commit and open
+the PR with the GitHub MCP tools instead (`mcp__github__create_pull_request`
+with `draft: true`).
 
-## Cross-reference
+**Draft, not ready-for-review — deliberately.** A draft doesn't trigger the
+`@claude` review bot, so no review round is spent on an empty or half-finished
+diff. Implement on top, pushing commits to the same PR; when the change is
+complete and the repo's checks pass, mark the PR **ready for review**
+(`gh pr ready <N>`, or `mcp__github__update_pull_request` with `draft: false`).
+Marking it ready is what kicks off ARDI.
 
-See [`claim-pr`](claim-pr.md) for the claim comment this draft PR follows.
-The `gi`, `gii`, `gip`, and `st` skills operationalize this step.
+So the per-issue order becomes: claim → branch → **open the draft PR now** →
+implement → mark ready-for-review → ARDI.

@@ -22,3 +22,20 @@ Do **not** report "ready to merge with one minor nit noted" / "harmless as-is" /
 requester. If after 3--4 rounds the reviewer keeps generating new nits each
 cycle (asymptotic noise), surface that and ask whether to keep going or accept
 the current state.
+
+**When a finding is a pattern (a formatting/style rule broken in one spot),
+apply it everywhere it recurs in the same file, not just the flagged line.**
+A reviewer that flags one inconsistent list-item format is telling you about
+the rule, not just that one item --- fix every occurrence in the same file that
+breaks it in the same pass, rather than waiting for the reviewer to flag each
+occurrence in a separate round. Re-scan the whole changed file for the same
+pattern before pushing the fix.
+
+**When a prose fix changes wording that's also paraphrased elsewhere in the
+same PR (a CHANGELOG entry, a PR description, a cross-reference), sync that
+copy too.** A CHANGELOG entry written before the review lands often quotes or
+paraphrases the exact phrase a reviewer later flags; fixing the source
+prose but leaving the paraphrase stale reintroduces the same wording issue
+one file over. Grep the diff for the flagged phrase before considering the
+finding closed. (ai-config#373: fixed "routing/dispatch site" in the skill
+per review, but the CHANGELOG entry still said it until a follow-up commit.)

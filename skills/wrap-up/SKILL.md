@@ -49,11 +49,15 @@ git log --oneline -5 origin/main           # what actually landed on main
   check those too — `gh pr list --repo <owner>/<repo> --state open
   --json number,title,headRefName,author,mergeable,mergeStateStatus,comments`.
 - **Merge conflict sweep.** Before closing out, check every open PR's
-  `mergeable` field. For each PR with `mergeable == "CONFLICTING"`, check its
-  claim status (most recent comment) and fix unclaimed ones using the cascade
-  procedure in `post-merge` step 1.5 (claim → isolated worktree → merge main →
-  `resolve-conflicts` skill → push → unclaim). Don't leave conflicting PRs
-  behind when wrapping up — they block whoever works the queue next.
+  `mergeable` field. For each PR with `mergeable == "CONFLICTING"` **or
+  `"UNKNOWN"`** (see `resolve-conflicts`, "Verify before you act" —
+  `UNKNOWN` can mean GitHub hasn't finished computing yet), verify with
+  `git merge-tree --write-tree origin/main origin/<branch>` before acting,
+  then check claim status (most recent comment) and fix confirmed conflicts
+  using the cascade procedure in `post-merge` step 1.5 (claim → isolated
+  worktree → merge main → `resolve-conflicts` skill → push → unclaim). Don't
+  leave conflicting PRs behind when wrapping up — they block whoever works
+  the queue next.
 
 ### 2. Surface anything still open or dangling
 
@@ -77,18 +81,36 @@ List, don't bury:
   the explicit `TZ` enforces PT on a machine set to any other zone) so "as of
   when" is unambiguous when the user re-reads it later.
 
-### 4. Run a UMS review
+### 4. Run a UMS review, then close with the right signal
 
 Run the full `ums` procedure (invoke the `ums` skill by name): scan the session
-for mistakes-corrected, new user preferences, tool quirks, and skill gaps;
-update the relevant memory files and skill definitions; commit via a **branch +
-PR** (not direct to `main`). If nothing durable emerged, say so explicitly
-rather than manufacturing edits.
+for mistakes-corrected, new user preferences, tool quirks, and skill gaps —
+including whether `spot-skill-opportunities` flagged a recurring pattern
+during the session that's still unbuilt; update the relevant memory files and
+skill definitions; commit via a **branch + PR** (not direct to `main`). If
+nothing durable emerged, say so explicitly rather than manufacturing edits.
+
+**Then close the reply correctly, depending on whether anything is waiting on
+the user:**
+
+- **Nothing open** — end with an explicit stopping-point signal, e.g. "This
+  session is at a good stopping point." A silent trailing summary leaves the
+  user unsure whether you're actually done or just paused.
+- **Something open** — an ambiguous review item, a deadlock needing a human
+  reviewer, a choice only the user can make — do **not** claim a stopping
+  point. End the reply **with the open question(s)**, last and clearly
+  visible, rather than burying them earlier in a long recap. The last thing
+  the user reads should be the thing you need from them.
+
+## Relationship to other skills
+
+- **`record-learnings`** (continuous) and **`ums`** (the learnings checkpoint,
+  which this embeds as step 4) — `wrap-up` is their session-level bookend.
+- **`spot-skill-opportunities`** — step 4's UMS pass checks whether it flagged
+  a recurring pattern during the session that's still unbuilt.
 
 ## Notes
 
 - Wrap-up reports PR/issue state and, where needed, resolves merge conflicts
   in unclaimed conflicting PRs (step 1). It does **not** merge PRs — merging
   stays the user's call unless they ask.
-- This is the session-level bookend to `record-learnings` (continuous) and
-  `ums` (the learnings checkpoint, which this embeds as step 4).

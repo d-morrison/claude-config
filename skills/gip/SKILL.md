@@ -14,8 +14,8 @@ allowed-tools:
 
 Grab a batch of open issues and work them **at the same time** — one subagent
 per issue, each in its own git worktree, each running the full grab-issue flow
-(claim → check history → implement → open MR/PR → ARDI to clean). Then assemble
-one combined report.
+(claim → check history → open draft PR → implement → mark ready → ARDI to
+clean). Then assemble one combined report.
 
 This is the **parallel** counterpart to [`gii`](../gii/SKILL.md), which is
 **deliberately serial**. The whole job of this skill is to safely lift that
@@ -125,29 +125,25 @@ and the default branch for each issue:
 > 3. **Branch from current `<default-branch>`**: `git fetch origin
 >    <default-branch> -q && git checkout -b <slug> origin/<default-branch>`.
 >    Use a descriptive `<slug>`.
-> 4. **Open a draft PR immediately** (before implementing): make an empty
->    commit, push the branch, and open a draft PR referencing `Closes #<N>`.
->    This makes the in-flight work visible right away.
->    `git commit --allow-empty -m "chore: claim #<N> [skip ci]" && git push -u origin HEAD`,
->    then open a draft PR with a real embedded newline in `--body` (not a
->    literal `\n`, which bash won't expand in a double-quoted string):
->    ```bash
->    gh pr create --draft \
->      --title "<title>" \
->      --body "Closes #<N>
->
->    Draft --- work in progress."
->    ```
-> 5. **Implement** the change. Keep the diff focused on this issue only ---
+> 4. **Open the draft PR now** — before implementing, so this worktree's work
+>    is visible to the other parallel workers and no one double-grabs the issue
+>    (see [`pr-on-claim`](../../shared/workflow/pr-on-claim.md)). Give the branch
+>    a diff with an empty commit, push, and open a **draft** PR into
+>    `<default-branch>` referencing `Closes #<N>`:
+>    `git commit --allow-empty -m "start: <title> (closes #<N>)"`, then
+>    `git push -u origin HEAD` (retry with backoff on a network error), then
+>    `gh pr create --draft …` (or `mcp__github__create_pull_request` with
+>    `draft: true`). A draft doesn't trigger the review bot on an empty diff.
+> 5. **Implement** the change. Keep the diff focused on this issue only —
 >    do **not** touch files another issue owns. Follow the repo's conventions
 >    (its `CLAUDE.md` / lab manual). Run the repo's pre-commit checks
 >    (render / lint / spell / tests) and fix what they flag.
-> 6. **Commit** with a clear message that references the issue
->    (`Closes #<N>` so the PR auto-closes it).
-> 7. **Push** `git push` (retry with backoff on a network error), then
->    **mark the PR ready** (`gh pr ready <PR-number>`) to convert from draft
->    and trigger the `@claude` review bot.
-> 8. **ARDI to clean** --- drive the PR to a clean review verdict: read the
+> 6. **Commit and push** the implementation onto the draft PR with a clear
+>    message referencing the issue (`Closes #<N>` so the PR auto-closes it),
+>    then **mark the PR ready for review** — `gh pr ready <N>` (or
+>    `mcp__github__update_pull_request` with `draft: false`). Marking it ready
+>    is what kicks off review.
+> 7. **ARDI to clean** — drive the PR to a clean review verdict: read the
 >    LATEST review, Address every finding / Rebut what's wrong / Defer
 >    out-of-scope items to a tracked issue, push, re-request review, repeat
 >    until zero findings and CI is green. Don't stop at "review-clean, needs
@@ -217,8 +213,10 @@ signal is present; otherwise propose with a cost estimate first.
   GIP can't prove independent goes back through GII. (gii : gip :: the write
   loop stays series, the safe subset fans out.)
 - **`gi`** / **`grab-issue`** — the per-issue flow each subagent runs (claim →
-  history → implement → PR → ARDI). GIP restates it inline because subagents
-  start fresh.
+  history → open draft PR → implement → mark ready → ARDI). GIP restates it
+  inline because subagents start fresh.
+- **`pr-on-claim`** — the rule behind each subagent's step 4: open the draft PR
+  up front so parallel workers see the in-flight issue before implementing.
 - **`gia`** — clears the whole queue (clean open PRs, then work issues); compose
   GIP into its issue phase when that phase's issues are independent.
 - **`ardi`** — each subagent ARDIs its own PR to clean.

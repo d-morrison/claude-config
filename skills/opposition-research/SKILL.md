@@ -157,6 +157,16 @@ Workflow: parallel finders by surface, then the dedupe-and-rank synthesis stage
 (step 6). Launch directly when an opt-in signal is present; otherwise propose with
 a cost estimate first.
 
+## Custom agent for the per-surface fan-out
+
+Step 3's fan-out workers have no need for Edit, Write, or Bash access.
+Spawn the `community-demand-scout` custom agent
+(`.claude/agents/community-demand-scout.md`) for each surface instead of a
+general-purpose subagent, for a hard, harness-enforced guarantee that no
+worker can file an issue or commit on its own --- rather than relying on
+this skill's own instruction-only discipline. Dedupe, rank, and file issues
+(§6--7) in the main session afterward.
+
 ## Relationship to other skills
 
 - **`scout-peers`** — the sibling, mirror image. `scout-peers` reads a

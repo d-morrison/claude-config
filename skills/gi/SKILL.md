@@ -136,28 +136,31 @@ Branch naming:
 - Docs → `docs/<issue-slug>`
 - Refactor → `refactor/<issue-slug>`
 
-### 8. Open a draft PR immediately
+### 8. Open the PR now — draft, from an empty commit
 
-Before implementing, make an empty commit, push the branch, and open a
-**draft** PR. An open PR is the strongest "in-flight" signal — it appears in
-`gh pr list` and in the issue's cross-referenced timeline, and is what other
-sessions check (step 4) before starting duplicate work.
+Open the PR **immediately, before implementing**, so the open-PR signal that
+step 4 relies on fires right away and other sessions can see the issue is being
+worked (see [`pr-on-claim`](../../shared/workflow/pr-on-claim.md)). Give the
+branch a diff with an empty commit, push, and open a **draft** PR:
 
 ```bash
-git commit --allow-empty -m "chore: claim #<N> [skip ci]"
+git commit --allow-empty -m "start: <issue title> (closes #<N>)"
 git push -u origin fix/<slug>
 
-# GitHub
-gh pr create --draft \
-  --title "<title>" \
-  --body "Closes #<N>
+# GitHub — draft PR
+gh pr create --draft --title "<title>" --body "Closes #<N>
 
-Draft --- work in progress."
+WIP — opened up front to claim the issue; implementing now."
+
+# GitLab — draft MR
+glab mr create --draft --title "<title>" --description "Closes #<N>
+
+WIP — opened up front to claim the issue; implementing now." --assignee <your-gitlab-username>  # default: demorrison
 ```
 
-Keep it draft until implementation is done — a draft does not trigger the
-`@claude` review bot. See
-[`pr-on-claim`](../../shared/workflow/pr-on-claim.md) for the principle.
+Keep it a draft: a draft doesn't trigger the `@claude` review bot, so no review
+round is wasted on an empty diff. Include `Closes #N` to auto-close the issue on
+merge.
 
 ### 9. Implement
 
@@ -167,29 +170,21 @@ Keep it draft until implementation is done — a draft does not trigger the
 - Commit with a message referencing the issue:
   `fix: handle auth timeout on slow networks (closes #12)`
 
-### 10. Push and mark PR ready for review
-
-Push the implementation commits:
+### 10. Push and mark the PR ready for review
 
 ```bash
-git push
+git push origin fix/<slug>   # push the implementation onto the draft PR from step 8
+gh pr ready <N>              # GitHub — flip draft → ready, which kicks off review
+# GitLab: glab mr update <N> --ready
 ```
 
-Then convert the draft to ready-for-review (triggers the `@claude` review
-bot):
-
-```bash
-# GitHub
-gh pr ready <PR-number>
-
-# GitLab — drafts use "Draft:" prefix; remove it with:
-glab mr update <MR-number> --ready
-```
+The PR already exists (step 8), so there's nothing new to create — pushing the
+implementation and marking it ready for review is what starts ARDI.
 
 ### 11. ARDI to clean
 
-Invoke the `ardi` skill on the newly opened MR/PR. Drive it through
-review rounds until the verdict is clean (zero findings).
+Invoke the `ardi` skill on the MR/PR. Drive it through review rounds until the
+verdict is clean (zero findings).
 
 ### 12. Report
 
@@ -233,7 +228,8 @@ dependency, needs design decision, upstream bug):
 - **`check-history`** — invoked in step 5 to avoid undoing past work
 - **`ardi`** — invoked in step 11 to drive the MR/PR to clean
 - **`claim-pr`** — the issue claim in step 6 follows the same pattern
-- **`pr-on-claim`** — the draft PR opened in step 8 follows this fragment
+- **`pr-on-claim`** — the rule behind step 8: open the draft PR up front so the
+  work is visible to other sessions before you implement
 - **`split-concerns`** — if the implementation grows too large, offer to split
 - **`defer-issue`** — if sub-tasks emerge during implementation, defer them
 
@@ -245,6 +241,8 @@ dependency, needs design decision, upstream bug):
 - ❌ Picking a huge issue that can't be completed in one session without
   discussing scope with the user first
 - ❌ Implementing without understanding "done" criteria from the issue
+- ❌ Opening the PR only after implementing — open a draft PR up front (step 8)
+  so the work is visible and a parallel session doesn't grab the same issue
 - ❌ Forgetting `Closes #N` in the MR/PR description
 - ❌ Merging without re-checking that a concurrent session's PR hasn't already
   closed the issue (resolve a surprise merge conflict by reading the diff, not

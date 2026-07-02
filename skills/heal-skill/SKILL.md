@@ -83,6 +83,11 @@ is authored without the same flaw.
 
 - **`skill-builder`** — the authoring counterpart; it writes a skill, this skill
   repairs one after it ships and misfires.
+- **`agent-builder`** — the authoring counterpart for a `.claude/agents/*.md`
+  subagent. If a heavy skill's fan-out step misbehaves because the *spawned
+  agent's* prompt or tool-scoping is wrong (not the calling skill's body), fix
+  the agent file via `agent-builder`'s conventions instead of editing the
+  skill.
 - **`link-skills`** — the proactive, whole-corpus cross-link audit; `heal-skill`
   is the single-skill reactive repair, and fixing an ambiguous overlap here
   means cross-linking the two skills (exactly what `link-skills` sweeps for).

@@ -5,6 +5,7 @@
 - Always disable it: pipe `| cat` or set `GH_PAGER=cat` (e.g. `gh pr view 116 | cat`).
 - **Rate limit is shared (5000/hr) and split GraphQL vs REST.** All tools/sessions/agents share the one user's 5000/hr; **GraphQL has its own, smaller pool that exhausts first** — `gh pr checks`, `gh pr view --json comments`, `gh pr list --json` use GraphQL. When GraphQL is spent, get the same data via REST (still has budget): `gh api repos/<o>/<r>/pulls/<n>`, `.../commits/<sha>/check-runs`, `.../issues/<n>/comments`. `gh api rate_limit --jq .resources` is **free** (doesn't count) — check `core` vs `graphql` remaining/reset before retrying. Don't tight-poll; use a background watcher with `sleep` (parallel sessions drain the shared pool fast).
 - **The @claude review bot's author name differs by API:** its comment author is `claude[bot]` in REST (`.user.login`) but `claude` in GraphQL (`.author.login`). A watcher filtering REST comments for `.user.login == "claude"` silently finds nothing — use `"claude[bot]"`.
+- **Polling for the bot's verdict: match `Claude finished`, don't exclude a placeholder.** While a run is underway, the bot's comment holds an in-progress placeholder whose wording *varies between runs* ("### Review in progress …", "Claude Code is working…"), so a watcher that exits when comments exist, or when one known placeholder phrase disappears, fires early on the next differently-worded placeholder. Completed runs (review and agent alike) start the body with `**Claude finished`. Poll `gh api repos/<o>/<r>/issues/<N>/comments --jq '[.[] | select(.user.login=="claude[bot]")] | last | .body'` and wait for that marker. (Cost two wasted watch rounds on ai-config#357 before keying on it.)
 - **`gh pr view --json` does not accept `merged` as a field.** Use `state` (returns `"MERGED"`) and `mergedAt` (ISO timestamp, null if not merged) to check merge status. Example: `gh pr view <N> --json state,mergedAt`.
 - **`gh pr edit` exits 1 on repos with Projects Classic — use `gh api` to update PR body.** `gh pr edit <N> --body "..."` / `--body-file <f>` returns exit code 1 with a GraphQL deprecation warning (`Projects (classic) is being deprecated…`). Sometimes the edit lands anyway; **sometimes it does not apply at all** (seen on sparta 2026-06-30: three `gh pr edit --body-file` attempts left the body unchanged with the `SHA_PLACEHOLDER` still in place). Either way, don't trust it — verify with `gh api repos/<o>/<r>/pulls/<N> --jq .body`, and just use the REST PATCH directly, which always exits 0 and applies: `gh api -X PATCH repos/<o>/<r>/pulls/<N> -f body="..."`. For a multi-line body, read it from a file with `-F body=@<path>` (capital `-F` to pull the field value from the file) rather than cramming it into `-f body="..."`.
 - **PR description image embeds: use `raw.githubusercontent.com`, not `github.com/.../raw/...`.** Embedding a committed file in a PR body with `![](https://github.com/<owner>/<repo>/raw/<sha>/<path>)` may not render — the reviewer will flag it. The correct raw-content domain is `https://raw.githubusercontent.com/<owner>/<repo>/<sha>/<path>`. Reference the full commit SHA so the image keeps rendering after the branch is deleted on merge.
@@ -121,6 +122,16 @@
   requires **only `threadId`** (node ID, e.g. `PRRT_kwDO...`); `owner`,
   `repo`, and `pullNumber` are ignored for that method. Thread node IDs come
   from `get_review_comments`.
+- **`mergeable_state` glossary — `unstable` is NOT a merge conflict.** GitHub's
+  `pull_request_read` `get` returns `mergeable_state` alongside `mergeable`;
+  the common values: `clean` (mergeable, all checks passing), `unstable`
+  (mergeable, but some check is pending/failing — not blocking), `dirty` (real
+  merge conflicts — this is the one that needs `git merge origin/main` +
+  conflict resolution), `blocked` (a required check hasn't passed),
+  `behind` (branch protection requires an update first). Only `dirty` means
+  conflicts; `unstable` just means "wait for CI" and needs no merge action.
+  (ai-config#373: `mergeable_state: unstable` right after a push was CI still
+  running, not a conflict signal.)
 - Webhook PR-activity events cover comments/reviews/CI *failures* but NOT CI
   *success*, new pushes, or merge-conflict transitions — don't rely on events
   alone to know a PR went green or merged; re-check explicitly.
@@ -137,15 +148,19 @@
   git-only proxy), so it's purely a timer, and foreground Bash `sleep` is
   blocked, which is why the background `Monitor` is the workable one. There is no
   `send_later` tool. Re-arm until the build goes green. Learned driving rme#929.
-- The `gh`->MCP substitution **mapping table** lives in `d-morrison/gha`'s
-  `CLAUDE.md` specifically (the "GitHub access in remote / web sessions" table);
-  other repos' `CLAUDE.md` (e.g. `ai-config`) do NOT carry it. When a skill or
-  doc tells a reader to "use the GitHub MCP tools," name the tools by example
-  (`mcp__github__add_issue_comment`, `mcp__github__create_pull_request`,
-  `mcp__github__search_pull_requests`) rather than pointing at "the repo's
-  `CLAUDE.md` mapping table" — that cross-reference
-  resolves only in gha and reads as a fabricated reference elsewhere. (Caught in
-  ai-config#137 review: the gip skill referenced a table ai-config doesn't have.)
+- `d-morrison/gha`'s `CLAUDE.md` carries its own `gh`->MCP substitution table
+  (the "GitHub access in remote / web sessions" section), scoped to that repo.
+  `d-morrison/ai-config` has its own cross-model registry at
+  [`tool-mappings.md`](../tool-mappings.md) (generated from `tool-mappings.yml`),
+  which ai-config skills can point to directly — see `CLAUDE.md`'s "Skills that
+  call gh/glab" section. When a skill or doc in a **different** repo (one with
+  neither table) tells a reader to "use the GitHub MCP tools," name the tools by
+  example (`mcp__github__add_issue_comment`, `mcp__github__create_pull_request`,
+  `mcp__github__search_pull_requests`) rather than pointing at a `CLAUDE.md`
+  mapping table that repo doesn't have — that cross-reference resolves only
+  where the table actually lives. (Caught in ai-config#137 review: the gip
+  skill referenced a table ai-config didn't have at the time; ai-config#327
+  later added `tool-mappings.md` to close that gap.)
 
 ## GII (Grab Issues Iteratively) — startup cleanup sweep
 
@@ -208,6 +223,30 @@ closed-issue references in multiple PR bodies, and stacking conflicts mid-ARDI.
 - `git switch -C "$BRANCH"` is already safe against flag-shaped branch names: `$BRANCH` is the argument *to* `-C`, so a value like `--weird` fails cleanly as `fatal: '--weird' is not a valid branch name` rather than being parsed as an option.
 - Do NOT "harden" it to `git switch -C -- "$BRANCH"` — that form is **broken**: the `--` is consumed as the branch name (the required argument to `-C`), so `$BRANCH` is parsed as the start-point instead and the command fails without creating the branch. (Verified on git 2.x; a review bot suggested the broken form on d-morrison/gha#58.)
 
+## Git — `gh pr merge --delete-branch` can orphan a stacked PR instead of retargeting it
+- GitHub's docs promise automatic retargeting: "If you delete a head branch
+  after its pull request has been merged, GitHub checks for any open pull
+  requests in the same repository that specify the deleted branch as their
+  base branch. GitHub automatically updates any such pull requests, changing
+  their base branch to the merged pull request's base branch."
+- In practice (Lacaedemon/sparta, 2026-07-01), `gh pr merge <N> --squash
+  --delete-branch` did NOT retarget a stacked PR onto the new base — it
+  auto-**closed** the stacked PR instead. Root cause unconfirmed (possibly a
+  timing/API-path difference between `gh`'s post-merge branch deletion and the
+  web UI's "Delete branch" button the docs describe) — but the failure mode is
+  reproducible enough to plan around regardless of cause.
+- **Before running `gh pr merge <N> --delete-branch`**, check whether another
+  open PR uses that branch as its base: `gh pr list --base <branch-name>`. If
+  one does, omit `--delete-branch` (merge without it, or delete manually
+  afterward once you've confirmed the stacked PR retargeted cleanly).
+- **Recovery when it happens anyway:** the *head* branch of the closed PR
+  usually still exists (only the deleted *base* branch is gone) —
+  `gh pr reopen` fails once the base is gone, so instead open a **new** PR
+  from that same head branch targeting `main` (or whatever the new
+  grandparent base is), note in the body that it supersedes the closed PR
+  number with identical commits, and comment on the closed PR linking the
+  replacement.
+
 ## Git — `worktree add` does not cd into the new worktree
 - `git worktree add <path> <ref>` creates the worktree at `<path>` but leaves the
   shell in the **original** checkout. Subsequent bare git commands (`git checkout`,
@@ -235,6 +274,28 @@ closed-issue references in multiple PR bodies, and stacking conflicts mid-ARDI.
 - `git merge --continue --no-edit` fails with `fatal: --continue expects no arguments`.
 - After resolving conflicts and staging (`git add <files>`), use `git merge --continue` alone.
 - In a non-interactive (headless) session git uses the auto-generated merge commit message without prompting — no editor opens.
+
+## Git stash — verify supersession line-by-line, tag before dropping
+- Before dropping a stash as "already landed", verify against `origin/main`,
+  not by eyeball: extract the stash's added lines
+  (`git stash show -p 'stash@{0}' | grep '^+[^+]'` — the `[^+]` keeps the
+  `+++ b/<path>` diff headers out of the set, where they'd read as spurious
+  "missing from main" lines) and `grep -F` each one in
+  main's version of the file; for files the stash *creates*, check
+  `git cat-file -e origin/main:<path>`. A line that matches on topic but not
+  verbatim usually means main carries the **improved** review-cycle revision —
+  read both and confirm main's is a superset before calling it superseded.
+- `git stash show -p` **omits the untracked-files component.** Check
+  `git show 'stash@{0}^3'` (that parent exists only if the stash was made with
+  `-u`) before judging supersession.
+- `git stash drop` is irreversible, and Claude Code's auto-mode classifier
+  blocks it for exactly that reason — sometimes even after a general "do the
+  cleanup" go-ahead, when the stash is large. Don't fight it: run
+  `git tag backup/stash-<topic> 'stash@{0}'` first. The stash commit stays
+  reachable, the drop becomes genuinely reversible (recover with
+  `git stash apply backup/stash-<topic>`), and the retried drop passes. Tell
+  the user the tag exists; remove it with `git tag -d backup/stash-<topic>`
+  once confident.
 
 ## GitLab Discussions API (inline diff comments)
 - Endpoint: `POST /projects/:id/merge_requests/:iid/discussions`
@@ -320,6 +381,24 @@ closed-issue references in multiple PR bodies, and stacking conflicts mid-ARDI.
     with the autoloader off:
     `RENV_CONFIG_AUTOLOADER_ENABLED=FALSE Rscript -e 'lintr::lint("path/to/file.qmd")'`.
     (Used to lint the changed files for rme #873 when lintr wasn't in the renv lib.)
+- **When the container's R is a brand-new release P3M hasn't built binaries for
+  yet** (e.g. R 4.6.1 in mid-2026), `install.packages()` from P3M silently falls
+  back to **source**, and heavy pkgs (DT → sass, etc.) fail or time out — so a
+  full HTML `quarto render` (needs knitr/DT/rmarkdown) isn't feasible locally.
+  Two mitigations: (1) replicate just the **build-breaking check in base R**
+  (e.g. a Quarto page's `stop()`-on-missing-data guard) — base R needs no
+  install; (2) `quarto install tinytex` **does** work, so validate the LaTeX/PDF
+  paths locally with lualatex (`quarto render <f>.qmd --to pdf`) even when the
+  HTML render is blocked. Let CI do the authoritative HTML render. (macros#71:
+  DT/knitr uninstallable, but a base-R interpretation-completeness check + a
+  lualatex PDF render of the new macros validated the change before push.)
+- **R in these containers defaults to the `C` locale**, so
+  `read.delim(..., fileEncoding="UTF-8")` (or any read) of a file with multibyte
+  chars (π, μ, ℓ, …) **silently truncates at the first non-ASCII byte**, emitting
+  only an `invalid input found on input connection` warning — you get a few rows,
+  not all, and a completeness check then reports bogus "missing" rows. Run R with
+  `LANG=C.UTF-8 LC_ALL=C.UTF-8 Rscript …` to read UTF-8 data files correctly.
+  (CI runners are UTF-8, so this bites only locally.)
 - **renv activation failure when a GitHub remote is blocked**: if `DESCRIPTION`
   lists a GitHub `Remotes:` entry the proxy can't reach (e.g. bcs's
   `d-morrison/altdoc@recursive-qmd-search`), renv activation (via `.Rprofile`)
@@ -327,6 +406,24 @@ closed-issue references in multiple PR bodies, and stacking conflicts mid-ARDI.
   Bypass: `R --no-save --no-restore --no-site-file --no-init-file` skips
   `.Rprofile` entirely. Install needed packages from P3M into the user library
   and proceed. (Observed on ucdavis/bcs cloud sessions.)
+- **To check whether a CRAN package is archived, query the PPM JSON API, not
+  WebFetch against the CRAN HTML page — and check `is_archived`, NOT
+  `tran_archive`.**
+  `curl -s https://packagemanager.posit.co/__api__/repos/cran/packages/<pkg>`
+  returns a top-level boolean `"is_archived": true|false` — that's the
+  authoritative field. `tran_archive` is a decoy: it's present in the same
+  response but stays `null` even for a package that **is** archived (verified
+  directly — `pryr`'s response has `"tran_archive": null` alongside
+  `"is_archived": true`), so checking it gives a false "not archived" on every
+  query. Confirmed by curling both packages live: `pryr` and `veccompare` each
+  return `"is_archived": true`. WebFetch summarizing
+  `cran.r-project.org/package=<pkg>` can also return confident-sounding but
+  unverified specifics (an "Archival Date" / "Reason" framing CRAN's actual
+  archived-package page doesn't present that way) — cross-check against the
+  PPM API's `is_archived` field before citing a date or reason as fact.
+  (Surfaced on ucdavis/fxtas#157: pak failed to resolve `pryr` +
+  `veccompare` from the PPM snapshot; the repo owner verified via this
+  endpoint before concluding they were genuinely archived.)
 - **`snapr` is not on CRAN or P3M**: install from the GitHub tarball.
   `curl -L https://codeload.github.com/d-morrison/snapr/tar.gz/refs/heads/main -o /tmp/snapr.tar.gz`
   then in R, install `readr` first (a direct `snapr` `Imports:` dependency):
@@ -415,6 +512,18 @@ closed-issue references in multiple PR bodies, and stacking conflicts mid-ARDI.
   (separate findings). They can DISAGREE — one says clean while the other finds
   nits. Reconcile BOTH before calling a PR clean; the agent post-step tends to
   drip 1–2 pre-existing cosmetic nits per round (asymptotic).
+
+## Claude Code on the web: CI monitoring toggles have no default setting
+- The per-PR "CI monitoring" panel (web session sidebar) shows two toggles,
+  **Auto-fix CI & address comments** and **Auto-merge when ready**. There is
+  **no account-, org-, repo-, or environment-level setting to default these on**
+  — confirmed against https://code.claude.com/docs/en/claude-code-on-the-web.
+  Each new PR/session starts with both off and they must be toggled manually.
+- Closest workaround: run `/autofix-pr` from the CLI on a PR's branch — it
+  spawns a web session with **Auto-fix CI & address comments** already on for
+  that PR. There's no CLI shortcut for **Auto-merge when ready**; that one
+  always needs a manual toggle. A true default would require a feature
+  request via `/feedback`.
 
 ## @claude CI action (d-morrison/gha `claude.yml`)
 - The reusable `claude.yml@v1` agent workflow restores config files (`CLAUDE.md`,
@@ -519,6 +628,15 @@ closed-issue references in multiple PR bodies, and stacking conflicts mid-ARDI.
     The guard step fails the check ❌. The prior clean review on the same diff is still
     valid. Fix: push a trivial commit to trigger a fresh review. Observed on gha#92 run
     #28034977099.
+- **A review job with `conclusion: success` but NO posted comment is NOT
+  automatically "unreviewed."** It is either (a) a quota/auth skip (see above:
+  `total_cost_usd=0`, `num_turns=1`) or (b) a genuinely **clean review that found
+  nothing to flag**. Tell them apart from the job log: a clean review shows a
+  full agent run (`"subtype":"success"`, `"is_error":false`, high `num_turns`,
+  `total_cost_usd` > 0) followed by `No buffered inline comments` in the
+  post-comments step — the bot reviewed and posted nothing because it had nothing
+  to say. Don't treat that as a missing review or re-trigger it. (macros#71:
+  `claude-review` ran 21 turns at $0.88 and buffered 0 comments = clean.)
 - **Reading the hidden error behind a failed `claude-code-review`.** The action prints
   `Running Claude Code via SDK (full output hidden for security)…` and suppresses the real
   API error. The reusable `claude-code-review.yml` now accepts a **`show-full-output`** input
@@ -749,6 +867,27 @@ common patterns.
   negotiation succeeds, but the real push 403s on the ref update). So you cannot
   cut tags from such a session — hand the exact `git tag` + `git push` commands to
   the user instead. Don't retry the 403 (policy denial, not transient).
+- **A session can be fully READ-ONLY on a repo — even the harness-assigned
+  branch can be unwritable.** Beyond the tag-push case above, some sessions
+  403 on every write path to a given repo: `git push` to the assigned branch
+  itself (not just other branches — and `git ls-remote` may show the assigned
+  branch doesn't even exist on the remote yet, so the push 403s trying to
+  create it), plus every GitHub MCP write tool — `push_files`/branch creation,
+  `create_or_update_file` (contents API), and `add_issue_comment` — all
+  returning `403 Resource not accessible by integration`. Confirm this
+  conclusively by testing 2-3 *distinct* write endpoints (not just retrying the
+  same one) before concluding read-only, since a single 403 could be a
+  branch-scope issue (the case above) rather than a repo-wide one. Once
+  confirmed: don't keep retrying — package the diff as a patch
+  (`git format-patch`) and hand it to the user via `SendUserFile` instead of a
+  pasted diff, so it's directly `git am`-able. Because you can't push, watch
+  for the user (or another session) to land an independently-derived fix
+  rather than your literal patch — re-verify the actual merged diff before
+  reporting status rather than assuming your patch was applied as-is. (Hit on
+  ucdavis/fxtas#156: diagnosed a CI-breaking dependency issue, delivered the
+  fix as two patch files since every write 403'd; the user filed their own
+  issue/PR with a different fix for the same root cause and merged that
+  instead.)
 - **`mcp__github__actions_list` / `list_workflow_runs` returns HUGE objects**
   (full repo metadata embedded per run, ~30-60KB even at `per_page: 1`), which
   blows the tool-output cap and gets saved to a file. To read a run's
@@ -800,6 +939,8 @@ deduplication, two API endpoints carry different content:
   This pattern discriminates review summaries from `@claude` task-handler responses
   (which also post as `claude[bot]` but use "Claude finished…" / "Claude Code is
   working…" headers, not the "### Code Review" heading the review workflow uses).
+  The ai-config `claude-review.yml` (#275) omits this content filter — it was
+  accepted, but task-handler responses can appear in the `prior-reviews` context.
 - **`/repos/{owner}/{repo}/pulls/{n}/comments`** — inline review findings posted
   via the review API. These are already `claude[bot]`-only (the `@claude` task
   handler posts to `/issues/`, not `/pulls/`), so no content filter is needed.
@@ -822,15 +963,6 @@ DELIMITER="eof_$(openssl rand -hex 8)"
 The ai-config `claude-review.yml` (merged in #275) uses a static
 `__REVIEWS_EOF__` delimiter instead — accepted by design but is a known
 divergence from this best practice.
-
-**Content filter for issue-comments endpoint.** When fetching
-`/issues/{n}/comments` for prior reviews, the filter
-`select(.user.login == "claude[bot]")` picks up BOTH review summaries AND
-`@claude` task-handler responses ("Claude finished…" / "Claude Code is
-working…"). Add `and (.body | test("### Code Review"))` to discriminate review
-summaries from task-handler posts. The ai-config `claude-review.yml` (#275)
-omits this content filter — it was accepted, but task-handler responses can
-appear in the `prior-reviews` context.
 
 **`needs.X.result != 'cancelled'` vs `== 'success'`** — when the dependency job
 is non-critical (acceptable to proceed without its output), use
@@ -1002,6 +1134,24 @@ not block `claude-review`.)
   defaults first (no config): collect the full violation list. Disable every failing rule
   to achieve a green baseline with zero corpus churn. Re-enable rules incrementally after
   targeted fix passes. This prevents flooding CI with hundreds of pre-existing violations.
+
+## Custom subagents (`.claude/agents/*.md`) — Bash is a write-access loophole
+
+The `tools:` frontmatter field (comma-separated, e.g. `tools: Bash, Read,
+Grep, Glob`) is the correct, harness-enforced way to restrict a custom
+subagent — confirmed against the real docs
+(<https://code.claude.com/docs/en/sub-agents>). But blocking `Edit` and
+`Write` does **not** make an agent read-only if it still has `Bash`: shell
+commands (`sed -i`, `echo >`, `git commit`, `renv::update()` without
+`check = TRUE`) write to the filesystem regardless of which Claude tools are
+in the allowlist. Only an agent with *no* `Bash` (e.g. `WebSearch, WebFetch,
+Read, Grep, Glob`) gets a genuine harness-enforced read-only guarantee.
+When an agent needs `Bash` for read-only shell checks (`grep`, `gh api`,
+`git status`), describe the isolation honestly as "no Edit/Write tool use;
+avoiding write-capable shell commands is instruction-level discipline" —
+don't claim an unconditional "nothing can be modified" guarantee. (Caught
+across three review rounds on ai-config#341, `hallucination-detector` and
+`dependency-auditor`.)
 
 ## Office Open XML (.docx / .xlsx) — editing committed content
 - `.docx`/`.xlsx` are zip archives. To strip or edit content (e.g. remove a sensitive

@@ -15,7 +15,10 @@ touches the same files --- branch it off that PR's tip instead of `main`, so it
 stacks on top. Note the dependency in the new PR's description
 (`Stacked on #N --- merge that first`) and track the merge order for the final
 report. Branch off `main` only when the next item is genuinely independent of
-every open PR.
+every open PR. See the [`stack-prs`](../../skills/stack-prs/SKILL.md) skill for
+the mechanics --- branching off the base PR's tip, setting the new PR's `base`,
+keeping it in sync as the base branch moves, and re-targeting to `main` once
+the base merges.
 
 So the between-item decision is always *keep going*; the only open question is
 the base branch:

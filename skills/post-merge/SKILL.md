@@ -51,15 +51,22 @@ gh pr list --state open \
   --json number,title,headRefName,mergeable,mergeStateStatus,comments
 ```
 
-For each PR where `mergeable == "CONFLICTING"`:
+For each PR where `mergeable == "CONFLICTING"` **or `"UNKNOWN"`** (GitHub can
+take minutes to finish computing mergeability after a push — a genuinely
+conflicting PR can sit in `UNKNOWN` and get missed if you filter for
+`CONFLICTING` alone):
 
-1. **Check claim status.** Read the most recent comment. If it says "Working on
+1. **Verify before claiming — don't trust the flag alone.** See
+   `resolve-conflicts`, "Verify before you act": `git merge-tree --write-tree
+   origin/main origin/<branch>` gives ground truth without a worktree. Skip
+   if it comes back clean.
+2. **Check claim status.** Read the most recent comment. If it says "Working on
    this — paws off" (or equivalent), skip it — another session owns it.
-2. **Claim it.**
+3. **Claim it.**
    ```bash
    gh pr comment <N> --body "Working on this — paws off until I'm done."
    ```
-3. **Create an isolated worktree**, fetch the latest `main` (the squash-merge
+4. **Create an isolated worktree**, fetch the latest `main` (the squash-merge
    commit that caused the conflict), and merge:
    ```bash
    git fetch origin main <branch>   # fetch both: we need the new main tip
@@ -68,15 +75,15 @@ For each PR where `mergeable == "CONFLICTING"`:
    git checkout -b <branch>         # or --track origin/<branch> if the name is free
    git merge origin/main            # picks up the new squash-merge commit
    ```
-4. **Resolve conflicts** using the `resolve-conflicts` skill (consolidate both
+5. **Resolve conflicts** using the `resolve-conflicts` skill (consolidate both
    sides' intent; do not blindly pick one side wholesale).
-5. **Run the repo's pre-commit checks**, then push and remove the worktree:
+6. **Run the repo's pre-commit checks**, then push and remove the worktree:
    ```bash
    git push origin <branch>
    cd -
    git worktree remove .claude/worktrees/pr-<N>
    ```
-6. **Unclaim** with a brief resolution summary:
+7. **Unclaim** with a brief resolution summary:
    ```bash
    gh pr comment <N> --body "Conflict resolved — branch is now mergeable. <one-line summary of what conflicted and how it was resolved>"
    ```
@@ -151,7 +158,8 @@ Run the full `ums` procedure (invoke the `ums` skill by name), focused on what
 - **Corrections / guidance the user gave mid-PR** → preference + skill update
   (per "update BOTH skills AND preferences").
 - **Tool / CI quirks** hit during the loop → `tools.md` / `debugging.md`.
-- **A multi-step pattern that emerged** → consider a new skill.
+- **A multi-step pattern that emerged** → run `spot-skill-opportunities` to
+  judge whether it's genuinely recurring, then hand off to `skill-builder`.
 
 This is the "learn from mistakes and guidance along the way" step — a merge is
 the natural checkpoint to bank those lessons before the context is gone. If
@@ -183,6 +191,8 @@ PT on a machine set to any other zone).
   per-PR version: run it each time a PR lands; run `wrap-up` once at session
   end. They share the verify-then-UMS shape.
 - **`ums`** — step 4 invokes it.
+- **`spot-skill-opportunities`** — step 4's "multi-step pattern that emerged"
+  bullet routes here to judge recurrence before handing off to `skill-builder`.
 - **`cb` / `clean-branches`** — for stacked or stale sibling branches.
 - **`clean-worktrees` / `cw`** — if the PR was built in a git worktree, remove
   it during the tidy (step 2); a leftover worktree pins its branch and blocks
