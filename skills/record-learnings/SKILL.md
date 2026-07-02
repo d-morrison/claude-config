@@ -83,7 +83,7 @@ For standing instructions that should always be in context:
    `git -C ~/.claude/skills/record-learnings rev-parse --show-toplevel`), or to
    `agent-builder` to scaffold a persistent read-only subagent in
    `.claude/agents/` when the pattern is really a worker persona a heavy
-   skill's fan-out step needs
+   skill's fan-out step needs.
 
 ## Sharing with other agents
 

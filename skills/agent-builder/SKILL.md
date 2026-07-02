@@ -151,7 +151,7 @@ Branch + PR + ARDI, the same flow as `skill-builder`.
 > section for the full explanation.
 
 ```bash
-cd "$(git -C ~/.claude/skills/agent-builder rev-parse --show-toplevel)"   # ai-config root
+cd "$(git -C ~/.claude/skills/agent-builder rev-parse --show-toplevel)"   # ai-config root — NOTE: the MAIN checkout, NOT your worktree (see caveat above)
 git fetch origin main && git checkout -b add-<name>-agent origin/main
 # write .claude/agents/<name>.md, and update the one calling skill's SKILL.md
 # The `validate` CI job runs these four — run all four locally before pushing,
