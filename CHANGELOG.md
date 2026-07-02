@@ -14,7 +14,7 @@ behavior change to an existing one), not every mechanical edit.
 
 - **`mergeable_state` glossary** (`memories/tools.md`) and **`address-every-comment`
   policy refinement**. Records that GitHub's `mergeable_state: unstable` means
-  "CI still running", not a merge conflict (only `dirty` does); and that a
+  "CI pending or failing (non-required)", not a merge conflict (only `dirty` does); and that a
   prose fix should sync any paraphrase of the same wording elsewhere in the
   PR (e.g. a CHANGELOG entry written before the review landed). Lessons from
   PR #373's review lifecycle.
