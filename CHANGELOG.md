@@ -12,6 +12,12 @@ behavior change to an existing one), not every mechanical edit.
 
 ## Unreleased
 
+- **`fact-check-prose` policy refinement: tool/library behavior claims.**
+  When prose describes deterministic, cheaply-reproducible tool or library
+  behavior (a git merge driver, a shell built-in, a regex engine), verify it
+  with a live repro rather than relying on memory or half-remembered docs.
+  Prompted by a git union-merge "de-duplicates identical lines" claim in
+  #366 that turned out false — confirmed with a constructed conflict test.
 - **`configure-gitattributes` skill** (#364). New skill for configuring or
   auditing a repo's `.gitattributes`: union-merge for changelog/news files
   that almost always want both sides kept on conflict, line-ending

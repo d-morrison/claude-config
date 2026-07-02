@@ -11,6 +11,14 @@ claims and reasoning that are resolved but wrong.
   and, where the claim is checkable against an external source (a paper, a
   spec, a package's documentation, a dataset), fetch and check it there too.
   Don't accept a plausible-sounding claim without checking it.
+- **Tool/library behavior claims.** When prose describes how a specific tool
+  or library behaves (a git merge driver, a shell built-in, a regex engine, a
+  function's edge-case handling) and that behavior is deterministic and cheap
+  to reproduce, run a small live test rather than relying on memory or a
+  half-remembered doc. A plausible-sounding mechanism description ("union
+  merge de-duplicates identical lines") can be wrong in a specific,
+  checkable way; a two-minute constructed repro settles it definitively where
+  recall alone can't.
 - **Document-internal reasoning.** Work through the logic of any argument the
   document makes, not just its individual factual claims --- this includes
   **formal mathematical reasoning** (derivations, proofs, algebraic steps ---
