@@ -22,3 +22,11 @@ Do **not** report "ready to merge with one minor nit noted" / "harmless as-is" /
 requester. If after 3--4 rounds the reviewer keeps generating new nits each
 cycle (asymptotic noise), surface that and ask whether to keep going or accept
 the current state.
+
+**When a finding is a pattern (a formatting/style rule broken in one spot),
+apply it everywhere it recurs in the same file, not just the flagged line.**
+A reviewer that flags one inconsistent list-item format is telling you about
+the rule, not just that one item --- fix every item in the same list that
+breaks it in the same pass, rather than waiting for the reviewer to flag each
+occurrence in a separate round. Re-scan the whole changed file for the same
+pattern before pushing the fix.
