@@ -288,6 +288,16 @@
   most easily drops a qualifier and becomes misleading. (Learned on PR #43: the terse
   pipe-examples bullet dropped the "in R" qualifier that `CLAUDE.md` had, which a reviewer
   flagged as implying `|>` / `%>%` exist in Python/JS.)
+- Before adding a bullet that redefines or narrows an existing term (fully clean, claim-pr,
+  ARDI, etc.), grep the repo for that term's OTHER canonical definitions — not just the
+  twin preferences.md/CLAUDE.md copy above, but any `shared/*.md` fragment, skill doc, or
+  other memory file that states the same rule. If the new rule is a genuine refinement,
+  update the canonical doc itself in the same PR, not just a satellite copy; note in the
+  PR description that the canonical file is touched and why. (Learned on sparta 2026-07-01,
+  PR #318: a new `dont-merge-failing-workflows` bullet expanded "fully clean" CI to mean
+  every workflow green, including non-gating checks — but silently contradicted the
+  canonical `shared/workflow/fully-clean.md` [`@`-included into `CLAUDE.md`], which still
+  said "every required check." The `@claude` bot review caught the drift in round 1.)
 - After adding or updating skills OR memory files in the ai-config repo, always commit
   and push everything to origin (on the current branch if a PR is already open, or
   create a new branch + PR if the change is out of scope). Never leave ANY changes in
