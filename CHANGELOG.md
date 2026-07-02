@@ -19,6 +19,12 @@ behavior change to an existing one), not every mechanical edit.
   against the code (routing/dispatch site, tests) before scoping new work,
   and scope only the genuine remaining slice when the issue is partly done.
   Caught on sparta #164/#240 (nearly rebuilt already-done work).
+- **Squash-merge branch-reuse gotcha documented in `CLAUDE.md`** (#361).
+  Reusing a harness-assigned branch name for follow-up work after its own PR
+  squash-merged breaks git ancestry, so pushing more commits on top shows the
+  entire prior PR's diff again. Records the check-before-push
+  (`git merge-base --is-ancestor`) and rebuild-with-cherry-pick fix.
+
 - **`mwc` skill (aliases `merge-when-confident`, `maw`, `merge-at-will`).**
   New session-scoped exception to the standing "merge is human-gated" rule:
   when the user explicitly grants it, I may squash-merge any PR I'm driving
