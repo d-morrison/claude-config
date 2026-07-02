@@ -122,6 +122,16 @@
   requires **only `threadId`** (node ID, e.g. `PRRT_kwDO...`); `owner`,
   `repo`, and `pullNumber` are ignored for that method. Thread node IDs come
   from `get_review_comments`.
+- **`mergeable_state` glossary — `unstable` is NOT a merge conflict.** GitHub's
+  `pull_request_read` `get` returns `mergeable_state` alongside `mergeable`;
+  the common values: `clean` (mergeable, all checks passing), `unstable`
+  (mergeable, but some check is pending/failing — not blocking), `dirty` (real
+  merge conflicts — this is the one that needs `git merge origin/main` +
+  conflict resolution), `blocked` (a required check hasn't passed),
+  `behind` (branch protection requires an update first). Only `dirty` means
+  conflicts; `unstable` just means "wait for CI" and needs no merge action.
+  (ai-config#373: `mergeable_state: unstable` right after a push was CI still
+  running, not a conflict signal.)
 - Webhook PR-activity events cover comments/reviews/CI *failures* but NOT CI
   *success*, new pushes, or merge-conflict transitions — don't rely on events
   alone to know a PR went green or merged; re-check explicitly.

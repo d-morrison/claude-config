@@ -30,3 +30,12 @@ the rule, not just that one item --- fix every occurrence in the same file that
 breaks it in the same pass, rather than waiting for the reviewer to flag each
 occurrence in a separate round. Re-scan the whole changed file for the same
 pattern before pushing the fix.
+
+**When a prose fix changes wording that's also paraphrased elsewhere in the
+same PR (a CHANGELOG entry, a PR description, a cross-reference), sync that
+copy too.** A CHANGELOG entry written before the review lands often quotes or
+paraphrases the exact phrase a reviewer later flags; fixing the source
+prose but leaving the paraphrase stale reintroduces the same wording issue
+one file over. Grep the diff for the flagged phrase before considering the
+finding closed. (ai-config#373: fixed "routing/dispatch site" in the skill
+per review, but the CHANGELOG entry still said it until a follow-up commit.)
