@@ -610,10 +610,16 @@
   freehand-implementing the scaffold-and-ship flow. Skill-builder encodes steps
   that are easy to skip when done ad hoc: the extend-first check, running the
   four local validation scripts (`validate-skills.py`, `check-links.py`,
-  `check-vendored-drift.py`, `markdownlint-cli2`) before pushing, and explicitly
-  requesting `d-morrison` as reviewer. (Learned on ai-config#338 — the
-  `prompt-me`/`pm` skill was built and shipped without invoking `skill-builder`,
-  so none of those steps ran; CI happened to catch what the scripts would have.)
+  `check-vendored-drift.py`, `markdownlint-cli2`) before pushing, registering
+  any cited MCP tool in `tool-mappings.yml`, updating `skills.qmd`'s count from
+  the actual `skills/` directory count (not a manual +1), cross-linking related
+  skills, and explicitly requesting `d-morrison` as reviewer. (Learned on
+  ai-config#338 — the `prompt-me`/`pm` skill was built and shipped without
+  invoking `skill-builder`, so none of those steps ran; CI happened to catch
+  what the scripts would have. Reinforced on ai-config#347 — `resolve-pr-threads`
+  was hand-authored and needed a review round to catch a `tool-mappings.yml`
+  gap `skill-builder` already documented from a near-identical miss in
+  `push-memory` #311.)
 - Claim a PR before pushing iterative commits to it, even when you opened the
   PR yourself in the same session — this repo's `@claude` review workflow can
   fire and interleave with an in-flight push. Post the "paws off" comment from

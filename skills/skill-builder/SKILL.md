@@ -130,6 +130,11 @@ allowed-tools:               # real skill: list its tools. alias: mirror the can
 - **No registry to update.** Skills are auto-discovered from `skills/` (the
   bootstrap symlink and the plugin root both read the directory) — adding the
   directory is enough.
+- **List it in `skills.qmd` if it belongs in one of the category tables**, and
+  bump the "All N+ canonical skills" count at the bottom to the **actual**
+  directory count (`ls -d skills/*/ | wc -l`), not a manual +1 — `main` often
+  gains other skills while your PR is in review, so a hand-incremented count
+  drifts and reads as stale by the time you merge (ai-config#347).
 - **Register any new tool the skill names.** Discovery needs no registry, but
   tool *references* do. If the procedure names a **GitHub MCP tool or `gh`/`git`
   operation not already in `tool-mappings.yml`** (grep it to check), verify the
@@ -148,6 +153,21 @@ allowed-tools:               # real skill: list its tools. alias: mirror the can
   `$PATH`. A reader who copies the command without substituting the placeholder
   runs something wrong. Use `<path>`, `<url>`, `<target>` instead. (See
   `memories/tools.md` → "Skill command blocks".)
+- **Every procedural step needs a runnable command, not just prose.** If
+  sibling steps in the same skill show a bash snippet, a step that only
+  describes the action in prose ("rebase to drop the commits") reads as
+  incomplete and invites a reviewer finding. This matters most for a
+  destructive or history-rewriting step that already requires explicit user
+  approval — the user needs to see exactly what they're approving, not infer
+  it. (`stack-prs` #359 round 1: the one step without a concrete command was
+  the abandoned-base-PR rebase.)
+- **Verify a cross-skill claim against the referenced skill's actual
+  mechanics before writing it — don't infer from what would be plausible.**
+  A claim like "skill X uses signal Y to detect Z" needs to be checked against
+  X's real procedure, not assumed from what sounds reasonable. (`stack-prs`
+  #359 round 1: claimed `ardia`'s stacked-PR detection reads the PR body,
+  when `ardia/SKILL.md` actually matches `baseRefName` against `headRefName`
+  — the body note only helps a human scanning the list.)
 
 ## If the skill fans out to subagents
 
@@ -284,7 +304,10 @@ Then, as their own explicit steps (don't leave them buried in a comment):
 - ❌ Encoding a standing rule in the skill but not in `preferences.md`.
 - ❌ Naming a GitHub MCP tool (or `gh`/`git` operation) the skill uses without
   registering it in `tool-mappings.yml` — the reviewer flags the unregistered
-  name as a possible hallucination (`push-memory` #311).
+  name as a possible hallucination (`push-memory` #311, `resolve-pr-threads` #347).
+- ❌ Bumping `skills.qmd`'s skill count by a manual +1 instead of re-deriving it
+  from `ls -d skills/*/ | wc -l` — it drifts whenever `main` gains other skills
+  mid-review (`resolve-pr-threads` #347).
 - ❌ Leaving the new skill as a local-only uncommitted file (or pushing direct to main).
 - ❌ In a worktree session, writing the skill files to the `rev-parse --show-toplevel`
   path — it resolves to the main checkout (via the `~/.claude/skills` symlink), not
