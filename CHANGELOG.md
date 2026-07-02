@@ -21,6 +21,10 @@ behavior change to an existing one), not every mechanical edit.
   on a fresh empty-commit draft PR is a signal to check `main`'s position
   before debugging the failure itself --- a stale local checkout can surface
   failures that are really just "main moved."
+- **`memories/tools.md`: watch for the bot's `Claude finished` marker** (#367).
+  A watcher polling for the @claude bot's verdict must match the completion
+  marker (`**Claude finished`), not the absence of an in-progress placeholder
+  --- placeholder wording varies between runs, so exclusion filters fire early.
 - **Squash-merge branch-reuse gotcha documented in `CLAUDE.md`** (#361).
   Reusing a harness-assigned branch name for follow-up work after its own PR
   squash-merged breaks git ancestry, so pushing more commits on top shows the
