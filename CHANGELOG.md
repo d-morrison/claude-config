@@ -12,6 +12,12 @@ behavior change to an existing one), not every mechanical edit.
 
 ## Unreleased
 
+- **`stack-prs` skill** (#358). Branch new work off an existing, unmerged
+  PR's tip instead of `main`, open the dependent PR with `base` set to that
+  PR's branch, keep it in sync as the base branch moves, and re-target it to
+  `main` once the base merges. The general-purpose, directly-invocable
+  counterpart to the stacking logic that `ardia`, `gii`/`gia`, and
+  `stack-dont-pause` each already do as a side effect of their own loops.
 - **`fact-check-prose` skill (alias `fcp`) and `prose-fact-checker` agent**
   (#344). New standing policy (`shared/writing/fact-check-prose.md`): when
   reviewing prose, check factual claims against domain knowledge and external

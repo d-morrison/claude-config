@@ -1,17 +1,17 @@
 ---
-name: "resolve-pr-threads"
-description: "Codex wrapper for the ai-config Claude skill `resolve-pr-threads`. Sweep a PR/MR's inline review threads and resolve only the ones that are already genuinely settled (Addressed-and-pushed, Defer-with-issue-linked, Acknowledged, or a Rebut the reviewer didn't re-raise), leaving anything else open for a full `ard` pass. Use when asked to 'resolve pr threads', 'clean up the threads', 'resolve stale threads', or before re-requesting review so old threads don't carry over. Does not disposition new findings \u2014 that's `ard`'s job. Use when Codex is asked to use `resolve-pr-threads`, `/resolve-pr-threads`, or the corresponding ai-config/Claude skill workflow."
+name: "stack-prs"
+description: "Codex wrapper for the ai-config Claude skill `stack-prs`. Branch new work off an existing, unmerged PR instead of `main`, open the dependent PR with its `base` set to that PR's branch, and keep it in sync as the base branch moves (or re-point it to `main` once the base merges). Use when asked to 'stack this PR on #N', 'branch off that PR', 'stack-prs', or whenever new work genuinely depends on an open, unmerged PR's code. Use when Codex is asked to use `stack-prs`, `/stack-prs`, or the corresponding ai-config/Claude skill workflow."
 ---
 
-# resolve-pr-threads (Codex wrapper)
+# stack-prs (Codex wrapper)
 
 This is a generated Codex wrapper around the canonical ai-config Claude skill.
 
-Source: [skills/resolve-pr-threads/SKILL.md](../../skills/resolve-pr-threads/SKILL.md)
+Source: [skills/stack-prs/SKILL.md](../../skills/stack-prs/SKILL.md)
 
 Before acting, read the source skill completely and follow its workflow, adapting it to Codex.
 
-The source lives at `skills/resolve-pr-threads/SKILL.md` in the same ai-config checkout as this wrapper. If this wrapper was loaded through `${CODEX_HOME:-$HOME/.codex}/skills/resolve-pr-threads`, resolve the symlink target for this wrapper directory first, then read `../../skills/resolve-pr-threads/SKILL.md` relative to that real directory. Do not resolve that relative path from inside `${CODEX_HOME:-$HOME/.codex}/skills`, because it points back at the wrapper tree.
+The source lives at `skills/stack-prs/SKILL.md` in the same ai-config checkout as this wrapper. If this wrapper was loaded through `${CODEX_HOME:-$HOME/.codex}/skills/stack-prs`, resolve the symlink target for this wrapper directory first, then read `../../skills/stack-prs/SKILL.md` relative to that real directory. Do not resolve that relative path from inside `${CODEX_HOME:-$HOME/.codex}/skills`, because it points back at the wrapper tree.
 
 - Treat `user-invocable` and `allowed-tools` as Claude metadata, not Codex permissions.
 - Use the tools available in this Codex session for equivalent operations.
