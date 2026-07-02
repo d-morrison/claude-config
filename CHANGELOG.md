@@ -12,6 +12,12 @@ behavior change to an existing one), not every mechanical edit.
 
 ## Unreleased
 
+- **`sync-with-main` / `address-every-comment` policy refinements.** Re-check
+  `main` again right before the final push (conflict resolution can take long
+  enough for `main` to advance a second time); when a review nit is a pattern
+  broken in one spot, fix every recurrence in the same file in one pass
+  instead of letting the reviewer flag each occurrence separately. Lessons
+  from PR #353's review lifecycle.
 - **`wrap-up` skill: closing-signal guidance.** Step 4 now spells out how the
   final reply should end: an explicit "this session is at a good stopping
   point" (or similar) when nothing is waiting on the user, or --- when
